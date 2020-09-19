@@ -1,0 +1,15 @@
+---
+questions:
+  - question: What is your favorite food
+    selection:
+      - "kebap"
+      - "salad"
+      - "nutella": true
+      - "chair"
+
+  - question: What is your name
+    selection:
+      - "ismet": true
+      - "danger": true
+      - "gunter"
+      - "halid"
