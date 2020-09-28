@@ -64,43 +64,26 @@ def draw_menu(stdscr):
 
         ###########################################################################################
 
-        # Render status bar at the bottom
-        statusbarstr = "[STATUS BAR] Press 'q' to exit | Cursor Position: {}, {}".format(cursor_x, cursor_y)
-        stdscr.attron(curses.color_pair(3))
-        stdscr.addstr(term_height-1, 0, statusbarstr)
-        stdscr.addstr(term_height-1, len(statusbarstr), " " * (term_width - len(statusbarstr) - 1))
-        stdscr.attroff(curses.color_pair(3))
+        # Declaration of strings (ensuring that strings are not larger than screen term_width)
+        title = "Question: AWS Certified Architect Practice Exam"[:term_width-1]
+        x = 10
+        y = 10
+        stdscr.addstr(y, x, title)
+
+
+        x = 10
+        y = 11
+        selection = "Written by Ismet Handzic"[:term_width-1]
+        stdscr.addstr(y, x, selection)
+
+
+        x = 10
+        y = 13
+        keystr = "Last key pressed: {}".format(k)[:term_width-1]
+        stdscr.addstr(y, x, keystr)
+
 
         ###########################################################################################
-
-        # Declaration of strings (ensuring that strings are not larger than screen term_width)
-        title = "AWS Certified Architect Practice Exam"[:term_width-1]
-        subtitle = "Written by Ismet Handzic"[:term_width-1]
-        keystr = "Last key pressed: {}".format(k)[:term_width-1]
-
-        # Centering label calculations and what position in terminal to start
-        start_x_title = int((term_width // 2) - (len(title) // 2) - len(title) % 2)
-        start_x_subtitle = int((term_width // 2) - (len(subtitle) // 2) - len(subtitle) % 2)
-        start_x_keystr = int((term_width // 2) - (len(keystr) // 2) - len(keystr) % 2)
-
-        # Defining the vertical position to start text
-        start_y = int((term_height // 2) - 4)
-
-        # Turning on attributes for title
-        stdscr.attron(curses.color_pair(2))
-        stdscr.attron(curses.A_BOLD)
-
-        # Rendering title
-        stdscr.addstr(start_y, start_x_title, title)
-
-        # Turning off attributes for title
-        stdscr.attroff(curses.color_pair(2))
-        stdscr.attroff(curses.A_BOLD)
-
-        # Print rest of text
-        stdscr.addstr(start_y + 1, start_x_subtitle, subtitle)
-        stdscr.addstr(start_y + 3, (term_width // 2) - 2, '-' * 4)
-        stdscr.addstr(start_y + 5, start_x_keystr, keystr)
 
         # Once the cursor has written everything, move it back to where user specified
         stdscr.move(cursor_y, cursor_x)
@@ -113,10 +96,6 @@ def draw_menu(stdscr):
         # Wait for next user input
         k = stdscr.getch()
         
-        # stdscr.getkey()
-
-        ###########################################################################################
-
 
 def main():
     # Calling the curses 'draw_menu' function
