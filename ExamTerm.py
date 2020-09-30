@@ -2,9 +2,15 @@
 import curses
 from pprint import pprint
 from time import sleep, time
-from loguru import logger
+# from loguru import logger
 import yaml
 import threading
+import logging
+
+# Creating a message logger, all dependent scripts will inhearent this logger
+logging.basicConfig(format='[%(asctime)s][%(levelname)-8s] [%(filename)-30s:%(lineno)4s] %(message)s', datefmt='%m/%d-%H:%M:%S')
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)  # NOTE: No detailed logs shown when set to "logging.INFO"
 
 
 class Exam:
@@ -13,7 +19,7 @@ class Exam:
         self.exam_filepath = ""
         self.exam_contents = self.load_parse_examfile("sample_questions.yml")
 
-        self.stdscr = None
+        # stdscr = None
 
         self.indicator = ">"
         self.selection_index = 0
@@ -28,6 +34,7 @@ class Exam:
         self.questions_wrong = 0
 
         self.exam_begin_time = 0
+        self.elapsed_time = 0
 
         self.timer_timing = False
         
@@ -95,9 +102,15 @@ class Exam:
 
         self.exam_begin_time = time()
 
+        # Start the independent timer thread for entire exam
+        self.timer_timing = True
+        exam_timer_thread = threading.Thread(target=self.exam_timer_thread, args=())
+        exam_timer_thread.daemon = False
+        exam_timer_thread.start()
+
         for question in self.exam_contents['questions']:
+            # Show the question
             index, answer, correct = exam.show_question(question)
-            logger.info(answer)
 
             # Increment correct or wrong answer
             if correct:
@@ -111,6 +124,10 @@ class Exam:
             # Calculate Progress
             self.exam_progress_percent = (self.questions_complete / self.questions_total) * 100
 
+        # Stop independent exam timer
+        self.timer_timing = False
+        exam_timer_thread.join()
+
 
 
     def show_question(self, question):
@@ -121,31 +138,20 @@ class Exam:
 
     def exam_timer_thread(self):
         while self.timer_timing:
-            elapsed_time = time() - self.exam_begin_time
-            self.stdscr.addstr(22, 9, f"{elapsed_time:.2f}")
-            self.stdscr.refresh()
-            # logger.critical('YO')
-            sleep(1.0)
+            self.elapsed_time = time() - self.exam_begin_time
 
     def draw_question(self, stdscr, question):
-
-        self.stdscr = stdscr
-
-        # Start the independent thread
-        self.timer_timing = True
-        exam_timer_thread = threading.Thread(target=self.exam_timer_thread, args=())
-        exam_timer_thread.daemon = True
-        exam_timer_thread.start()
-
         # Predefine and pre-allocate variables
         k = 0
 
         # Hiding the cursor
         curses.curs_set(0)
 
-        # Clear and refresh the screen for a blank canvas
-        stdscr.clear()
-        stdscr.refresh()
+        # Turn off echo
+        curses.noecho()
+
+        # Non-blocking for user
+        stdscr.nodelay(True)
 
         # Define keys
         KEYS_ENTER = (curses.KEY_ENTER, ord('\n'), ord('\r'))
@@ -153,14 +159,8 @@ class Exam:
         KEYS_DOWN = (curses.KEY_DOWN, ord('j'))
         KEYS_SELECT = (curses.KEY_RIGHT, ord(' '))
 
-        # Turn off echo
-        curses.noecho()
-
         start_x = 9
         start_y = 10
-
-
-
 
         # Loop where k is the last character pressed
         while (k != ord('q')):
@@ -168,8 +168,6 @@ class Exam:
 
             # Clearing the screen at each loop iteration
             stdscr.clear()
-
-
 
             ########################################################################################
 
@@ -182,9 +180,7 @@ class Exam:
                 index = self.selection_index
                 correct = question['answer_bool'][self.selection_index]
                 answer = question['selection'][self.selection_index]
-                self.timer_timing = False
-                exam_timer_thread.join()
-                
+
                 return index, answer, correct
 
             # Check if within boundaries of selection indexes
@@ -206,24 +202,23 @@ class Exam:
             ########################################################################################
 
             # Progress bar and status - call method
-            stdscr.addstr(20, start_x, f"{self.exam_progress_percent:.2f}")
+            stdscr.addstr(20, start_x, f"{self.exam_progress_percent:.0f}%")
 
             ########################################################################################
 
-            # Elapsed TIme (count down) - call method
+            # Elapsed TIme (count down)
             # Also a progress bar
-            # elapsed_time = time() - self.exam_begin_time
-            # stdscr.addstr(22, start_x, f"{elapsed_time:.2f}")
-
+            stdscr.addstr(22, 9, f"{self.elapsed_time:.0f}s / 120s")
 
             ########################################################################################
-
 
             # Refresh the screen
             stdscr.refresh()
 
-            # Wait for next user input
+            # Get User input
             k = stdscr.getch()
+
+        
             
 
 

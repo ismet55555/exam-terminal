@@ -13,3 +13,10 @@ questions:
       - "danger": true
       - "gunter"
       - "halid"
+
+  - question: What is your sport
+    selection:
+      - "soccer": true
+      - "tennis"
+      - "volleyball"
+      - "chess"
