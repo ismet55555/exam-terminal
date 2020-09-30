@@ -28,7 +28,6 @@ class Exam:
         self.questions_complete = 0
         self.questions_current = 0
         self.exam_progress = 0
-        self.exam_progress_percent = 0
 
         self.questions_correct = 0
         self.questions_wrong = 0
@@ -122,13 +121,11 @@ class Exam:
             self.questions_complete += 1
 
             # Calculate Progress
-            self.exam_progress_percent = (self.questions_complete / self.questions_total) * 100
+            self.exam_progress = (self.questions_complete / self.questions_total)
 
         # Stop independent exam timer
         self.timer_timing = False
         exam_timer_thread.join()
-
-
 
     def show_question(self, question):
         return curses.wrapper(self.draw_question, question)
@@ -139,6 +136,16 @@ class Exam:
     def exam_timer_thread(self):
         while self.timer_timing:
             self.elapsed_time = time() - self.exam_begin_time
+
+    def get_progress_bar(self, exam_progress, bar_char_width=40) -> str:
+        progress_str = []
+        for i in range(bar_char_width):
+            if i <= exam_progress * bar_char_width:
+                progress_str.append("*")
+            else:
+                progress_str.append("_")
+        progress_str = "|" + "".join(progress_str) + "|"
+        return progress_str
 
     def draw_question(self, stdscr, question):
         # Predefine and pre-allocate variables
@@ -202,7 +209,8 @@ class Exam:
             ########################################################################################
 
             # Progress bar and status - call method
-            stdscr.addstr(20, start_x, f"{self.exam_progress_percent:.0f}%")
+            stdscr.addstr(20, start_x, f"{self.exam_progress * 100:.0f}%")
+            stdscr.addstr(21, start_x, self.get_progress_bar(self.exam_progress))
 
             ########################################################################################
 

@@ -1,6 +1,10 @@
 ---
+exam_title: "Sample Exam Title"
+exam_author: "Ismet Handzic"
+exam_time: 30
 questions:
   - question: What is your favorite food
+    time: 10
     selection:
       - "kebap"
       - "salad"
@@ -8,6 +12,7 @@ questions:
       - "chair"
 
   - question: What is your name
+    time: 30
     selection:
       - "ismet": true
       - "danger": true
@@ -15,6 +20,7 @@ questions:
       - "halid"
 
   - question: What is your sport
+    time: 0
     selection:
       - "soccer": true
       - "tennis"
