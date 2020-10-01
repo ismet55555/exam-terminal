@@ -17,12 +17,12 @@ class Exam:
     def __init__(self) -> None:
         # Constructor
         self.exam_filepath = ""
-        self.exam_contents = self.load_parse_examfile("sample_questions.yml")
-
-        # stdscr = None
 
         self.indicator = ">"
         self.selection_index = 0
+
+        # Loading exam contents
+        self.exam_contents = self.load_parse_examfile("sample_questions.yml")
 
         self.questions_total = len(self.exam_contents['questions'])
         self.questions_complete = 0
@@ -36,6 +36,8 @@ class Exam:
         self.elapsed_time = 0
 
         self.timer_timing = False
+
+
         
         logger.info('Exam object created')
 
@@ -50,6 +52,9 @@ class Exam:
         except Exception as e:
             logger.error(f"Failed to load specified exam file: '{filepath}'")
             return False
+
+        # Get the total exam time
+        self.exam_total_time = self.exam_contents['exam_time']
 
         logger.info('Parsing the loaded exam information ...')
         # Loop through all the questions
@@ -104,7 +109,7 @@ class Exam:
         # Start the independent timer thread for entire exam
         self.timer_timing = True
         exam_timer_thread = threading.Thread(target=self.exam_timer_thread, args=())
-        exam_timer_thread.daemon = False
+        exam_timer_thread.daemon = True
         exam_timer_thread.start()
 
         for question in self.exam_contents['questions']:
@@ -137,14 +142,14 @@ class Exam:
         while self.timer_timing:
             self.elapsed_time = time() - self.exam_begin_time
 
-    def get_progress_bar(self, exam_progress, bar_char_width=40) -> str:
+    def get_progress_bar(self, exam_progress, bar_char_width=60, bar_char_full='|', bar_char_empty='-') -> str:
         progress_str = []
         for i in range(bar_char_width):
             if i <= exam_progress * bar_char_width:
-                progress_str.append("*")
+                progress_str.append(bar_char_full)
             else:
-                progress_str.append("_")
-        progress_str = "|" + "".join(progress_str) + "|"
+                progress_str.append(bar_char_empty)
+        progress_str = "".join(progress_str)
         return progress_str
 
     def draw_question(self, stdscr, question):
@@ -153,6 +158,16 @@ class Exam:
 
         # Hiding the cursor
         curses.curs_set(0)
+
+        # Start colors in curses
+        curses.start_color()
+
+        # Define the colors to be used (foreground and background) (ie. curses.color_pair(1))
+        curses.init_pair(1, curses.COLOR_CYAN, curses.COLOR_BLACK)
+        curses.init_pair(2, curses.COLOR_RED, curses.COLOR_BLACK)
+        curses.init_pair(3, curses.COLOR_MAGENTA, curses.COLOR_BLACK)
+        curses.init_pair(4, curses.COLOR_GREEN, curses.COLOR_BLACK)
+        curses.init_pair(5, curses.COLOR_BLACK, curses.COLOR_WHITE)
 
         # Turn off echo
         curses.noecho()
@@ -171,10 +186,17 @@ class Exam:
 
         # Loop where k is the last character pressed
         while (k != ord('q')):
-            ########################################################################################
 
             # Clearing the screen at each loop iteration
             stdscr.clear()
+
+            ########################################################################################
+
+            # Getting the screen height and term_width
+            term_height, term_width = stdscr.getmaxyx()
+
+            whstr = "[Terminal Size: W:{}, H:{}]".format(term_width, term_height)
+            stdscr.addstr(0, 0, whstr, curses.color_pair(1))
 
             ########################################################################################
 
@@ -196,12 +218,18 @@ class Exam:
 
             ########################################################################################
 
+            # TODO: Handle text wrap!
+
+
             # Show the question
             stdscr.addstr(start_y - 3, start_x, question['question'])
 
             # List selections
             for i, selection in enumerate(question['selection']):
+                if i == self.selection_index:
+                    stdscr.attron(curses.color_pair(1))
                 stdscr.addstr(start_y + i, start_x, selection)
+                stdscr.attroff(curses.color_pair(1))
 
             # Draw selector
             stdscr.addstr(start_y + self.selection_index, start_x - 2, self.indicator)
@@ -209,14 +237,23 @@ class Exam:
             ########################################################################################
 
             # Progress bar and status - call method
-            stdscr.addstr(20, start_x, f"{self.exam_progress * 100:.0f}%")
-            stdscr.addstr(21, start_x, self.get_progress_bar(self.exam_progress))
+            stdscr.addstr(term_height - 2, 3, f"[ {self.questions_complete:3.0f}  / {self.questions_total:3.0f}  ][{self.get_progress_bar(self.exam_progress, bar_char_width=term_width-22)}]")
 
             ########################################################################################
 
-            # Elapsed TIme (count down)
-            # Also a progress bar
-            stdscr.addstr(22, 9, f"{self.elapsed_time:.0f}s / 120s")
+            # Elapsed Time
+            stdscr.addstr(term_height - 1, 3, f"[ {self.elapsed_time:3.0f}s / {self.exam_total_time:3.0f}s ][{self.get_progress_bar(self.elapsed_time / 60, bar_char_width=term_width-22)}]")
+
+            ########################################################################################
+
+            # Terminal Outline (Only for terminals larger than X, Y)
+            # for i in range(2, term_width-1):
+            #     stdscr.addstr(2, i, "-")
+            #     stdscr.addstr(term_height - 2, i, "-")
+
+            # for i in range(2, term_height - 1):
+            #     stdscr.addstr(i, 1, "|") 
+            #     stdscr.addstr(i, term_width - 1, "|")
 
             ########################################################################################
 
@@ -225,10 +262,6 @@ class Exam:
 
             # Get User input
             k = stdscr.getch()
-
-        
-            
-
 
 exam = Exam()
 exam.begin_exam()
