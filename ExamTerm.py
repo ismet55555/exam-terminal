@@ -17,13 +17,13 @@ logger.setLevel(logging.DEBUG)  # NOTE: No detailed logs shown when set to "logg
 class Exam:
     def __init__(self) -> None:
         # Constructor
-        self.exam_filepath = ""
+        self.exam_filepath = "sample_questions.yml"
 
-        self.indicator = ">"
+        self.indicator = "|"
         self.selection_index = 0
 
         # Loading exam contents
-        self.exam_contents = self.load_parse_examfile("sample_questions.yml")
+        self.exam_contents = self.load_parse_examfile(self.exam_filepath)
 
         self.questions_total = len(self.exam_contents['questions'])
         self.questions_complete = 0
@@ -38,15 +38,9 @@ class Exam:
 
         self.timer_timing = False
 
-        # Create text wrapper
-        self.wrapper_question = textwrap.TextWrapper(width=30)
-        self.wrapper_selection = textwrap.TextWrapper(width=20)
-
         logger.info('Exam object created')
 
     def load_parse_examfile(self, filepath: str) -> dict:
-        self.exam_filepath = filepath
-
         # Load the examp file
         logger.info(f"Loading specified exam file: '{filepath}' ...")
         try:
@@ -57,7 +51,10 @@ class Exam:
             return False
 
         # Get the total exam time
-        self.exam_total_time = self.exam_contents['exam_time']
+        self.exam_total_time = self.exam_contents['exam_total_time']
+        self.exam_total_time_units = self.exam_contents['exam_total_time_units']
+
+        # TODO: Calculate exam time in seconds? minutes?
 
         logger.info('Parsing the loaded exam information ...')
         # Loop through all the questions
@@ -97,10 +94,10 @@ class Exam:
             question['multiselect'] = sum(question['answer_bool']) > 1
             question['min_selection_count'] = sum(question['answer_bool'])
 
-        pprint(self.exam_contents)
-
         # Get the total number of questions
         self.questions_total = len(self.exam_contents['questions'])
+
+        pprint(self.exam_contents)
 
         return self.exam_contents
 
@@ -115,9 +112,22 @@ class Exam:
         exam_timer_thread.daemon = True
         exam_timer_thread.start()
 
-        for question in self.exam_contents['questions']:
+        for q, question in enumerate(self.exam_contents['questions']):
+            # Start timer for current question
+            question_elapsed_time = time()
+
             # Show the question
             index, answer, correct = exam.show_question(question)
+
+            # Exam quit
+            if index == -1:
+                break
+
+            # Log answer metadata
+            self.exam_contents['questions'][q]['answered_timestamp'] = time()
+            self.exam_contents['questions'][q]['answered_exam_time'] = self.elapsed_time
+            self.exam_contents['questions'][q]['answered_question_time'] = time() - question_elapsed_time
+            self.exam_contents['questions'][q]['answered_correctly'] = correct
 
             # Increment correct or wrong answer
             if correct:
@@ -134,6 +144,8 @@ class Exam:
         # Stop independent exam timer
         self.timer_timing = False
         exam_timer_thread.join()
+
+        pprint(self.exam_contents)
 
     def show_question(self, question):
         return curses.wrapper(self.draw_question, question)
@@ -173,7 +185,8 @@ class Exam:
         curses.init_pair(2, curses.COLOR_RED, curses.COLOR_BLACK)
         curses.init_pair(3, curses.COLOR_MAGENTA, curses.COLOR_BLACK)
         curses.init_pair(4, curses.COLOR_GREEN, curses.COLOR_BLACK)
-        curses.init_pair(5, curses.COLOR_BLACK, curses.COLOR_WHITE)
+        curses.init_pair(5, curses.COLOR_YELLOW, curses.COLOR_BLACK)
+        curses.init_pair(6, curses.COLOR_BLACK, curses.COLOR_WHITE)
 
         # Turn off echo
         curses.noecho()
@@ -187,8 +200,12 @@ class Exam:
         KEYS_DOWN = (curses.KEY_DOWN, ord('j'))
         KEYS_SELECT = (curses.KEY_RIGHT, ord(' '))
 
-        start_x = 9
-        start_y = 10
+        quesiton_x = 8
+        selection_x = 10
+        start_y = 5
+
+        # Reset selection
+        self.selection_index = 0
 
         # Loop where k is the last character pressed
         while (k != ord('q')):
@@ -201,9 +218,17 @@ class Exam:
             # Getting the screen height and term_width
             term_height, term_width = stdscr.getmaxyx()
 
-            whstr = "[Terminal Size: W:{}, H:{}]".format(term_width, term_height)
-            stdscr.addstr(0, 0, whstr, curses.color_pair(1))
 
+
+            if term_width >= 80:
+                whstr = "[Terminal Size: W:{}, H:{}]".format(term_width, term_height)
+                stdscr.addstr(0, 0, whstr, curses.color_pair(1))
+            else:
+
+                stdscr.addstr(0, 0, "Terminal Must be wider than 80 characters!", curses.color_pair(1))
+
+
+            
             ########################################################################################
 
             # Check user input and adjust the cursor movement
@@ -224,31 +249,48 @@ class Exam:
 
             ########################################################################################
 
-            # TODO: Handle text wrap!
+            # Create text wrappers
+            wrapper_question = textwrap.TextWrapper(width=60)
+            wrapper_selection = textwrap.TextWrapper(width=40)
 
+            # Wrap and show the question
+            question_wrap = wrapper_question.wrap(text=question['question']) 
+            for l, line in enumerate(question_wrap):
+                stdscr.addstr(start_y + l - 1, quesiton_x, line)
 
-            # Show the question
-            stdscr.addstr(start_y - 3, start_x, question['question'])
+            # Set the offset to the next line
+            selection_offset = len(question_wrap) + 3
 
-            # List selections
-            for i, selection in enumerate(question['selection']):
-                if i == self.selection_index:
-                    stdscr.attron(curses.color_pair(1))
-                stdscr.addstr(start_y + i, start_x, selection)
-                stdscr.attroff(curses.color_pair(1))
+            # Wrap and show selection
+            for s, selection in enumerate(question['selection']):
 
-            # Draw selector
-            stdscr.addstr(start_y + self.selection_index, start_x - 2, self.indicator)
+                if s == self.selection_index:
+                    stdscr.attron(curses.color_pair(5))
+
+                selection_wrap = wrapper_selection.wrap(text=selection)
+                for l, line in enumerate(selection_wrap):
+                    stdscr.addstr(start_y + selection_offset + l - 1, selection_x + 2, line)
+
+                    # Draw selector
+                    if s == self.selection_index:
+                        # if l == 0:
+                            # stdscr.addstr(start_y + selection_offset + l - 1, selection_x - 3, self.indicator)
+                        stdscr.addstr(start_y + selection_offset + l - 1, selection_x - 2, self.indicator)
+
+                stdscr.attroff(curses.color_pair(5))
+
+                # Set the offset to the next line
+                selection_offset += len(selection_wrap) + 1
 
             ########################################################################################
 
             # Progress bar and status - call method
-            stdscr.addstr(term_height - 2, 3, f"[ {self.questions_complete:3.0f}  / {self.questions_total:3.0f}  ][{self.get_progress_bar(self.exam_progress, bar_char_width=term_width-22)}]")
+            stdscr.addstr(term_height - 3, 3, f"[ {self.questions_complete:3.0f}  / {self.questions_total:3.0f}  ][{self.get_progress_bar(self.exam_progress, bar_char_width=term_width-23)}]")
 
             ########################################################################################
 
             # Elapsed Time
-            stdscr.addstr(term_height - 1, 3, f"[ {self.elapsed_time:3.0f}s / {self.exam_total_time:3.0f}s ][{self.get_progress_bar(self.elapsed_time / 60, bar_char_width=term_width-22)}]")
+            stdscr.addstr(term_height - 2, 3, f"[ {self.elapsed_time:3.0f}s / {self.exam_total_time:3.0f}s ][{self.get_progress_bar(self.elapsed_time / 60, bar_char_width=term_width-23)}]")
 
             ########################################################################################
 
@@ -268,6 +310,10 @@ class Exam:
 
             # Get User input
             k = stdscr.getch()
+
+        return -1, 'quit', False
+
+
 
 exam = Exam()
 exam.begin_exam()

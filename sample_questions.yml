@@ -1,7 +1,8 @@
 ---
 exam_title: "Sample Exam Title"
 exam_author: "Ismet Handzic"
-exam_time: 30
+exam_total_time: 30
+exam_total_time_units: sec
 questions:
   - question: What is your favorite food
     time: 10
@@ -19,10 +20,10 @@ questions:
       - "gunter"
       - "halid"
 
-  - question: What is your sport what is your sport what is sldjfl sjflsd fsjldf lsdfh \nlsd fyour sport what is your \nsport what is your sport what is your sport what is your sport what is your sport what is your sport
+  - question: "What is your sport what is your sport what is sldjfl sjflsd fsjldf lsdfh lsd fyour sport what is your sport what is your sport what is your sport what is your sport what is your sport what is your sport"
     time: 0
     selection:
-      - "soccer what is your sport what is your sport what is your sport what is your sport what is your sport what is your sport what is your sport what is your sport": true
+      - "soccer soccer soccer soccer soccer soccer soccer soccer soccer soccer soccer soccer soccer soccer soccer soccer soccer": true
       - "tennis"
       - "volleyball"
-      - "chess what is your sport what is your sport what is your sport what is your sport what is your sport what is your sport"
+      - "chess chess chess chess chess chess chess chess chess chess chess chess chess chess chess chess chess chess chess chess chess chess"
