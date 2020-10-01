@@ -6,6 +6,7 @@ from time import sleep, time
 import yaml
 import threading
 import logging
+import textwrap
 
 # Creating a message logger, all dependent scripts will inhearent this logger
 logging.basicConfig(format='[%(asctime)s][%(levelname)-8s] [%(filename)-30s:%(lineno)4s] %(message)s', datefmt='%m/%d-%H:%M:%S')
@@ -37,8 +38,10 @@ class Exam:
 
         self.timer_timing = False
 
+        # Create text wrapper
+        self.wrapper_question = textwrap.TextWrapper(width=30)
+        self.wrapper_selection = textwrap.TextWrapper(width=20)
 
-        
         logger.info('Exam object created')
 
     def load_parse_examfile(self, filepath: str) -> dict:
@@ -145,6 +148,9 @@ class Exam:
     def get_progress_bar(self, exam_progress, bar_char_width=60, bar_char_full='|', bar_char_empty='-') -> str:
         progress_str = []
         for i in range(bar_char_width):
+
+            # TODO: Different colors for different parts of the progress bar somehow
+
             if i <= exam_progress * bar_char_width:
                 progress_str.append(bar_char_full)
             else:
