@@ -66,10 +66,10 @@ def draw_menu(stdscr):
 
         # Render status bar at the bottom
         statusbarstr = "[STATUS BAR] Press 'q' to exit | Cursor Position: {}, {}".format(cursor_x, cursor_y)
-        stdscr.attron(curses.color_pair(3))
+        # stdscr.attron(curses.color_pair(3))
         stdscr.addstr(term_height-1, 0, statusbarstr)
-        stdscr.addstr(term_height-1, len(statusbarstr), " " * (term_width - len(statusbarstr) - 1))
-        stdscr.attroff(curses.color_pair(3))
+        stdscr.addstr(term_height-1, len(statusbarstr), " " * (term_width - len(statusbarstr) - 1), curses.color_pair(3))
+        # stdscr.attroff(curses.color_pair(3))
 
         ###########################################################################################
 

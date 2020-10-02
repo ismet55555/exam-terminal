@@ -36,6 +36,8 @@ class Exam:
         self.exam_begin_time = 0
         self.elapsed_time = 0
 
+        self.exam_paused = False
+
         self.timer_timing = False
 
         logger.info('Exam object created')
@@ -155,7 +157,8 @@ class Exam:
 
     def exam_timer_thread(self):
         while self.timer_timing:
-            self.elapsed_time = time() - self.exam_begin_time
+            if not self.exam_paused:
+                self.elapsed_time = time() - self.exam_begin_time
 
     def get_progress_bar(self, exam_progress, bar_char_width=60, bar_char_full='|', bar_char_empty='-') -> str:
         progress_str = []
@@ -199,6 +202,7 @@ class Exam:
         KEYS_UP = (curses.KEY_UP, ord('k'))
         KEYS_DOWN = (curses.KEY_DOWN, ord('j'))
         KEYS_SELECT = (curses.KEY_RIGHT, ord(' '))
+        KEYS_PAUSE = ord('p')
 
         quesiton_x = 8
         selection_x = 10
@@ -208,6 +212,9 @@ class Exam:
         self.selection_index = 0
 
         # Loop where k is the last character pressed
+
+        # TODO: while true and add q as a quit option with box
+
         while (k != ord('q')):
 
             # Clearing the screen at each loop iteration
@@ -224,7 +231,6 @@ class Exam:
                 whstr = "[Terminal Size: W:{}, H:{}]".format(term_width, term_height)
                 stdscr.addstr(0, 0, whstr, curses.color_pair(1))
             else:
-
                 stdscr.addstr(0, 0, "Terminal Must be wider than 80 characters!", curses.color_pair(1))
 
 
@@ -242,6 +248,10 @@ class Exam:
                 answer = question['selection'][self.selection_index]
 
                 return index, answer, correct
+            elif k == KEYS_PAUSE:
+                stdscr.addstr(1, 0, "DEBUG PAUSE", curses.color_pair(1))
+
+                # POP UP CURSES BOX
 
             # Check if within boundaries of selection indexes
             self.selection_index = max(self.selection_index, 0)
