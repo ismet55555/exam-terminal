@@ -184,12 +184,13 @@ class Exam:
         curses.start_color()
 
         # Define the colors to be used (foreground and background) (ie. curses.color_pair(1))
+        #     curses.init_pair(color reference index, font color number, background color number)
         curses.init_pair(1, curses.COLOR_CYAN, curses.COLOR_BLACK)
         curses.init_pair(2, curses.COLOR_RED, curses.COLOR_BLACK)
         curses.init_pair(3, curses.COLOR_MAGENTA, curses.COLOR_BLACK)
         curses.init_pair(4, curses.COLOR_GREEN, curses.COLOR_BLACK)
         curses.init_pair(5, curses.COLOR_YELLOW, curses.COLOR_BLACK)
-        curses.init_pair(6, curses.COLOR_BLACK, curses.COLOR_WHITE)
+        curses.init_pair(6, 248, curses.COLOR_BLACK)  # Grey
 
         # Turn off echo
         curses.noecho()
@@ -203,6 +204,7 @@ class Exam:
         KEYS_DOWN = (curses.KEY_DOWN, ord('j'))
         KEYS_SELECT = (curses.KEY_RIGHT, ord(' '))
         KEYS_PAUSE = ord('p')
+        KEYS_QUIT = ord('q')
 
         quesiton_x = 8
         selection_x = 10
@@ -211,47 +213,49 @@ class Exam:
         # Reset selection
         self.selection_index = 0
 
-        # Loop where k is the last character pressed
-
-        # TODO: while true and add q as a quit option with box
-
-        while (k != ord('q')):
-
-            # Clearing the screen at each loop iteration
+        # Main Loop
+        while True:
+            # Clearing the screen at each loop iteration before constructing the frame
             stdscr.clear()
 
             ########################################################################################
 
-            # Getting the screen height and term_width
+            # Getting the screen height and width
             term_height, term_width = stdscr.getmaxyx()
 
-
-
+            # Check terminal size
+            # TODO: Do something when terminal size is not right
+            #       Pause and box?
             if term_width >= 80:
                 whstr = "[Terminal Size: W:{}, H:{}]".format(term_width, term_height)
                 stdscr.addstr(0, 0, whstr, curses.color_pair(1))
             else:
                 stdscr.addstr(0, 0, "Terminal Must be wider than 80 characters!", curses.color_pair(1))
-
-
             
             ########################################################################################
 
             # Check user input and adjust the cursor movement
             if k in KEYS_DOWN:
                 self.selection_index += 1
+
             elif k in KEYS_UP:
                 self.selection_index -= 1
+
             elif k in KEYS_ENTER:
                 index = self.selection_index
                 correct = question['answer_bool'][self.selection_index]
                 answer = question['selection'][self.selection_index]
-
                 return index, answer, correct
+
             elif k == KEYS_PAUSE:
                 stdscr.addstr(1, 0, "DEBUG PAUSE", curses.color_pair(1))
 
+            elif k == KEYS_QUIT:
+                break
+
                 # POP UP CURSES BOX
+
+            ########################################################################################
 
             # Check if within boundaries of selection indexes
             self.selection_index = max(self.selection_index, 0)
@@ -295,12 +299,14 @@ class Exam:
             ########################################################################################
 
             # Progress bar and status - call method
+            stdscr.attron(curses.color_pair(6))
             stdscr.addstr(term_height - 3, 3, f"[ {self.questions_complete:3.0f}  / {self.questions_total:3.0f}  ][{self.get_progress_bar(self.exam_progress, bar_char_width=term_width-23)}]")
 
             ########################################################################################
 
             # Elapsed Time
             stdscr.addstr(term_height - 2, 3, f"[ {self.elapsed_time:3.0f}s / {self.exam_total_time:3.0f}s ][{self.get_progress_bar(self.elapsed_time / 60, bar_char_width=term_width-23)}]")
+            stdscr.attroff(curses.color_pair(6))
 
             ########################################################################################
 
