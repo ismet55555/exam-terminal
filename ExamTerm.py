@@ -215,9 +215,6 @@ class Exam:
         # Reset selection
         self.selection_index = 0
 
-        box1 = curses.newwin(20, 20, 5, 5)
-        box1.box() 
-
         # Main Loop
         while True:
             # Clearing the screen at each loop iteration before constructing the frame
@@ -240,9 +237,6 @@ class Exam:
             stdscr.attron(curses.color_pair(6))
             stdscr.border(0)
             stdscr.attroff(curses.color_pair(6))
-
-            box1.box() 
-            box1.refresh()
             
             ########################################################################################
 
