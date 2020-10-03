@@ -8,6 +8,8 @@ import threading
 import logging
 import textwrap
 
+# NOTE: https://docs.python.org/2/library/curses.html
+
 # Creating a message logger, all dependent scripts will inhearent this logger
 logging.basicConfig(format='[%(asctime)s][%(levelname)-8s] [%(filename)-30s:%(lineno)4s] %(message)s', datefmt='%m/%d-%H:%M:%S')
 logger = logging.getLogger()
@@ -213,6 +215,9 @@ class Exam:
         # Reset selection
         self.selection_index = 0
 
+        box1 = curses.newwin(20, 20, 5, 5)
+        box1.box() 
+
         # Main Loop
         while True:
             # Clearing the screen at each loop iteration before constructing the frame
@@ -231,6 +236,13 @@ class Exam:
                 stdscr.addstr(0, 0, whstr, curses.color_pair(1))
             else:
                 stdscr.addstr(0, 0, "Terminal Must be wider than 80 characters!", curses.color_pair(1))
+
+            stdscr.attron(curses.color_pair(6))
+            stdscr.border(0)
+            stdscr.attroff(curses.color_pair(6))
+
+            box1.box() 
+            box1.refresh()
             
             ########################################################################################
 
