@@ -207,6 +207,7 @@ class Exam:
         KEYS_DOWN = (curses.KEY_DOWN, ord('j'))
         KEYS_SELECT = (curses.KEY_RIGHT, ord(' '))
         KEYS_PAUSE = ord('p')
+        KEYS_RESUME = ord('r')
         KEYS_QUIT = ord('q')
 
         quesiton_x = 8
@@ -255,13 +256,14 @@ class Exam:
                 return index, answer, correct
 
             elif k == KEYS_PAUSE:
-                stdscr.addstr(1, 0, "DEBUG PAUSE", curses.color_pair(1))
+                self.exam_paused = True
+
+            elif k == KEYS_RESUME:
+                self.exam_paused = False
 
             elif k == KEYS_QUIT:
                 break
-
-                # POP UP CURSES BOX
-
+              
             ########################################################################################
 
             # Check if within boundaries of selection indexes
@@ -328,8 +330,28 @@ class Exam:
 
             ########################################################################################
 
+            # Exam pause message box
+            if self.exam_paused:
+                stdscr.nodelay(False)  # FIXME: Only run once
+
+                # Create a box (Height, Width, y, x) (Positions are top left)
+                pause_box = curses.newwin(7, 45, 15, 10)
+                pause_box.box()
+
+                # Add text to box (Text is relative to box -> y, x)
+                pause_box.addstr(3, 6, 'Exam paused. To resume press "R"')
+            else:
+                stdscr.nodelay(True)  # FIXME: Only run once
+                pass
+
+
+            ########################################################################################
+
             # Refresh the screen
             stdscr.refresh()
+
+            if self.exam_paused:
+                pause_box.refresh()
 
             # Get User input
             k = stdscr.getch()
