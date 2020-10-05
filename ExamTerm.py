@@ -188,6 +188,8 @@ class Exam:
 
         # Define the colors to be used (foreground and background) (ie. curses.color_pair(1))
         #     curses.init_pair(color reference index, font color number, background color number)
+        # NOTE:
+        #       -1 is transparent
         curses.init_pair(1, curses.COLOR_CYAN, curses.COLOR_BLACK)
         curses.init_pair(2, curses.COLOR_RED, curses.COLOR_BLACK)
         curses.init_pair(3, curses.COLOR_MAGENTA, curses.COLOR_BLACK)
@@ -244,16 +246,19 @@ class Exam:
 
             # Check user input and adjust the cursor movement
             if k in KEYS_DOWN:
-                self.selection_index += 1
+                if not self.exam_paused:
+                    self.selection_index += 1
 
             elif k in KEYS_UP:
-                self.selection_index -= 1
+                if not self.exam_paused:
+                    self.selection_index -= 1
 
             elif k in KEYS_ENTER:
-                index = self.selection_index
-                correct = question['answer_bool'][self.selection_index]
-                answer = question['selection'][self.selection_index]
-                return index, answer, correct
+                if not self.exam_paused:
+                    index = self.selection_index
+                    correct = question['answer_bool'][self.selection_index]
+                    answer = question['selection'][self.selection_index]
+                    return index, answer, correct
 
             elif k == KEYS_PAUSE:
                 self.exam_paused = True
@@ -262,7 +267,8 @@ class Exam:
                 self.exam_paused = False
 
             elif k == KEYS_QUIT:
-                break
+                if not self.exam_paused:
+                    break
               
             ########################################################################################
 
@@ -296,8 +302,6 @@ class Exam:
 
                     # Draw selector
                     if s == self.selection_index:
-                        # if l == 0:
-                            # stdscr.addstr(start_y + selection_offset + l - 1, selection_x - 3, self.indicator)
                         stdscr.addstr(start_y + selection_offset + l - 1, selection_x - 2, self.indicator)
 
                 stdscr.attroff(curses.color_pair(5))
@@ -331,15 +335,26 @@ class Exam:
             ########################################################################################
 
             # Exam pause message box
+
+            # FIXME: SUB LOOP FOR BOX????
+
             if self.exam_paused:
                 stdscr.nodelay(False)  # FIXME: Only run once
 
                 # Create a box (Height, Width, y, x) (Positions are top left)
-                pause_box = curses.newwin(7, 45, 15, 10)
+                box_height = int(term_height / 4)
+                box_width = int(term_width / 2)
+                box_y = int(term_height / 2 - box_height / 2)
+                box_x = int(term_width / 2 - box_width / 2)
+
+                pause_box = curses.newwin(box_height, box_width, box_y, box_x)
                 pause_box.box()
+                pause_box.border()
 
                 # Add text to box (Text is relative to box -> y, x)
                 pause_box.addstr(3, 6, 'Exam paused. To resume press "R"')
+
+                # TODO: Center text in box
             else:
                 stdscr.nodelay(True)  # FIXME: Only run once
                 pass
@@ -350,6 +365,7 @@ class Exam:
             # Refresh the screen
             stdscr.refresh()
 
+            # Refresh the pause messgae box
             if self.exam_paused:
                 pause_box.refresh()
 
