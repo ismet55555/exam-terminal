@@ -336,25 +336,28 @@ class Exam:
 
             # Exam pause message box
 
-            # FIXME: SUB LOOP FOR BOX????
+            # FIXME: SUB LOOP FOR BOX????  IN A METHOD WITH PASSED MESSAGE?
 
             if self.exam_paused:
                 stdscr.nodelay(False)  # FIXME: Only run once
 
+                message_lines = ['Exam was paused', 'To resume exam press "R"']
+                
                 # Create a box (Height, Width, y, x) (Positions are top left)
-                box_height = int(term_height / 4)
-                box_width = int(term_width / 2)
+                box_height = len(message_lines) + 4
+                box_width = int(term_width / 1.5)  # Alternative: len(max(message_lines, key=len)) + 12
                 box_y = int(term_height / 2 - box_height / 2)
                 box_x = int(term_width / 2 - box_width / 2)
-
                 pause_box = curses.newwin(box_height, box_width, box_y, box_x)
                 pause_box.box()
                 pause_box.border()
 
                 # Add text to box (Text is relative to box -> y, x)
-                pause_box.addstr(3, 6, 'Exam paused. To resume press "R"')
+                start_y = 2
+                for l, line in enumerate(message_lines):
+                    start_x = box_width // 2 - len(line) // 2
+                    pause_box.addstr(start_y + l, start_x, line)
 
-                # TODO: Center text in box
             else:
                 stdscr.nodelay(True)  # FIXME: Only run once
                 pass
