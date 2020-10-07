@@ -161,7 +161,12 @@ class Exam:
     def exam_timer_thread(self):
         while self.timer_timing:
             if not self.exam_paused:
-                self.elapsed_time = time() - self.exam_begin_time
+                self.elapsed_time = time() - self.exam_begin_time  # Error is here
+
+                # self.elapsed_time = recorded_time + (time() - self.exam_resume_time)
+
+                print(self.elapsed_time)
+                sleep(0.1)
 
     def get_progress_bar(self, exam_progress, bar_char_width=60, bar_char_full='|', bar_char_empty='-') -> str:
         progress_str = []
@@ -176,7 +181,7 @@ class Exam:
         progress_str = "".join(progress_str)
         return progress_str
 
-    def draw_question(self, stdscr, question):
+    def draw_question(self, scr, question):
         # Predefine and pre-allocate variables
         k = 0
 
@@ -201,7 +206,7 @@ class Exam:
         curses.noecho()
 
         # Non-blocking for user
-        stdscr.nodelay(True)
+        scr.nodelay(True)
 
         # Define keys
         KEYS_ENTER = (curses.KEY_ENTER, ord('\n'), ord('\r'))
@@ -212,7 +217,7 @@ class Exam:
         KEYS_RESUME = ord('r')
         KEYS_QUIT = ord('q')
 
-        quesiton_x = 8
+        question_x = 8
         selection_x = 10
         start_y = 5
 
@@ -222,25 +227,25 @@ class Exam:
         # Main Loop
         while True:
             # Clearing the screen at each loop iteration before constructing the frame
-            stdscr.clear()
+            scr.clear()
 
             ########################################################################################
 
             # Getting the screen height and width
-            term_height, term_width = stdscr.getmaxyx()
+            term_height, term_width = scr.getmaxyx()
 
             # Check terminal size
             # TODO: Do something when terminal size is not right
             #       Pause and box?
             if term_width >= 80:
                 whstr = "[Terminal Size: W:{}, H:{}]".format(term_width, term_height)
-                stdscr.addstr(0, 0, whstr, curses.color_pair(1))
+                scr.addstr(0, 0, whstr, curses.color_pair(1))
             else:
-                stdscr.addstr(0, 0, "Terminal Must be wider than 80 characters!", curses.color_pair(1))
+                scr.addstr(0, 0, "Terminal Must be wider than 80 characters!", curses.color_pair(1))
 
-            stdscr.attron(curses.color_pair(6))
-            stdscr.border(0)
-            stdscr.attroff(curses.color_pair(6))
+            scr.attron(curses.color_pair(6))
+            scr.border(0)
+            scr.attroff(curses.color_pair(6))
             
             ########################################################################################
 
@@ -278,14 +283,14 @@ class Exam:
 
             ########################################################################################
 
-            # Create text wrappers
+            # Create text wrappers wrapping text over number of characters
             wrapper_question = textwrap.TextWrapper(width=60)
             wrapper_selection = textwrap.TextWrapper(width=40)
 
             # Wrap and show the question
             question_wrap = wrapper_question.wrap(text=question['question']) 
             for l, line in enumerate(question_wrap):
-                stdscr.addstr(start_y + l - 1, quesiton_x, line)
+                scr.addstr(start_y + l - 1, question_x, line)
 
             # Set the offset to the next line
             selection_offset = len(question_wrap) + 3
@@ -294,17 +299,17 @@ class Exam:
             for s, selection in enumerate(question['selection']):
 
                 if s == self.selection_index:
-                    stdscr.attron(curses.color_pair(5))
+                    scr.attron(curses.color_pair(5))
 
                 selection_wrap = wrapper_selection.wrap(text=selection)
                 for l, line in enumerate(selection_wrap):
-                    stdscr.addstr(start_y + selection_offset + l - 1, selection_x + 2, line)
+                    scr.addstr(start_y + selection_offset + l - 1, selection_x + 2, line)
 
                     # Draw selector
                     if s == self.selection_index:
-                        stdscr.addstr(start_y + selection_offset + l - 1, selection_x - 2, self.indicator)
+                        scr.addstr(start_y + selection_offset + l - 1, selection_x - 2, self.indicator)
 
-                stdscr.attroff(curses.color_pair(5))
+                scr.attroff(curses.color_pair(5))
 
                 # Set the offset to the next line
                 selection_offset += len(selection_wrap) + 1
@@ -312,70 +317,53 @@ class Exam:
             ########################################################################################
 
             # Progress bar and status - call method
-            stdscr.attron(curses.color_pair(6))
-            stdscr.addstr(term_height - 3, 3, f"[ {self.questions_complete:3.0f}  / {self.questions_total:3.0f}  ][{self.get_progress_bar(self.exam_progress, bar_char_width=term_width-23)}]")
-
-            ########################################################################################
+            scr.attron(curses.color_pair(6))
+            scr.addstr(term_height - 3, 3, f"[ {self.questions_complete:3.0f}  / {self.questions_total:3.0f}  ][{self.get_progress_bar(self.exam_progress, bar_char_width=term_width-23)}]")
 
             # Elapsed Time
-            stdscr.addstr(term_height - 2, 3, f"[ {self.elapsed_time:3.0f}s / {self.exam_total_time:3.0f}s ][{self.get_progress_bar(self.elapsed_time / 60, bar_char_width=term_width-23)}]")
-            stdscr.attroff(curses.color_pair(6))
-
-            ########################################################################################
-
-            # Terminal Outline (Only for terminals larger than X, Y)
-            # for i in range(2, term_width-1):
-            #     stdscr.addstr(2, i, "-")
-            #     stdscr.addstr(term_height - 2, i, "-")
-
-            # for i in range(2, term_height - 1):
-            #     stdscr.addstr(i, 1, "|") 
-            #     stdscr.addstr(i, term_width - 1, "|")
+            scr.addstr(term_height - 2, 3, f"[ {self.elapsed_time:3.0f}s / {self.exam_total_time:3.0f}s ][{self.get_progress_bar(self.elapsed_time / 60, bar_char_width=term_width-23)}]")
+            scr.attroff(curses.color_pair(6))
 
             ########################################################################################
 
             # Exam pause message box
-
-            # FIXME: SUB LOOP FOR BOX????  IN A METHOD WITH PASSED MESSAGE?
-
+            # scr.nodelay(not self.exam_paused) 
             if self.exam_paused:
-                stdscr.nodelay(False)  # FIXME: Only run once
-
                 message_lines = ['Exam was paused', 'To resume exam press "R"']
-                
-                # Create a box (Height, Width, y, x) (Positions are top left)
-                box_height = len(message_lines) + 4
-                box_width = int(term_width / 1.5)  # Alternative: len(max(message_lines, key=len)) + 12
-                box_y = int(term_height / 2 - box_height / 2)
-                box_x = int(term_width / 2 - box_width / 2)
-                pause_box = curses.newwin(box_height, box_width, box_y, box_x)
+                height, width, y, x = self.__get_message_box_size(term_height, term_width, message_lines)
+                pause_box = curses.newwin(height, width, y, x)
                 pause_box.box()
                 pause_box.border()
 
                 # Add text to box (Text is relative to box -> y, x)
-                start_y = 2
                 for l, line in enumerate(message_lines):
-                    start_x = box_width // 2 - len(line) // 2
-                    pause_box.addstr(start_y + l, start_x, line)
-
-            else:
-                stdscr.nodelay(True)  # FIXME: Only run once
-                pass
+                    start_x = width // 2 - len(line) // 2
+                    pause_box.addstr(2 + l, start_x, line)
 
 
             ########################################################################################
 
             # Refresh the screen
-            stdscr.refresh()
+            scr.refresh()
 
             # Refresh the pause messgae box
             if self.exam_paused:
                 pause_box.refresh()
 
             # Get User input
-            k = stdscr.getch()
+            k = scr.getch()
 
         return -1, 'quit', False
+
+
+    def __get_message_box_size(self, term_height, term_width, message_lines):
+        # Create a box (Height, Width, y, x) (Positions are top left)
+        box_height = len(message_lines) + 4
+        box_width = int(term_width / 1.5)  # Alternative: len(max(message_lines, key=len)) + 12
+        box_y = int(term_height / 2 - box_height / 2)
+        box_x = int(term_width / 2 - box_width / 2)
+        
+        return box_height, box_width, box_y, box_x
 
 
 
