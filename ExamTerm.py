@@ -22,7 +22,7 @@ class Exam:
         # Constructor
         self.exam_filepath = "sample_questions.yml"
 
-        self.indicator = "|"
+        self.selection_indicator = "|"
         self.selection_index = 0
 
         # Loading exam contents
@@ -37,11 +37,12 @@ class Exam:
         self.questions_wrong = 0
 
         self.exam_begin_time = 0
-        self.elapsed_time = 0
+        self.exam_elapsed_time = 0
 
         self.exam_paused = False
+        self.exam_paused_elapsed_time = 0
 
-        self.timer_timing = False
+        self.is_timer_timing = False
 
         logger.info('Exam object created')
 
@@ -112,7 +113,7 @@ class Exam:
         self.exam_begin_time = time()
 
         # Start the independent timer thread for entire exam
-        self.timer_timing = True
+        self.is_timer_timing = True
         exam_timer_thread = threading.Thread(target=self.exam_timer_thread, args=())
         exam_timer_thread.daemon = True
         exam_timer_thread.start()
@@ -130,7 +131,7 @@ class Exam:
 
             # Log answer metadata
             self.exam_contents['questions'][q]['answered_timestamp'] = time()
-            self.exam_contents['questions'][q]['answered_exam_time'] = self.elapsed_time
+            self.exam_contents['questions'][q]['answered_exam_time'] = self.exam_elapsed_time
             self.exam_contents['questions'][q]['answered_question_time'] = time() - question_elapsed_time
             self.exam_contents['questions'][q]['answered_correctly'] = correct
 
@@ -147,7 +148,7 @@ class Exam:
             self.exam_progress = (self.questions_complete / self.questions_total)
 
         # Stop independent exam timer
-        self.timer_timing = False
+        self.is_timer_timing = False
         exam_timer_thread.join()
 
         pprint(self.exam_contents)
@@ -159,14 +160,16 @@ class Exam:
         return curses.wrapper(self.draw_menu)
 
     def exam_timer_thread(self):
-        while self.timer_timing:
+        while self.is_timer_timing:
             if not self.exam_paused:
-                self.elapsed_time = time() - self.exam_begin_time  # Error is here
+                self.exam_elapsed_time = (time() - self.exam_begin_time) - self.exam_paused_elapsed_time 
+            else:
+                self.exam_paused_elapsed_time = time() - self.exam_paused_time
 
-                # self.elapsed_time = recorded_time + (time() - self.exam_resume_time)
+                # self.exam_elapsed_time = recorded_time + (time() - self.exam_resume_time)
 
-                print(self.elapsed_time)
-                sleep(0.1)
+            print(self.exam_elapsed_time, self.exam_paused_elapsed_time)
+            sleep(0.25)
 
     def get_progress_bar(self, exam_progress, bar_char_width=60, bar_char_full='|', bar_char_empty='-') -> str:
         progress_str = []
@@ -307,7 +310,7 @@ class Exam:
 
                     # Draw selector
                     if s == self.selection_index:
-                        scr.addstr(start_y + selection_offset + l - 1, selection_x - 2, self.indicator)
+                        scr.addstr(start_y + selection_offset + l - 1, selection_x - 2, self.selection_indicator)
 
                 scr.attroff(curses.color_pair(5))
 
@@ -321,7 +324,7 @@ class Exam:
             scr.addstr(term_height - 3, 3, f"[ {self.questions_complete:3.0f}  / {self.questions_total:3.0f}  ][{self.get_progress_bar(self.exam_progress, bar_char_width=term_width-23)}]")
 
             # Elapsed Time
-            scr.addstr(term_height - 2, 3, f"[ {self.elapsed_time:3.0f}s / {self.exam_total_time:3.0f}s ][{self.get_progress_bar(self.elapsed_time / 60, bar_char_width=term_width-23)}]")
+            scr.addstr(term_height - 2, 3, f"[ {self.exam_elapsed_time:3.0f}s / {self.exam_total_time:3.0f}s ][{self.get_progress_bar(self.exam_elapsed_time / 60, bar_char_width=term_width-23)}]")
             scr.attroff(curses.color_pair(6))
 
             ########################################################################################
