@@ -169,7 +169,7 @@ class Exam:
                 # self.exam_elapsed_time = recorded_time + (time() - self.exam_resume_time)
 
             print(self.exam_elapsed_time, self.exam_paused_elapsed_time)
-            sleep(0.25)
+            sleep(0.20)  # Limit timer rate
 
     def get_progress_bar(self, exam_progress, bar_char_width=60, bar_char_full='|', bar_char_empty='-') -> str:
         progress_str = []
