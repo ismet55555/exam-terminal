@@ -4,6 +4,7 @@
 - Pause/Continue Button
 - Stop/quit button
 - Go back and forth with questions
+- Have a answered/unanswered questions indicator 
 - Curses box for messages
 - Set up where multiple choice selection yields something back
 - Set up multiple chocice

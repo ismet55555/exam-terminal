@@ -26,18 +26,21 @@ class Exam:
         self.selection_index = 0
 
         # Loading exam contents
-        self.exam_contents = self.load_parse_examfile(self.exam_filepath)
+        self.exam_contents = self.__load_parse_examfile(self.exam_filepath)
+
 
         self.questions_total = len(self.exam_contents['questions'])
         self.questions_complete = 0
-        self.questions_current = 0
-        self.exam_progress = 0
+        self.questions_progress = 0
 
         self.questions_correct = 0
         self.questions_wrong = 0
 
+
+        self.global_elapsed_time = 0
         self.exam_begin_time = 0
         self.exam_elapsed_time = 0
+        self.is_exam_time_out = False
 
         self.exam_paused = False
         self.exam_paused_elapsed_time = 0
@@ -46,7 +49,7 @@ class Exam:
 
         logger.info('Exam object created')
 
-    def load_parse_examfile(self, filepath: str) -> dict:
+    def __load_parse_examfile(self, filepath: str) -> dict:
         # Load the examp file
         logger.info(f"Loading specified exam file: '{filepath}' ...")
         try:
@@ -107,87 +110,7 @@ class Exam:
 
         return self.exam_contents
 
-    def begin_exam(self):
-        logger.info('Exam started')
-
-        self.exam_begin_time = time()
-
-        # Start the independent timer thread for entire exam
-        self.is_timer_timing = True
-        exam_timer_thread = threading.Thread(target=self.exam_timer_thread, args=())
-        exam_timer_thread.daemon = True
-        exam_timer_thread.start()
-
-        for q, question in enumerate(self.exam_contents['questions']):
-            # Start timer for current question
-            question_elapsed_time = time()
-
-            # Show the question
-            index, answer, correct = exam.show_question(question)
-
-            # Exam quit
-            if index == -1:
-                break
-
-            # Log answer metadata
-            self.exam_contents['questions'][q]['answered_timestamp'] = time()
-            self.exam_contents['questions'][q]['answered_exam_time'] = self.exam_elapsed_time
-            self.exam_contents['questions'][q]['answered_question_time'] = time() - question_elapsed_time
-            self.exam_contents['questions'][q]['answered_correctly'] = correct
-
-            # Increment correct or wrong answer
-            if correct:
-                self.questions_correct += 1
-            else:
-                self.questions_wrong += 1
-
-            # Increment questions compelted
-            self.questions_complete += 1
-
-            # Calculate Progress
-            self.exam_progress = (self.questions_complete / self.questions_total)
-
-        # Stop independent exam timer
-        self.is_timer_timing = False
-        exam_timer_thread.join()
-
-        pprint(self.exam_contents)
-
-    def show_question(self, question):
-        return curses.wrapper(self.draw_question, question)
-
-    def show_menu(self):
-        return curses.wrapper(self.draw_menu)
-
-    def exam_timer_thread(self):
-        while self.is_timer_timing:
-            if not self.exam_paused:
-                self.exam_elapsed_time = (time() - self.exam_begin_time) - self.exam_paused_elapsed_time 
-            else:
-                self.exam_paused_elapsed_time = time() - self.exam_paused_time
-
-                # self.exam_elapsed_time = recorded_time + (time() - self.exam_resume_time)
-
-            print(self.exam_elapsed_time, self.exam_paused_elapsed_time)
-            sleep(0.20)  # Limit timer rate
-
-    def get_progress_bar(self, exam_progress, bar_char_width=60, bar_char_full='|', bar_char_empty='-') -> str:
-        progress_str = []
-        for i in range(bar_char_width):
-
-            # TODO: Different colors for different parts of the progress bar somehow
-
-            if i <= exam_progress * bar_char_width:
-                progress_str.append(bar_char_full)
-            else:
-                progress_str.append(bar_char_empty)
-        progress_str = "".join(progress_str)
-        return progress_str
-
-    def draw_question(self, scr, question):
-        # Predefine and pre-allocate variables
-        k = 0
-
+    def __basic_screen_setup(self, scr):
         # Hiding the cursor
         curses.curs_set(0)
 
@@ -211,7 +134,105 @@ class Exam:
         # Non-blocking for user
         scr.nodelay(True)
 
-        # Define keys
+    def __draw_screen_border(self, scr, color_pair_index):
+        scr.attron(curses.color_pair(color_pair_index))
+        scr.border(0)
+        scr.attroff(curses.color_pair(color_pair_index))
+
+    def __check_terminal_size(self, scr, height, width) -> bool:
+        # Getting the screen height and width
+        term_height, term_width = scr.getmaxyx()
+        
+        # TODO: Do something when terminal size is not right
+        #       Pause and box?
+
+        print(term_height, term_width, width)
+        if term_width >= width:
+            scr.addstr(0, 0, f"[Terminal Size: W:{term_width}, H:{term_height}]", curses.color_pair(1))
+            terminal_too_small = False
+        else:
+            scr.addstr(0, 0, "Terminal Must be wider than 80 characters!", curses.color_pair(1))
+            terminal_too_small = True
+
+        return terminal_too_small
+
+
+    def __get_message_box_size(self, term_height, term_width, message_lines):
+        # Create a box (Height, Width, y, x) (Positions are top left)
+        box_height = len(message_lines) + 4
+        box_width = int(term_width / 1.5)  # Alternative: len(max(message_lines, key=len)) + 12
+        box_y = int(term_height / 2 - box_height / 2)
+        box_x = int(term_width / 2 - box_width / 2)
+        
+        return box_height, box_width, box_y, box_x
+
+    def get_progress_bar(self, exam_progress, bar_char_width=60, bar_char_full='|', bar_char_empty='-') -> str:
+        progress_str = []
+        for i in range(bar_char_width):
+            # TODO: Different colors for different parts of the progress bar somehow
+            if i <= exam_progress * bar_char_width:
+                progress_str.append(bar_char_full)
+            else:
+                progress_str.append(bar_char_empty)
+
+        progress_str = "".join(progress_str)
+        return progress_str
+
+    ###########################################################################
+
+    def draw_menu(self, scr):
+        # Setting up basic stuff for curses
+        self.__basic_screen_setup()
+
+        # Non-blocking for user
+        scr.nodelay(True)
+
+        # Define keys for this screen
+        KEYS_ENTER = (curses.KEY_ENTER, ord('\n'), ord('\r'))
+        KEYS_UP = (curses.KEY_UP, ord('k'))
+        KEYS_DOWN = (curses.KEY_DOWN, ord('j'))
+        KEYS_SELECT = (curses.KEY_RIGHT, ord(' '))
+        KEYS_PAUSE = ord('p')
+        KEYS_RESUME = ord('r')
+        KEYS_QUIT = ord('q')
+
+        # User key input (ASCII)
+        k = 0
+
+        # Main Loop
+        while True:
+            # Clearing the screen at each loop iteration before constructing the frame
+            scr.clear()
+
+
+
+        return
+
+    def show_menu(self):
+        return curses.wrapper(self.draw_menu)
+
+    ###########################################################################
+
+    def exam_timer_thread(self):
+        while self.is_timer_timing:
+            self.global_elapsed_time = time() - self.exam_begin_time 
+            if not self.exam_paused:
+                # Elapsed exam time
+                self.exam_elapsed_time = self.global_elapsed_time - self.exam_paused_elapsed_time 
+
+                # Check if exam time is up
+                if self.exam_elapsed_time > self.exam_contents['exam_total_time']:
+                    self.is_exam_time_out = True
+                    self.is_timer_timing = False
+            else:
+                # Time Spend paused
+                self.exam_paused_elapsed_time = self.global_elapsed_time - self.exam_elapsed_time
+
+    def draw_question(self, scr, question):
+        # Setting up basic stuff for curses
+        self.__basic_screen_setup(scr)
+
+        # Define keys for this screen
         KEYS_ENTER = (curses.KEY_ENTER, ord('\n'), ord('\r'))
         KEYS_UP = (curses.KEY_UP, ord('k'))
         KEYS_DOWN = (curses.KEY_DOWN, ord('j'))
@@ -227,6 +248,9 @@ class Exam:
         # Reset selection
         self.selection_index = 0
 
+        # User key input (ASCII)
+        k = 0
+
         # Main Loop
         while True:
             # Clearing the screen at each loop iteration before constructing the frame
@@ -238,17 +262,10 @@ class Exam:
             term_height, term_width = scr.getmaxyx()
 
             # Check terminal size
-            # TODO: Do something when terminal size is not right
-            #       Pause and box?
-            if term_width >= 80:
-                whstr = "[Terminal Size: W:{}, H:{}]".format(term_width, term_height)
-                scr.addstr(0, 0, whstr, curses.color_pair(1))
-            else:
-                scr.addstr(0, 0, "Terminal Must be wider than 80 characters!", curses.color_pair(1))
+            self.__check_terminal_size(scr, height=80, width=80)
 
-            scr.attron(curses.color_pair(6))
-            scr.border(0)
-            scr.attroff(curses.color_pair(6))
+            # Drawing the screen border
+            self.__draw_screen_border(scr, color_pair_index=6)
             
             ########################################################################################
 
@@ -321,16 +338,18 @@ class Exam:
 
             # Progress bar and status - call method
             scr.attron(curses.color_pair(6))
-            scr.addstr(term_height - 3, 3, f"[ {self.questions_complete:3.0f}  / {self.questions_total:3.0f}  ][{self.get_progress_bar(self.exam_progress, bar_char_width=term_width-23)}]")
+            progress_bar = self.get_progress_bar(exam_progress=self.questions_progress, bar_char_width=term_width - 23)
+            scr.addstr(term_height - 3, 3, f"[ {self.questions_complete:3.0f}  / {self.questions_total:3.0f}  ][{progress_bar}]")
 
             # Elapsed Time
-            scr.addstr(term_height - 2, 3, f"[ {self.exam_elapsed_time:3.0f}s / {self.exam_total_time:3.0f}s ][{self.get_progress_bar(self.exam_elapsed_time / 60, bar_char_width=term_width-23)}]")
+            progress_bar = self.get_progress_bar(exam_progress=self.exam_elapsed_time / self.exam_contents['exam_total_time'], bar_char_width=term_width - 23)
+            scr.addstr(term_height - 2, 3, f"[ {self.exam_elapsed_time:3.0f}s / {self.exam_total_time:3.0f}s ][{progress_bar}]")
             scr.attroff(curses.color_pair(6))
 
             ########################################################################################
 
             # Exam pause message box
-            # scr.nodelay(not self.exam_paused) 
+            scr.nodelay(not self.exam_paused) 
             if self.exam_paused:
                 message_lines = ['Exam was paused', 'To resume exam press "R"']
                 height, width, y, x = self.__get_message_box_size(term_height, term_width, message_lines)
@@ -340,9 +359,14 @@ class Exam:
 
                 # Add text to box (Text is relative to box -> y, x)
                 for l, line in enumerate(message_lines):
-                    start_x = width // 2 - len(line) // 2
-                    pause_box.addstr(2 + l, start_x, line)
+                    x = width // 2 - len(line) // 2
+                    pause_box.addstr(2 + l, x, line)
 
+            ########################################################################################
+
+            # Check if time has run out on the exam
+            if self.is_exam_time_out:
+                break
 
             ########################################################################################
 
@@ -358,19 +382,64 @@ class Exam:
 
         return -1, 'quit', False
 
+    def show_question(self, question):
+        return curses.wrapper(self.draw_question, question)
 
-    def __get_message_box_size(self, term_height, term_width, message_lines):
-        # Create a box (Height, Width, y, x) (Positions are top left)
-        box_height = len(message_lines) + 4
-        box_width = int(term_width / 1.5)  # Alternative: len(max(message_lines, key=len)) + 12
-        box_y = int(term_height / 2 - box_height / 2)
-        box_x = int(term_width / 2 - box_width / 2)
-        
-        return box_height, box_width, box_y, box_x
+    ###########################################################################
+
+    def begin_exam(self):
+        logger.info('Exam started')
+
+        self.exam_begin_time = time()
+
+        # Start the independent timer thread for entire exam
+        self.is_timer_timing = True
+        exam_timer_thread = threading.Thread(target=self.exam_timer_thread, args=())
+        exam_timer_thread.daemon = True
+        exam_timer_thread.start()
+
+        # TODO: Add option to go back and forth on questions
+
+        for q, question in enumerate(self.exam_contents['questions']):
+            # Start timer for current question
+            question_elapsed_time = time()
+
+            # Show the question
+            index, answer, correct = exam.show_question(question)
+
+            # Exam quit
+            if index == -1:
+                break
+
+            # Log answer metadata
+            self.exam_contents['questions'][q]['answered_timestamp'] = time()
+            self.exam_contents['questions'][q]['answered_exam_time'] = self.exam_elapsed_time
+            self.exam_contents['questions'][q]['answered_question_time'] = time() - question_elapsed_time
+            self.exam_contents['questions'][q]['answered_correctly'] = correct
+
+            # Increment correct or wrong answer
+            if correct:
+                self.questions_correct += 1
+            else:
+                self.questions_wrong += 1
+
+            # Increment questions compelted
+            self.questions_complete += 1
+
+            # Calculate Progress
+            self.questions_progress = (self.questions_complete / self.questions_total)
+
+        # Stop independent exam timer
+        self.is_timer_timing = False
+        exam_timer_thread.join()
+
+        pprint(self.exam_contents)
+
 
 
 
 exam = Exam()
+# exam.show_menu()
 exam.begin_exam()
 
 

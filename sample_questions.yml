@@ -1,7 +1,7 @@
 ---
 exam_title: "Sample Exam Title"
 exam_author: "Ismet Handzic"
-exam_total_time: 30
+exam_total_time: 10
 exam_total_time_units: sec
 questions:
   - question: What is your favorite food
