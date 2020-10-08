@@ -1,0 +1,33 @@
+---
+exam:
+  exam_title: Sample Exam Title
+  exam_description: This is a sample exam and this is a description
+  exam_author: Ismet Handzic
+  exam_total_time: 15
+  exam_total_time_units: seconds
+  exam_passing_score: 70
+
+questions:
+  - question: What is your favorite food
+    question_time: 10
+    selection:
+      - "kebap"
+      - "salad"
+      - "nutella": true
+      - "chair"
+
+  - question: What is your name
+    question_time: 30
+    selection:
+      - "ismet": true
+      - "danger": true
+      - "gunter"
+      - "halid"
+
+  - question: "What is your sport what is your sport what is sldjfl sjflsd fsjldf lsdfh lsd fyour sport what is your sport what is your sport what is your sport what is your sport what is your sport what is your sport"
+    question_time: 0
+    selection:
+      - "soccer soccer soccer soccer soccer soccer soccer soccer soccer soccer soccer soccer soccer soccer soccer soccer soccer": true
+      - "tennis"
+      - "volleyball"
+      - "chess chess chess chess chess chess chess chess chess chess chess chess chess chess chess chess chess chess chess chess chess chess"

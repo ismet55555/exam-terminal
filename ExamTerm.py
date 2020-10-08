@@ -18,16 +18,9 @@ logger.setLevel(logging.DEBUG)  # NOTE: No detailed logs shown when set to "logg
 
 
 class Exam:
-    def __init__(self) -> None:
-        # Constructor
-        self.exam_filepath = "sample_questions.yml"
-
-        self.selection_indicator = "|"
-        self.selection_index = 0
-
+    def __init__(self, exam_filepath: str) -> None:
         # Loading exam contents
-        self.exam_contents = self.__load_parse_examfile(self.exam_filepath)
-
+        self.exam_contents = self.__load_parse_examfile(exam_filepath)
 
         self.questions_total = len(self.exam_contents['questions'])
         self.questions_complete = 0
@@ -36,6 +29,8 @@ class Exam:
         self.questions_correct = 0
         self.questions_wrong = 0
 
+        self.selection_indicator = "|"
+        self.selection_index = 0
 
         self.global_elapsed_time = 0
         self.exam_begin_time = 0
@@ -45,9 +40,11 @@ class Exam:
         self.exam_paused = False
         self.exam_paused_elapsed_time = 0
 
+        self.exam_quit = False
+
         self.is_timer_timing = False
 
-        logger.info('Exam object created')
+        logger.info('Exam was created and exam file loaded')
 
     ###############################################################################################
 
@@ -62,8 +59,8 @@ class Exam:
             return False
 
         # Get the total exam time
-        self.exam_total_time = self.exam_contents['exam_total_time']
-        self.exam_total_time_units = self.exam_contents['exam_total_time_units']
+        self.exam_total_time = self.exam_contents['exam']['exam_total_time']
+        self.exam_total_time_units = self.exam_contents['exam']['exam_total_time_units']
 
         # TODO: Calculate exam time in seconds? minutes?
 
@@ -171,7 +168,24 @@ class Exam:
         
         return box_height, box_width, box_y, box_x
 
-    def get_progress_bar(self, exam_progress, bar_char_width=60, bar_char_full='|', bar_char_empty='-') -> str:
+    def __show_message_box(self, scr, message_lines: list) -> None:
+        term_height, term_width = scr.getmaxyx()
+
+        height, width, y, x = self.__get_message_box_size(term_height, term_width, message_lines)
+        message_box = curses.newwin(height, width, y, x)
+        message_box.box()
+        message_box.border()
+
+        for l, line in enumerate(message_lines):
+            # Add text each line to box (Text is relative to box -> y, x)
+            x = width // 2 - len(line) // 2
+            y = l + 2
+            message_box.addstr(y, x, line)
+
+        # Refresh the messgae box
+        message_box.refresh()
+
+    def __get_progress_bar(self, exam_progress, bar_char_width=60, bar_char_full='|', bar_char_empty='-') -> str:
         progress_str = []
         for i in range(bar_char_width):
             # TODO: Different colors for different parts of the progress bar somehow
@@ -183,23 +197,25 @@ class Exam:
         progress_str = "".join(progress_str)
         return progress_str
 
+    @staticmethod
+    def __load_keys():
+        KEYS = {
+            "ENTER": (curses.KEY_ENTER, ord('\n'), ord('\r')),
+            "KEYS_UP": (curses.KEY_UP, ord('k')),
+            "KEYS_DOWN": (curses.KEY_DOWN, ord('j')),
+            "KEYS_SELECT": (curses.KEY_RIGHT, ord(' ')),
+            "KEYS_PAUSE": ord('p'),
+            "KEYS_RESUME": ord('r'),
+            "KEYS_QUIT": ord('q')
+        }
+        return KEYS
+
     ###############################################################################################
 
     def draw_menu(self, scr):
-        # Setting up basic stuff for curses
-        self.__basic_screen_setup()
-
-        # Non-blocking for user
-        scr.nodelay(True)
-
-        # Define keys for this screen
-        KEYS_ENTER = (curses.KEY_ENTER, ord('\n'), ord('\r'))
-        KEYS_UP = (curses.KEY_UP, ord('k'))
-        KEYS_DOWN = (curses.KEY_DOWN, ord('j'))
-        KEYS_SELECT = (curses.KEY_RIGHT, ord(' '))
-        KEYS_PAUSE = ord('p')
-        KEYS_RESUME = ord('r')
-        KEYS_QUIT = ord('q')
+        # Setting up basic stuff for curses and load keys
+        self.__basic_screen_setup(scr)
+        KEYS = self.__load_keys()
 
         # User key input (ASCII)
         k = 0
@@ -209,9 +225,46 @@ class Exam:
             # Clearing the screen at each loop iteration before constructing the frame
             scr.clear()
 
+            ########################################################################################
+
+            # Check user input and adjust the cursor movement
+            if k == KEYS['KEYS_QUIT']:
+                break
+
+            ########################################################################################
+
+            # Check terminal size
+            terminal_size_good = self.__check_terminal_size(scr, height_limit=30, width_limit=80)
+            if not terminal_size_good:
+                pass
+
+            # Drawing the screen border
+            self.__draw_screen_border(scr, color_pair_index=6)
+
+            ########################################################################################
+
+            # TODO: Set up main menu
+            #   - Display basic information from test file
+            #       - Exam title
+            #       - Description
+            #       - Author
+            #       - Number of questions
+            #       - Exam time
+            #       - Passing score
+            #
+            #   - Option to Begin Exam
+            #   - Option to Exit
+
+            ########################################################################################
+
+            # Refresh the screen
+            scr.refresh()
+
+            # Get User input
+            k = scr.getch()
 
 
-        return
+        return -1, 'quit', False
 
     def show_menu(self):
         return curses.wrapper(self.draw_menu)
@@ -226,7 +279,7 @@ class Exam:
                 self.exam_elapsed_time = self.global_elapsed_time - self.exam_paused_elapsed_time 
 
                 # Check if exam time is up
-                if self.exam_elapsed_time > self.exam_contents['exam_total_time']:
+                if self.exam_elapsed_time > self.exam_contents['exam']['exam_total_time']:
                     self.is_exam_time_out = True
                     self.is_timer_timing = False
             else:
@@ -234,23 +287,13 @@ class Exam:
                 self.exam_paused_elapsed_time = self.global_elapsed_time - self.exam_elapsed_time
 
     def draw_question(self, scr, question):
-        # Setting up basic stuff for curses
+        # Setting up basic stuff for curses and load keys
         self.__basic_screen_setup(scr)
+        KEYS = self.__load_keys()
 
-        # Define keys for this screen
-        KEYS_ENTER = (curses.KEY_ENTER, ord('\n'), ord('\r'))
-        KEYS_UP = (curses.KEY_UP, ord('k'))
-        KEYS_DOWN = (curses.KEY_DOWN, ord('j'))
-        KEYS_SELECT = (curses.KEY_RIGHT, ord(' '))
-        KEYS_PAUSE = ord('p')
-        KEYS_RESUME = ord('r')
-        KEYS_QUIT = ord('q')
-
+        start_y = 5
         question_x = 8
         selection_x = 10
-        start_y = 5
-
-        # Reset selection
         self.selection_index = 0
 
         # User key input (ASCII)
@@ -264,35 +307,39 @@ class Exam:
             ########################################################################################
 
             # Check user input and adjust the cursor movement
-            if k in KEYS_DOWN:
+            if k in KEYS['KEYS_DOWN']:
                 if not self.exam_paused:
                     self.selection_index += 1
 
-            elif k in KEYS_UP:
+            elif k in KEYS['KEYS_UP']:
                 if not self.exam_paused:
                     self.selection_index -= 1
 
-            elif k in KEYS_ENTER:
+            elif k in KEYS['ENTER']:
                 if not self.exam_paused:
                     index = self.selection_index
                     correct = question['answer_bool'][self.selection_index]
                     answer = question['selection'][self.selection_index]
+
+                    # Return the entered answer
                     return index, answer, correct
 
-            elif k == KEYS_PAUSE:
+            elif k == KEYS['KEYS_PAUSE']:
                 self.exam_paused = True
 
-            elif k == KEYS_RESUME:
+            elif k == KEYS['KEYS_RESUME']:
                 self.exam_paused = False
+                self.exam_quit = False
 
-            elif k == KEYS_QUIT:
+            elif k == KEYS['KEYS_QUIT']:
                 if not self.exam_paused:
-                    break
+                    self.exam_quit = True
+                else:
+                    self.exam_quit = False
+
+                # FIXME: Make sure that quitting and exam timeout works fine
               
             ########################################################################################
-
-            # Getting the screen height and width
-            term_height, term_width = scr.getmaxyx()
 
             # Check terminal size
             terminal_size_good = self.__check_terminal_size(scr, height_limit=30, width_limit=80)
@@ -343,46 +390,47 @@ class Exam:
 
             ########################################################################################
 
+            # Getting the screen height and width
+            term_height, term_width = scr.getmaxyx()
+
             # Progress bar and status - call method
             scr.attron(curses.color_pair(6))
-            progress_bar = self.get_progress_bar(exam_progress=self.questions_progress, bar_char_width=term_width - 23)
+            progress_bar = self.__get_progress_bar(exam_progress=self.questions_progress, bar_char_width=term_width - 23)
             scr.addstr(term_height - 3, 3, f"[ {self.questions_complete:3.0f}  / {self.questions_total:3.0f}  ][{progress_bar}]")
 
             # Elapsed Time
-            progress_bar = self.get_progress_bar(exam_progress=self.exam_elapsed_time / self.exam_contents['exam_total_time'], bar_char_width=term_width - 23)
+            progress_bar = self.__get_progress_bar(exam_progress=self.exam_elapsed_time / self.exam_contents['exam']['exam_total_time'], bar_char_width=term_width - 23)
             scr.addstr(term_height - 2, 3, f"[ {self.exam_elapsed_time:3.0f}s / {self.exam_total_time:3.0f}s ][{progress_bar}]")
             scr.attroff(curses.color_pair(6))
 
             ########################################################################################
 
-            # Exam pause message box
-            scr.nodelay(not self.exam_paused) 
-            if self.exam_paused:
-                message_lines = ['Exam was paused', 'To resume exam press "R"']
-                height, width, y, x = self.__get_message_box_size(term_height, term_width, message_lines)
-                pause_box = curses.newwin(height, width, y, x)
-                pause_box.box()
-                pause_box.border()
-
-                # Add text to box (Text is relative to box -> y, x)
-                for l, line in enumerate(message_lines):
-                    x = width // 2 - len(line) // 2
-                    pause_box.addstr(2 + l, x, line)
-
-            ########################################################################################
-
-            # Check if time has run out on the exam
-            if self.is_exam_time_out:
-                break
-
-            ########################################################################################
-
-            # Refresh the screen
+            # Refresh the main screen layout
             scr.refresh()
 
-            # Refresh the pause messgae box
+            ########################################################################################
+
+            # If prompts are shown, ensure that no nodelay is False, and vice versa
+            scr.nodelay(not any([self.exam_paused, self.exam_quit, self.is_exam_time_out])) 
+
+            # Exam pause message box
             if self.exam_paused:
-                pause_box.refresh()
+                message_lines = ['Exam was paused', 'To resume exam press "R"']
+                self.__show_message_box(scr, message_lines)
+
+            # Exam quit message box
+            if self.exam_quit:
+                message_lines = ['Are you sure you want to quit?', 'To quit press "Q"', 'To resume exam press "R"']
+                self.__show_message_box(scr, message_lines)
+
+            # Exam timed out message box
+            if self.is_exam_time_out:
+                message_lines = ['Exam time has expired', 'Press "ENTER" to continue']
+                self.__show_message_box(scr, message_lines)
+
+            # TODO:  Only use a exit flag instead of break to outsource the checking (ensure loop is completed)
+
+            ########################################################################################
 
             # Get User input
             k = scr.getch()
@@ -445,7 +493,7 @@ class Exam:
 
 
 
-exam = Exam()
+exam = Exam(exam_filepath="exam.yml")
 # exam.show_menu()
 exam.begin_exam()
 
