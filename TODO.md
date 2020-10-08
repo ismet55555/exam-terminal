@@ -13,3 +13,11 @@
 
 - See if progress can be a ball on a string moving
   -  ============[]------
+
+
+# Name Ideas
+  - Console / Terminal
+  - Exam / Test(ing) / Assessment / Pilot?
+  - Cursed Console Test
+
+  - Test Terminal
