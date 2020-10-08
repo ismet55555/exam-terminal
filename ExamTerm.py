@@ -49,6 +49,8 @@ class Exam:
 
         logger.info('Exam object created')
 
+    ###############################################################################################
+
     def __load_parse_examfile(self, filepath: str) -> dict:
         # Load the examp file
         logger.info(f"Loading specified exam file: '{filepath}' ...")
@@ -139,23 +141,26 @@ class Exam:
         scr.border(0)
         scr.attroff(curses.color_pair(color_pair_index))
 
-    def __check_terminal_size(self, scr, height, width) -> bool:
+    def __check_terminal_size(self, scr, height_limit, width_limit) -> bool:
+        terminal_size_good = True
+
         # Getting the screen height and width
         term_height, term_width = scr.getmaxyx()
         
-        # TODO: Do something when terminal size is not right
-        #       Pause and box?
+        # Check Height
+        if term_height < height_limit:
+            scr.addstr(1, 1, f"Terminal height must be more than {height_limit} characters!", curses.color_pair(1))
+            terminal_size_good = False
 
-        print(term_height, term_width, width)
-        if term_width >= width:
+        # Check Width
+        if term_width < width_limit:
+            scr.addstr(2, 1, f"Terminal width must be more than {width_limit} characters!", curses.color_pair(1))
+            terminal_size_good = False
+
+        if terminal_size_good:
             scr.addstr(0, 0, f"[Terminal Size: W:{term_width}, H:{term_height}]", curses.color_pair(1))
-            terminal_too_small = False
-        else:
-            scr.addstr(0, 0, "Terminal Must be wider than 80 characters!", curses.color_pair(1))
-            terminal_too_small = True
 
-        return terminal_too_small
-
+        return terminal_size_good
 
     def __get_message_box_size(self, term_height, term_width, message_lines):
         # Create a box (Height, Width, y, x) (Positions are top left)
@@ -178,7 +183,7 @@ class Exam:
         progress_str = "".join(progress_str)
         return progress_str
 
-    ###########################################################################
+    ###############################################################################################
 
     def draw_menu(self, scr):
         # Setting up basic stuff for curses
@@ -211,7 +216,7 @@ class Exam:
     def show_menu(self):
         return curses.wrapper(self.draw_menu)
 
-    ###########################################################################
+    ###############################################################################################
 
     def exam_timer_thread(self):
         while self.is_timer_timing:
@@ -258,17 +263,6 @@ class Exam:
 
             ########################################################################################
 
-            # Getting the screen height and width
-            term_height, term_width = scr.getmaxyx()
-
-            # Check terminal size
-            self.__check_terminal_size(scr, height=80, width=80)
-
-            # Drawing the screen border
-            self.__draw_screen_border(scr, color_pair_index=6)
-            
-            ########################################################################################
-
             # Check user input and adjust the cursor movement
             if k in KEYS_DOWN:
                 if not self.exam_paused:
@@ -295,6 +289,19 @@ class Exam:
                 if not self.exam_paused:
                     break
               
+            ########################################################################################
+
+            # Getting the screen height and width
+            term_height, term_width = scr.getmaxyx()
+
+            # Check terminal size
+            terminal_size_good = self.__check_terminal_size(scr, height_limit=30, width_limit=80)
+            if not terminal_size_good:
+                pass
+
+            # Drawing the screen border
+            self.__draw_screen_border(scr, color_pair_index=6)
+            
             ########################################################################################
 
             # Check if within boundaries of selection indexes
@@ -385,7 +392,7 @@ class Exam:
     def show_question(self, question):
         return curses.wrapper(self.draw_question, question)
 
-    ###########################################################################
+    ###############################################################################################
 
     def begin_exam(self):
         logger.info('Exam started')
