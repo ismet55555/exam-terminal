@@ -59,8 +59,8 @@ class Exam:
             return False
 
         # Get the total exam time
-        self.exam_total_time = self.exam_contents['exam']['exam_total_time']
-        self.exam_total_time_units = self.exam_contents['exam']['exam_total_time_units']
+        self.exam_allowed_time = self.exam_contents['exam']['exam_allowed_time']
+        self.exam_allowed_time_units = self.exam_contents['exam']['exam_allowed_time_units']
 
         # TODO: Calculate exam time in seconds? minutes?
 
@@ -113,19 +113,8 @@ class Exam:
         # Hiding the cursor
         curses.curs_set(0)
 
-        # Start colors in curses
-        curses.start_color()
-
-        # Define the colors to be used (foreground and background) (ie. curses.color_pair(1))
-        #     curses.init_pair(color reference index, font color number, background color number)
-        # NOTE:
-        #       -1 is transparent
-        curses.init_pair(1, curses.COLOR_CYAN, curses.COLOR_BLACK)
-        curses.init_pair(2, curses.COLOR_RED, curses.COLOR_BLACK)
-        curses.init_pair(3, curses.COLOR_MAGENTA, curses.COLOR_BLACK)
-        curses.init_pair(4, curses.COLOR_GREEN, curses.COLOR_BLACK)
-        curses.init_pair(5, curses.COLOR_YELLOW, curses.COLOR_BLACK)
-        curses.init_pair(6, 248, curses.COLOR_BLACK)  # Grey
+        # Load curses colors
+        self.__load_curses_colors()
 
         # Turn off echo
         curses.noecho()
@@ -197,6 +186,24 @@ class Exam:
         progress_str = "".join(progress_str)
         return progress_str
 
+    ###############################################################################################
+
+    @staticmethod
+    def __load_curses_colors() -> None:
+        # Start colors in curses
+        try: curses.start_color()
+        except: pass
+
+        # Define the colors to be used (foreground and background) (ie. curses.color_pair(1))
+        #     curses.init_pair(color reference index, font color number, background color number)
+        # NOTE: -1 is transparent
+        curses.init_pair(1, curses.COLOR_CYAN, curses.COLOR_BLACK)
+        curses.init_pair(2, curses.COLOR_RED, curses.COLOR_BLACK)
+        curses.init_pair(3, curses.COLOR_MAGENTA, curses.COLOR_BLACK)
+        curses.init_pair(4, curses.COLOR_GREEN, curses.COLOR_BLACK)
+        curses.init_pair(5, curses.COLOR_YELLOW, curses.COLOR_BLACK)
+        curses.init_pair(6, 248, curses.COLOR_BLACK)  # Grey
+
     @staticmethod
     def __load_keys():
         KEYS = {
@@ -209,6 +216,17 @@ class Exam:
             "KEYS_QUIT": (27 , ord('q'))
         }
         return KEYS
+
+    @staticmethod
+    def __load_software_ascii_name() -> list:
+        software_name = [
+            " _____        _   _            _____              _         _ ",
+            "|_   _|__ ___| |_|_|___ ___   |_   _|__ ___ _____|_|___ ___| |",
+            "  | || -_|_ -|  _| |   | . |    | || -_|  _|     | |   | .'| |",
+            "  |_||___|___|_| |_|_|_|_  |    |_||___|_| |_|_|_|_|_|_|__,|_|",
+            "                       |___|                                  ",
+        ]
+        return software_name
 
     ###############################################################################################
 
@@ -236,6 +254,7 @@ class Exam:
             # Check terminal size
             terminal_size_good = self.__check_terminal_size(scr, height_limit=30, width_limit=80)
             if not terminal_size_good:
+                # TODO: Do something here ...
                 pass
 
             # Drawing the screen border
@@ -245,17 +264,69 @@ class Exam:
 
             # TODO: Set up main menu
             #   - Display basic information from test file
-            #       - Center and format
+            #   - Display the software name
             #   - Option to Begin Exam
             #   - Option to Exit
 
-            start_y = 5
+            term_height, term_width = scr.getmaxyx()
 
-            scr.addstr(start_y + 0, 5, self.exam_contents['exam']['exam_title'])
-            scr.addstr(start_y + 1, 5, self.exam_contents['exam']['exam_description'])
-            scr.addstr(start_y + 2, 5, self.exam_contents['exam']['exam_author'])
-            scr.addstr(start_y + 3, 5, f"{self.exam_contents['exam']['exam_total_time']} {self.exam_contents['exam']['exam_total_time_units']}")
-            scr.addstr(start_y + 4, 5, f"{self.exam_contents['exam']['exam_passing_score']}%")
+            # Show software name/title
+            software_name = self.__load_software_ascii_name()
+            start_x = term_width // 2 - len(software_name[0]) // 2
+            for y, line in enumerate(software_name):
+                scr.addstr(2 + y, start_x, line, curses.A_BOLD)
+
+            # Seperator
+            for x in range(term_width - 2):
+                scr.addstr(y + 3, x + 1, '_', curses.A_BOLD)
+
+
+            # TODO: text wrapper
+
+            y = 10           
+            start_x = [10, 26]
+
+            lines = ["Exam Title:", f"{self.exam_contents['exam']['exam_title']}"]
+            for x, line in zip(start_x, lines):
+                scr.addstr(y + 0, x, line, curses.color_pair(1) | curses.A_BOLD)
+
+            lines = ["Composed By:", f"{self.exam_contents['exam']['exam_author']}"]
+            for x, line in zip(start_x, lines):
+                scr.addstr(y + 1, x, line, curses.color_pair(1))
+
+            lines = ["Edit Date:", f"{self.exam_contents['exam']['exam_edit_date']}"]
+            for x, line in zip(start_x, lines):
+                scr.addstr(y + 2, x, line, curses.color_pair(1))
+
+
+
+            lines = [f"{self.exam_contents['exam']['exam_title']}"]
+            for x, line in zip(start_x, lines):
+                scr.addstr(y + 0, x, line, curses.color_pair(1) | curses.A_BOLD)
+
+
+
+            lines = ["Description:", f"{self.exam_contents['exam']['exam_description']}"]
+            for x, line in zip(start_x, lines):
+                scr.addstr(y + 4, x, line, curses.color_pair(1))
+            
+            lines = ["Exam Type:", f"Multiple Choice, Single Choice"]
+            for x, line in zip(start_x, lines):
+                scr.addstr(y + 5, x, line, curses.color_pair(1))
+
+            lines = ["Questions:", f"52"]
+            for x, line in zip(start_x, lines):
+                scr.addstr(y + 6, x, line, curses.color_pair(1))
+
+            lines = ["Allowed Time:", f"{self.exam_contents['exam']['exam_allowed_time']} {self.exam_contents['exam']['exam_allowed_time_units']}"]
+            for x, line in zip(start_x, lines):
+                scr.addstr(y + 7, x, line, curses.color_pair(1))
+
+            lines = ["Passing Score:", f"{self.exam_contents['exam']['exam_passing_score']} %"]
+            for x, line in zip(start_x, lines):
+                scr.addstr(y + 8, x, line, curses.color_pair(1))
+
+
 
             ########################################################################################
 
@@ -266,7 +337,7 @@ class Exam:
             k = scr.getch()
 
 
-        return -1, 'quit', False
+        return
 
     def show_menu(self):
         return curses.wrapper(self.draw_menu)
@@ -281,7 +352,7 @@ class Exam:
                 self.exam_elapsed_time = self.global_elapsed_time - self.exam_paused_elapsed_time 
 
                 # Check if exam time is up
-                if self.exam_elapsed_time > self.exam_contents['exam']['exam_total_time']:
+                if self.exam_elapsed_time > self.exam_contents['exam']['exam_allowed_time']:
                     self.is_exam_time_out = True
                     self.is_timer_timing = False
             else:
@@ -400,8 +471,8 @@ class Exam:
             scr.addstr(term_height - 3, 3, f"[ {self.questions_complete:3.0f}  / {self.questions_total:3.0f}  ][{progress_bar}]")
 
             # Elapsed Time
-            progress_bar = self.__get_progress_bar(exam_progress=self.exam_elapsed_time / self.exam_contents['exam']['exam_total_time'], bar_char_width=term_width - 23)
-            scr.addstr(term_height - 2, 3, f"[ {self.exam_elapsed_time:3.0f}s / {self.exam_total_time:3.0f}s ][{progress_bar}]")
+            progress_bar = self.__get_progress_bar(exam_progress=self.exam_elapsed_time / self.exam_contents['exam']['exam_allowed_time'], bar_char_width=term_width - 23)
+            scr.addstr(term_height - 2, 3, f"[ {self.exam_elapsed_time:3.0f}s / {self.exam_allowed_time:3.0f}s ][{progress_bar}]")
             scr.attroff(curses.color_pair(6))
 
             ########################################################################################
