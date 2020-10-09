@@ -105,7 +105,7 @@ class Exam:
         # Get the total number of questions
         self.questions_total = len(self.exam_contents['questions'])
 
-        pprint(self.exam_contents)
+        # pprint(self.exam_contents)
 
         return self.exam_contents
 
@@ -206,7 +206,7 @@ class Exam:
             "KEYS_SELECT": (curses.KEY_RIGHT, ord(' ')),
             "KEYS_PAUSE": ord('p'),
             "KEYS_RESUME": ord('r'),
-            "KEYS_QUIT": ord('q')
+            "KEYS_QUIT": (27 , ord('q'))
         }
         return KEYS
 
@@ -308,15 +308,18 @@ class Exam:
 
             # Check user input and adjust the cursor movement
             if k in KEYS['KEYS_DOWN']:
-                if not self.exam_paused:
+                if not self.exam_paused and not self.is_exam_time_out:
                     self.selection_index += 1
 
             elif k in KEYS['KEYS_UP']:
-                if not self.exam_paused:
+                if not self.exam_paused and not self.is_exam_time_out:
                     self.selection_index -= 1
 
             elif k in KEYS['ENTER']:
-                if not self.exam_paused:
+                if self.is_exam_time_out:
+                    return -1, 'quit', False
+
+                elif not self.exam_paused:
                     index = self.selection_index
                     correct = question['answer_bool'][self.selection_index]
                     answer = question['selection'][self.selection_index]
@@ -331,13 +334,9 @@ class Exam:
                 self.exam_paused = False
                 self.exam_quit = False
 
-            elif k == KEYS['KEYS_QUIT']:
-                if not self.exam_paused:
-                    self.exam_quit = True
-                else:
-                    self.exam_quit = False
-
-                # FIXME: Make sure that quitting and exam timeout works fine
+            elif k in KEYS['KEYS_QUIT']:
+                if not self.is_exam_time_out:
+                    self.exam_quit += 1
               
             ########################################################################################
 
@@ -414,18 +413,22 @@ class Exam:
             scr.nodelay(not any([self.exam_paused, self.exam_quit, self.is_exam_time_out])) 
 
             # Exam pause message box
-            if self.exam_paused:
+            if self.exam_paused and not self.exam_quit:
                 message_lines = ['Exam was paused', 'To resume exam press "R"']
                 self.__show_message_box(scr, message_lines)
 
             # Exam quit message box
             if self.exam_quit:
+                self.exam_paused = True
                 message_lines = ['Are you sure you want to quit?', 'To quit press "Q"', 'To resume exam press "R"']
                 self.__show_message_box(scr, message_lines)
+                # Quit Message confirmed (pressed twice)
+                if self.exam_quit > 1:
+                    break
 
             # Exam timed out message box
             if self.is_exam_time_out:
-                message_lines = ['Exam time has expired', 'Press "ENTER" to continue']
+                message_lines = ['Exam time has expired', 'Press "ENTER" to evalute']
                 self.__show_message_box(scr, message_lines)
 
             # TODO:  Only use a exit flag instead of break to outsource the checking (ensure loop is completed)
@@ -488,7 +491,7 @@ class Exam:
         self.is_timer_timing = False
         exam_timer_thread.join()
 
-        pprint(self.exam_contents)
+        # pprint(self.exam_contents)
 
 
 
