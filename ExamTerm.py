@@ -228,7 +228,7 @@ class Exam:
             ########################################################################################
 
             # Check user input and adjust the cursor movement
-            if k == KEYS['KEYS_QUIT']:
+            if k in KEYS['KEYS_QUIT']:
                 break
 
             ########################################################################################
@@ -245,15 +245,17 @@ class Exam:
 
             # TODO: Set up main menu
             #   - Display basic information from test file
-            #       - Exam title
-            #       - Description
-            #       - Author
-            #       - Number of questions
-            #       - Exam time
-            #       - Passing score
-            #
+            #       - Center and format
             #   - Option to Begin Exam
             #   - Option to Exit
+
+            start_y = 5
+
+            scr.addstr(start_y + 0, 5, self.exam_contents['exam']['exam_title'])
+            scr.addstr(start_y + 1, 5, self.exam_contents['exam']['exam_description'])
+            scr.addstr(start_y + 2, 5, self.exam_contents['exam']['exam_author'])
+            scr.addstr(start_y + 3, 5, f"{self.exam_contents['exam']['exam_total_time']} {self.exam_contents['exam']['exam_total_time_units']}")
+            scr.addstr(start_y + 4, 5, f"{self.exam_contents['exam']['exam_passing_score']}%")
 
             ########################################################################################
 
@@ -497,7 +499,7 @@ class Exam:
 
 
 exam = Exam(exam_filepath="exam.yml")
-# exam.show_menu()
-exam.begin_exam()
+exam.show_menu()
+# exam.begin_exam()
 
 

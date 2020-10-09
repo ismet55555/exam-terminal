@@ -3,7 +3,7 @@ exam:
   exam_title: Sample Exam Title
   exam_description: This is a sample exam and this is a description
   exam_author: Ismet Handzic
-  exam_total_time: 15
+  exam_total_time: 5
   exam_total_time_units: seconds
   exam_passing_score: 70
 
