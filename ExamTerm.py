@@ -288,7 +288,7 @@ class Exam:
 
     ###############################################################################################
 
-    def draw_menu(self, scr):
+    def draw_menu(self, scr) -> bool:
         # Setting up basic stuff for curses and load keys
         self.__basic_screen_setup(scr)
         KEYS = self.__load_keys()
@@ -311,10 +311,16 @@ class Exam:
                 self.selection_index -= 1
 
             elif k in KEYS['ENTER']:
-                 return
+                if self.selection_index == 0:
+                    # TODO: Prompt or countdown?
+                    return True
+                elif self.selection_index == 1:
+                    # TODO: Are you sure prompt
+                    return False
 
             elif k in KEYS['QUIT']:
-                break
+                # TODO: Are you sure prompt
+                return False
 
             ########################################################################################
 
@@ -332,10 +338,6 @@ class Exam:
             self.__draw_screen_border(scr, self.color['grey'])
 
             ########################################################################################
-
-            # TODO: Set up main menu
-            #   - Option to Begin Exam
-            #   - Option to Exit
 
             # Show software name/title
             software_name = self.__load_software_ascii_name()
@@ -395,10 +397,7 @@ class Exam:
 
             y_selection = term_height - 9
 
-            selections = [
-                "Begin Exam",
-                "Quit"
-            ]
+            selections = ["Begin Exam","Quit"]
 
             # Check if within boundaries of selection indexes
             self.selection_index = max(self.selection_index, 0)
@@ -432,9 +431,7 @@ class Exam:
             # Get User input
             k = scr.getch()
 
-        return
-
-    def show_menu(self):
+    def show_menu(self) -> bool:
         return curses.wrapper(self.draw_menu)
 
     ###############################################################################################
@@ -514,7 +511,7 @@ class Exam:
                 pass
 
             # Drawing the screen border
-            self.__draw_screen_border(scr, color_pair_index=6)
+            self.__draw_screen_border(scr, self.color['grey'])
             
             ########################################################################################
 
@@ -539,18 +536,17 @@ class Exam:
             # Wrap and show selection
             for s, selection in enumerate(question['selection']):
 
-                if s == self.selection_index:
-                    scr.attron(curses.color_pair(5))
-
                 selection_wrap = wrapper_selection.wrap(text=selection)
                 for l, line in enumerate(selection_wrap):
-                    scr.addstr(start_y + selection_offset + l - 1, selection_x + 2, line)
-
-                    # Draw selector
+                    # Style selection and draw selector
                     if s == self.selection_index:
-                        scr.addstr(start_y + selection_offset + l - 1, selection_x - 2, self.selection_indicator)
+                        color = self.color['green'] | self.decor['bold']
+                        scr.addstr(start_y + selection_offset + l - 1, selection_x - 2, self.selection_indicator, color)
+                    else:
+                        color = self.color['default']
 
-                scr.attroff(curses.color_pair(5))
+                    scr.addstr(start_y + selection_offset + l - 1, selection_x + 2, line, color)
+
 
                 # Set the offset to the next line
                 selection_offset += len(selection_wrap) + 1
@@ -561,14 +557,12 @@ class Exam:
             term_height, term_width = scr.getmaxyx()
 
             # Progress bar and status - call method
-            scr.attron(curses.color_pair(6))
             progress_bar = self.__get_progress_bar(exam_progress=self.questions_progress, bar_char_width=term_width - 23)
-            scr.addstr(term_height - 3, 3, f"[ {self.questions_complete:3.0f}  / {self.questions_total:3.0f}  ][{progress_bar}]")
+            scr.addstr(term_height - 3, 3, f"[ {self.questions_complete:3.0f}  / {self.questions_total:3.0f}  ][{progress_bar}]", self.color['default'])
 
             # Elapsed Time
             progress_bar = self.__get_progress_bar(exam_progress=self.exam_elapsed_time / self.exam_contents['exam']['exam_allowed_time'], bar_char_width=term_width - 23)
-            scr.addstr(term_height - 2, 3, f"[ {self.exam_elapsed_time:3.0f}s / {self.exam_allowed_time:3.0f}s ][{progress_bar}]")
-            scr.attroff(curses.color_pair(6))
+            scr.addstr(term_height - 2, 3, f"[ {self.exam_elapsed_time:3.0f}s / {self.exam_allowed_time:3.0f}s ][{progress_bar}]", self.color['default'])
 
             ########################################################################################
 
@@ -665,7 +659,8 @@ class Exam:
 
 
 exam = Exam(exam_filepath="exam.yml")
-exam.show_menu()
-# exam.begin_exam()
+menu_result = exam.show_menu()
+if menu_result:
+    exam.begin_exam()
 
 
