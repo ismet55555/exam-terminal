@@ -14,13 +14,15 @@ import textwrap
 # Creating a message logger, all dependent scripts will inhearent this logger
 logging.basicConfig(format='[%(asctime)s][%(levelname)-8s] [%(filename)-30s:%(lineno)4s] %(message)s', datefmt='%m/%d-%H:%M:%S')
 logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)  # NOTE: No detailed logs shown when set to "logging.INFO"
+logger.setLevel(logging.FATAL)  # NOTE: No detailed logs shown when set to "logging.INFO"
 
 
 class Exam:
     def __init__(self, exam_filepath: str) -> None:
         # Loading exam contents
         self.exam_contents = self.__load_parse_examfile(exam_filepath)
+
+        self.color = {}
 
         self.questions_total = len(self.exam_contents['questions'])
         self.questions_complete = 0
@@ -114,7 +116,7 @@ class Exam:
         curses.curs_set(0)
 
         # Load curses colors
-        self.__load_curses_colors()
+        self.color = self.__load_curses_colors()
 
         # Turn off echo
         curses.noecho()
@@ -122,9 +124,21 @@ class Exam:
         # Non-blocking for user
         scr.nodelay(True)
 
-    def __draw_screen_border(self, scr, color_pair_index):
+    def __draw_screen_border(self, scr, color_pair_index) -> None:
         scr.attron(curses.color_pair(color_pair_index))
         scr.border(0)
+        scr.attroff(curses.color_pair(color_pair_index))
+
+    def __draw_horizontal_sceen_seperator(self, scr, y, color_pair_index) -> None:
+        # Getting the screen height and width
+        term_height, term_width = scr.getmaxyx()
+
+        scr.attron(curses.color_pair(color_pair_index))
+
+        if y < term_height - 2 and y > 2:
+            for x in range(term_width - 2):
+                scr.addstr(y, x + 1, '_', curses.color_pair(6) | curses.A_BOLD)
+
         scr.attroff(curses.color_pair(color_pair_index))
 
     def __check_terminal_size(self, scr, height_limit, width_limit) -> bool:
@@ -189,20 +203,32 @@ class Exam:
     ###############################################################################################
 
     @staticmethod
-    def __load_curses_colors() -> None:
+    def __load_curses_colors() -> dict:
         # Start colors in curses
         try: curses.start_color()
         except: pass
 
         # Define the colors to be used (foreground and background) (ie. curses.color_pair(1))
         #     curses.init_pair(color reference index, font color number, background color number)
-        # NOTE: -1 is transparent
-        curses.init_pair(1, curses.COLOR_CYAN, curses.COLOR_BLACK)
-        curses.init_pair(2, curses.COLOR_RED, curses.COLOR_BLACK)
-        curses.init_pair(3, curses.COLOR_MAGENTA, curses.COLOR_BLACK)
-        curses.init_pair(4, curses.COLOR_GREEN, curses.COLOR_BLACK)
-        curses.init_pair(5, curses.COLOR_YELLOW, curses.COLOR_BLACK)
-        curses.init_pair(6, 248, curses.COLOR_BLACK)  # Grey
+
+        # Define colors
+        color_definition = {
+            'default':  [curses.COLOR_WHITE, 0],
+            'cyan':     [curses.COLOR_CYAN, 0],
+            'red':      [curses.COLOR_RED, 0],
+            'magenta':  [curses.COLOR_MAGENTA, 0],
+            'green':    [curses.COLOR_GREEN, 0],
+            'yellow':   [curses.COLOR_YELLOW, 0],
+            'gray':     [240, 0]
+        }
+
+        # Initiating curses color and saving for quick reference
+        color = {}
+        for index, (key, value) in enumerate(color_definition.items()):
+            curses.init_pair(index + 1, value[0], value[1])
+            color[key] = index + 1
+
+        return color
 
     @staticmethod
     def __load_keys():
@@ -210,10 +236,11 @@ class Exam:
             "ENTER": (curses.KEY_ENTER, ord('\n'), ord('\r')),
             "KEYS_UP": (curses.KEY_UP, ord('k')),
             "KEYS_DOWN": (curses.KEY_DOWN, ord('j')),
-            "KEYS_SELECT": (curses.KEY_RIGHT, ord(' ')),
-            "KEYS_PAUSE": ord('p'),
-            "KEYS_RESUME": ord('r'),
-            "KEYS_QUIT": (27 , ord('q'))
+            "KEYS_RIGHT": (curses.KEY_RIGHT, ord('l')),
+            "KEYS_LEFT": (curses.KEY_LEFT, ord('h')),
+            "KEYS_PAUSE": (ord('p'), ord('P')),
+            "KEYS_RESUME": (ord('r'), ord('R')),
+            "KEYS_QUIT": (27 , ord('q'), ord('Q'))
         }
         return KEYS
 
@@ -245,9 +272,22 @@ class Exam:
 
             ########################################################################################
 
-            # Check user input and adjust the cursor movement
-            if k in KEYS['KEYS_QUIT']:
+            # Check user keyboard input
+            if k in KEYS['KEYS_DOWN']:
+                self.selection_index += 1
+
+            elif k in KEYS['KEYS_UP']:
+                self.selection_index -= 1
+
+            elif k in KEYS['ENTER']:
+                 return
+
+            elif k in KEYS['KEYS_QUIT']:
                 break
+
+            ########################################################################################
+
+            term_height, term_width = scr.getmaxyx()              
 
             ########################################################################################
 
@@ -263,23 +303,19 @@ class Exam:
             ########################################################################################
 
             # TODO: Set up main menu
-            #   - Display basic information from test file
-            #   - Display the software name
             #   - Option to Begin Exam
             #   - Option to Exit
-
-            term_height, term_width = scr.getmaxyx()
 
             # Show software name/title
             software_name = self.__load_software_ascii_name()
             start_x = term_width // 2 - len(software_name[0]) // 2
             for y, line in enumerate(software_name):
-                scr.addstr(2 + y, start_x, line, curses.A_BOLD)
+                scr.addstr(2 + y, start_x, line, curses.color_pair(6) | curses.A_BOLD)
 
-            # Seperator
-            for x in range(term_width - 2):
-                scr.addstr(y + 3, x + 1, '_', curses.A_BOLD)
+            # Horizontal Seperator
+            self.__draw_horizontal_sceen_seperator(scr, y + 3, self.color['green'])
 
+            ########################################################################################
 
             # TODO: text wrapper
 
@@ -297,12 +333,6 @@ class Exam:
             lines = ["Edit Date:", f"{self.exam_contents['exam']['exam_edit_date']}"]
             for x, line in zip(start_x, lines):
                 scr.addstr(y + 2, x, line, curses.color_pair(1))
-
-
-
-            lines = [f"{self.exam_contents['exam']['exam_title']}"]
-            for x, line in zip(start_x, lines):
-                scr.addstr(y + 0, x, line, curses.color_pair(1) | curses.A_BOLD)
 
 
 
@@ -326,7 +356,29 @@ class Exam:
             for x, line in zip(start_x, lines):
                 scr.addstr(y + 8, x, line, curses.color_pair(1))
 
+            ########################################################################################
 
+            # Horizontal Seperator
+            self.__draw_horizontal_sceen_seperator(scr, y + 12, curses.color_pair(6))
+
+            ########################################################################################
+
+            selections = [
+                "Begin Exam",
+                "Quit"
+            ]
+
+            # Check if within boundaries of selection indexes
+            self.selection_index = max(self.selection_index, 0)
+            self.selection_index = min(self.selection_index, len(selections) - 1)
+
+            for s, selection in enumerate(selections):
+                if s == self.selection_index:
+                    # Color for highlighted selection text
+                    color = curses.A_BOLD 
+                else:
+                    color = curses.color_pair(6)
+                scr.addstr(y + s + 14, term_width // 2 - len(selection) // 2, selection, color)
 
             ########################################################################################
 
@@ -379,7 +431,7 @@ class Exam:
 
             ########################################################################################
 
-            # Check user input and adjust the cursor movement
+            # Check user keyboard input
             if k in KEYS['KEYS_DOWN']:
                 if not self.exam_paused and not self.is_exam_time_out:
                     self.selection_index += 1
@@ -400,10 +452,10 @@ class Exam:
                     # Return the entered answer
                     return index, answer, correct
 
-            elif k == KEYS['KEYS_PAUSE']:
+            elif k in KEYS['KEYS_PAUSE']:
                 self.exam_paused = True
 
-            elif k == KEYS['KEYS_RESUME']:
+            elif k in KEYS['KEYS_RESUME']:
                 self.exam_paused = False
                 self.exam_quit = False
 

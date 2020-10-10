@@ -7,9 +7,10 @@
 - Have a answered/unanswered questions indicator 
 - Curses box for messages
 - Set up where multiple choice selection yields something back
-- Set up multiple chocice
+- Set up multiple choice
 - Encrypt the exam file with a password so you can send it to someone?-
-- Quiting exam with option to continue later -> create a temp .exam file
+- Quitting exam with option to continue later -> create a temp .exam file
+- Auto save to protect against crashes
 
 - See if progress can be a ball on a string moving
   -  ============[]------
