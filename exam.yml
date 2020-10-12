@@ -4,7 +4,7 @@ exam:
   exam_description: This is a sample exam and this is a description
   exam_author: Ismet Handzic
   exam_edit_date: "10/09/2020"
-  exam_allowed_time: 5
+  exam_allowed_time: 60
   exam_allowed_time_units: seconds
   exam_passing_score: 70
 

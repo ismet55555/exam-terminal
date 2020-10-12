@@ -1,5 +1,6 @@
 # TODO 
 
+- Queston and selection text wrap to screen width
 - Go back and forth with questions
 - Have a answered/unanswered questions indicator 
 - Set up where multiple choice selection yields something backce
@@ -7,6 +8,7 @@
 - Quitting exam with option to continue later -> create a temp .exam file
 - Auto save to protect against crashes
 - Timeout on question taking too long (maybe X% of total test ...)
+- For results show time plot and per question plot
 
 
 

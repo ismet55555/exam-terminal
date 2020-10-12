@@ -3,7 +3,6 @@
 import curses
 from pprint import pprint
 from time import sleep, time
-# from loguru import logger
 import yaml
 import threading
 import logging
@@ -157,8 +156,8 @@ class Exam:
             scr.addstr(2, 1, f"Terminal width must be more than {self.width_limit} characters!", curses.color_pair(1))
             terminal_size_good = False
 
-        if terminal_size_good:
-            scr.addstr(1, 1, f"[Terminal Size: W:{term_width}, H:{term_height}]", curses.color_pair(1))
+        # if terminal_size_good:
+        #     scr.addstr(1, 1, f"[Terminal Size: W:{term_width}, H:{term_height}]", curses.color_pair(1))
 
         return terminal_size_good
 
@@ -221,7 +220,7 @@ class Exam:
             'yellow':       [curses.COLOR_YELLOW, 0],
             'cyan':         [curses.COLOR_CYAN, 0],
             'magenta':      [curses.COLOR_MAGENTA, 0],
-            'grey':         [240, 0],
+            'grey':         [242, 0],
             'black-white':  [curses.COLOR_BLACK, curses.COLOR_WHITE],
             'white-red':    [curses.COLOR_WHITE, curses.COLOR_RED]
         }
@@ -350,10 +349,11 @@ class Exam:
 
             ########################################################################################
 
-            # TODO: text wrapper
+            # TODO: text wrapper to screen width
+            #       Decorate title
 
             y = 4
-            start_x = [10, 26]
+            start_x = [6, 25]
 
             line = f"{self.exam_contents['exam']['exam_title']}"
             # lines = ["Exam Title:", f"{self.exam_contents['exam']['exam_title']}"]
@@ -456,9 +456,9 @@ class Exam:
         self.__basic_screen_setup(scr)
         KEYS = self.__load_keys()
 
-        start_y = 5
-        question_x = 8
-        selection_x = 10
+        start_y = 3
+        question_x = 4
+        selection_x = 6
         self.selection_index = 0
 
         # User key input (ASCII)
@@ -522,8 +522,9 @@ class Exam:
             ########################################################################################
 
             # Create text wrappers wrapping text over number of characters
-            wrapper_question = textwrap.TextWrapper(width=60)
-            wrapper_selection = textwrap.TextWrapper(width=40)
+            term_height, term_width = scr.getmaxyx()
+            wrapper_question = textwrap.TextWrapper(width=term_width - 10)
+            wrapper_selection = textwrap.TextWrapper(width=term_width - 20)
 
             # Wrap and show the question
             question_wrap = wrapper_question.wrap(text=question['question']) 
@@ -531,7 +532,7 @@ class Exam:
                 scr.addstr(start_y + l - 1, question_x, line)
 
             # Set the offset to the next line
-            selection_offset = len(question_wrap) + 3
+            selection_offset = len(question_wrap) + 2
 
             # Wrap and show selection
             for s, selection in enumerate(question['selection']):
@@ -540,8 +541,14 @@ class Exam:
                 for l, line in enumerate(selection_wrap):
                     # Style selection and draw selector
                     if s == self.selection_index:
-                        color = self.color['green'] | self.decor['bold']
-                        scr.addstr(start_y + selection_offset + l - 1, selection_x - 2, self.selection_indicator, color)
+                        color = self.color['default'] | self.decor['bold']
+
+                        # Get the x position of selection indicator
+                        # longest_selection_text = len(max(question['selection'], key = len))
+
+                        # Draw the indicators
+                        scr.addstr(start_y + selection_offset + l - 1, selection_x - 2, self.selection_indicator, self.color['blue'])
+                        # scr.addstr(start_y + selection_offset + l - 1, selection_x + longest_selection_text + 4, self.selection_indicator, color)
                     else:
                         color = self.color['default']
 
