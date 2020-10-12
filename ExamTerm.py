@@ -218,9 +218,11 @@ class Exam:
             'green':        [curses.COLOR_GREEN, 0],
             'blue':         [curses.COLOR_BLUE, 0],
             'yellow':       [curses.COLOR_YELLOW, 0],
+            'orange':       [209, 0],
             'cyan':         [curses.COLOR_CYAN, 0],
             'magenta':      [curses.COLOR_MAGENTA, 0],
-            'grey':         [242, 0],
+            'grey-dark':    [240, 0],
+            'grey-light':   [248, 0],
             'black-white':  [curses.COLOR_BLACK, curses.COLOR_WHITE],
             'white-red':    [curses.COLOR_WHITE, curses.COLOR_RED]
         }
@@ -334,7 +336,7 @@ class Exam:
                 pass
 
             # Drawing the screen border
-            self.__draw_screen_border(scr, self.color['grey'])
+            self.__draw_screen_border(scr, self.color['grey-dark'])
 
             ########################################################################################
 
@@ -342,56 +344,61 @@ class Exam:
             software_name = self.__load_software_ascii_name()
             start_x = term_width // 2 - len(software_name[0]) // 2
             for y, line in enumerate(software_name):
-                scr.addstr(1 + y, start_x, line, self.color['grey'])
+                scr.addstr(1 + y, start_x, line, self.color['grey-dark'])
 
             # Horizontal Seperator
-            self.__draw_horizontal_sceen_seperator(scr, y + 2, self.color['grey'])
+            self.__draw_horizontal_sceen_seperator(scr, y + 2, self.color['grey-dark'])
 
             ########################################################################################
 
-            # TODO: text wrapper to screen width
-            #       Decorate title
+            wrapper_menu_item = textwrap.TextWrapper(width=term_width - 35)
+
+            start_y = 5
 
             y = 4
             start_x = [6, 25]
 
             line = f"{self.exam_contents['exam']['exam_title']}"
-            # lines = ["Exam Title:", f"{self.exam_contents['exam']['exam_title']}"]
-            # for x, line in zip(start_x, lines):
-            scr.addstr(y + 0, self.__center_x(term_width, line), line, self.decor['bold'])
+            scr.addstr(start_y, self.__center_x(term_width, line), line, self.decor['bold'])
+            start_y += 1
 
             line = f"{self.exam_contents['exam']['exam_author']}"
-            # lines = ["Composed By:", f"{self.exam_contents['exam']['exam_author']}"]
-            # for x, line in zip(start_x, lines):
-            scr.addstr(y + 1, self.__center_x(term_width, line), line, self.color['grey'])
+            scr.addstr(start_y, self.__center_x(term_width, line), line, self.color['grey-light'])
+            start_y += 1
 
             line = f"{self.exam_contents['exam']['exam_edit_date']}"
-            # lines = ["Edit Date:", f"{self.exam_contents['exam']['exam_edit_date']}"]
-            # for x, line in zip(start_x, lines):
-            scr.addstr(y + 2, self.__center_x(term_width, line), line, self.color['grey'])
+            scr.addstr(start_y, self.__center_x(term_width, line), line, self.color['grey-light'])
+            start_y += 4
 
-
-            y += 0
 
             lines = ["Description:", f"{self.exam_contents['exam']['exam_description']}"]
-            for x, line in zip(start_x, lines):
-                scr.addstr(y + 4, x, line, self.color['default'])
+            menu_item_wrap = ' '
+            for x, line_text in zip(start_x, lines):
+                menu_item_wrap = wrapper_menu_item.wrap(text=line_text)
+                for l, line in enumerate(menu_item_wrap):
+                    scr.addstr(start_y + l - 1, x, line, self.color['default'])
+            start_y += len(menu_item_wrap)
+
             
             lines = ["Exam Type:", f"Multiple Choice, Single Answer"]
             for x, line in zip(start_x, lines):
-                scr.addstr(y + 5, x, line, self.color['default'])
+                scr.addstr(start_y , x, line, self.color['default'])
+            start_y += 2
 
             lines = ["Questions:", f"52"]
             for x, line in zip(start_x, lines):
-                scr.addstr(y + 6, x, line, self.color['default'])
+                scr.addstr(start_y, x, line, self.color['default'])
+            start_y += 2
 
             lines = ["Allowed Time:", f"{self.exam_contents['exam']['exam_allowed_time']} {self.exam_contents['exam']['exam_allowed_time_units']}"]
             for x, line in zip(start_x, lines):
-                scr.addstr(y + 7, x, line, self.color['default'])
+                scr.addstr(start_y, x, line, self.color['default'])
+            start_y += 2
 
             lines = ["Passing Score:", f"{self.exam_contents['exam']['exam_passing_score']} %"]
             for x, line in zip(start_x, lines):
-                scr.addstr(y + 8, x, line, self.color['default'])
+                scr.addstr(start_y, x, line, self.color['default'])
+            start_y += 2
 
             ########################################################################################
 
@@ -415,13 +422,13 @@ class Exam:
                     scr.addstr(y + s + 1 + y_selection, x_begin, '|', color)
                     scr.addstr(y + s + 1 + y_selection, x_end, '|', color)
                 else:
-                    color = self.color['grey']
+                    color = self.color['grey-light']
                 scr.addstr(y + s + 1 + y_selection, term_width // 2 - len(selection) // 2, selection, color)
 
             ########################################################################################
 
             # Horizontal Seperator
-            self.__draw_horizontal_sceen_seperator(scr, term_height - 6, self.color['grey'])
+            self.__draw_horizontal_sceen_seperator(scr, term_height - 6, self.color['grey-dark'])
 
             ########################################################################################
 
@@ -511,7 +518,7 @@ class Exam:
                 pass
 
             # Drawing the screen border
-            self.__draw_screen_border(scr, self.color['grey'])
+            self.__draw_screen_border(scr, self.color['grey-dark'])
             
             ########################################################################################
 
@@ -547,10 +554,10 @@ class Exam:
                         # longest_selection_text = len(max(question['selection'], key = len))
 
                         # Draw the indicators
-                        scr.addstr(start_y + selection_offset + l - 1, selection_x - 2, self.selection_indicator, self.color['blue'])
+                        scr.addstr(start_y + selection_offset + l - 1, selection_x - 2, self.selection_indicator, self.color['default'] | self.decor['bold'])
                         # scr.addstr(start_y + selection_offset + l - 1, selection_x + longest_selection_text + 4, self.selection_indicator, color)
                     else:
-                        color = self.color['default']
+                        color = self.color['grey-light']
 
                     scr.addstr(start_y + selection_offset + l - 1, selection_x + 2, line, color)
 
@@ -568,8 +575,14 @@ class Exam:
             scr.addstr(term_height - 3, 3, f"[ {self.questions_complete:3.0f}  / {self.questions_total:3.0f}  ][{progress_bar}]", self.color['default'])
 
             # Elapsed Time
-            progress_bar = self.__get_progress_bar(exam_progress=self.exam_elapsed_time / self.exam_contents['exam']['exam_allowed_time'], bar_char_width=term_width - 23)
-            scr.addstr(term_height - 2, 3, f"[ {self.exam_elapsed_time:3.0f}s / {self.exam_allowed_time:3.0f}s ][{progress_bar}]", self.color['default'])
+            examp_elapsed_dec = self.exam_elapsed_time / self.exam_contents['exam']['exam_allowed_time']
+            color = self.color['default']
+            if examp_elapsed_dec > 0.85 and examp_elapsed_dec <= 0.95:
+                color = self.color['orange']
+            if examp_elapsed_dec > 0.92:
+                color = self.color['red'] | self.decor['bold']
+            progress_bar = self.__get_progress_bar(exam_progress=examp_elapsed_dec, bar_char_width=term_width - 23)
+            scr.addstr(term_height - 2, 3, f"[ {self.exam_elapsed_time:3.0f}s / {self.exam_allowed_time:3.0f}s ][{progress_bar}]", color)
 
             ########################################################################################
 
