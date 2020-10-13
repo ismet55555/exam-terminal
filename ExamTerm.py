@@ -7,6 +7,7 @@ import yaml
 import threading
 import logging
 import textwrap
+from datetime import datetime
 
 # NOTE: https://docs.python.org/2/library/curses.html
 
@@ -44,6 +45,7 @@ class Exam:
 
         self.exam_paused = False
         self.exam_paused_elapsed_time = 0
+        self.exam_paused_count = 0
 
         self.exam_quit = False
 
@@ -111,7 +113,7 @@ class Exam:
             question['answered'] = False
 
         # Get the total number of questions
-        self.questions_total = len(self.exam_contents['questions'])
+        self.exam_contents['exam']['exam_questions_count'] = len(self.exam_contents['questions'])
 
         return self.exam_contents
 
@@ -502,6 +504,7 @@ class Exam:
 
             elif k in KEYS['PAUSE']:
                 self.exam_paused = True
+                self.exam_paused_count += 1
 
             elif k in KEYS['RESUME']:
                 self.exam_paused = False
@@ -716,102 +719,151 @@ class Exam:
             # Get User input
             k = scr.getch()
 
-    def __assemble_exam_results(self) -> dict:
+    def __evaluate_exam(self):
+        questions_count = len(self.exam_contents['questions'])
 
-        pprint(self.exam_contents)
+        # Get the score
+        self.exam_contents['exam']['evaluation_percent'] = (self.questions_correct / questions_count) * 100
+
+        # Get the score label/text
+        if self.exam_contents['exam']['evaluation_percent'] >= self.exam_contents['exam']['exam_passing_score']:
+            self.exam_contents['exam']['evaluation_label'] = "PASSED"
+        else:
+            self.exam_contents['exam']['evaluation_label'] = "FAILED"
+
+    def __assemble_exam_results(self) -> dict:
+        results = {}
+
+        index = 0
+
+        results[index] = {
+            "label": "Exam Title:",
+            "text": self.exam_contents['exam']['exam_title'],
+            "color": "default",
+            "decor": "bold",
+            "x_pos": [4, 35],
+            "skip_lines": 1
+        }
+        index += 1
+
+        results[index] = {
+            "label": "Result:",
+            "text": self.exam_contents['exam']['evaluation_label'],
+            "color": "blue",
+            "decor": "bold",
+            "x_pos": [4, 35],
+            "skip_lines": 1
+        }
+        index += 1
+
+        results[index] = {
+            "label": "Correct:",
+            "text": f"{self.exam_contents['exam']['evaluation_percent']:3.1f}% ({self.questions_correct} of {self.exam_contents['exam']['exam_questions_count']})",
+            "color": "default",
+            "decor": "normal",
+            "x_pos": [4, 35],
+            "skip_lines": 1
+        }
+        index += 1
+
+        results[index] = {
+            "label": "Elapsed Exam Time:",
+            "text": f"{self.exam_elapsed_time:3.1f} seconds",  # TODO: Convert to hr, min, sec
+            "color": "default",
+            "decor": "normal",
+            "x_pos": [4, 35],
+            "skip_lines": 1
+        }
+        index += 1
+
+        exam_begin_time = datetime.fromtimestamp(self.exam_contents['exam']['exam_begin_timestamp'])
+        exam_end_time = datetime.fromtimestamp(self.exam_contents['exam']['exam_end_timestamp'])
+        results[index] = {
+            "label": "Exam Time Range:",
+            "text": f"{exam_begin_time} -> {exam_end_time}",
+            "color": "default",
+            "decor": "normal",
+            "x_pos": [4, 35],
+            "skip_lines": 1
+        }
+        index += 1
+        
+        results[index] = {
+            "label": "Number of Times Paused:",
+            "text": str(self.exam_paused_count),
+            "color": "default",
+            "decor": "normal",
+            "x_pos": [4, 35],
+            "skip_lines": 1
+        }
+        index += 1
+
+        results[index] = {
+            "label": "Elapsed Pauseed Time:",
+            "text": f"{self.exam_paused_elapsed_time:3.1f} seconds",  # TODO: Convert to hr, min, sec
+            "color": "default",
+            "decor": "normal",
+            "x_pos": [4, 35],
+            "skip_lines": 3
+        }
+        index += 1
+
+        answer_distribution = ""
+        for question in self.exam_contents['questions']:
+            if question['answered']:
+                if question['answered_correctly']:
+                    answer_distribution += ' +'
+                else:
+                    answer_distribution += ' -'
+        results[index] = {
+            "label": "Answers Per Question:",
+            "text": f"[First]{answer_distribution} [Last]",
+            "color": "default",
+            "decor": "normal",
+            "x_pos": [4, 35],
+            "skip_lines": 1
+        }
+        index += 1
+        
+        width = 30
+        answer_distribution = [' '] * width       
+        for question in self.exam_contents['questions']:
+            if question['answered']:
+                index = int((question['answered_exam_time'] / self.exam_elapsed_time) * width)
+                answer_distribution[index-1] = "*"
+        results[index] = {
+            "label": "Answers Over Time:",
+            "text": f"[0s] {''.join(answer_distribution)} [{self.exam_elapsed_time:.0f}s]",
+            "color": "default",
+            "decor": "normal",
+            "x_pos": [4, 35],
+            "skip_lines": 3
+        }
+        index += 1
+
 
         # TODO: Do this in pieces, appending the results dict
+        #       Number skipped
 
-        results = {
-            0: {
-                "label": "Exam Title:",
-                "text": "This is a Sample Exam Just To Test Things, Certification",
-                "color": "default",
-                "decor": "bold",
-                "x_pos": [4, 35],
-                "skip_lines": 1
-            },
-            1: {
-                "label": "Result:",
-                "text": "PASSED",
-                "color": "green",
-                "decor": "bold",
-                "x_pos": [4, 35],
-                "skip_lines": 1
-            },
-            2: {
-                "label": "Correct:",
-                "text": "79% (45 / 60)",
-                "color": "default",
-                "decor": "normal",
-                "x_pos": [4, 35],
-                "skip_lines": 1
-            },
-            3: {
-                "label": "Elapsed Exam Time:",
-                "text": "56 minutes, 46 seconds",
-                "color": "default",
-                "decor": "normal",
-                "x_pos": [4, 35],
-                "skip_lines": 1
-            },
-            4: {
-                "label": "Exam Time Range:",
-                "text": "05/04/2020:15:54 -> 05/04/2020:16:54",
-                "color": "default",
-                "decor": "normal",
-                "x_pos": [4, 35],
-                "skip_lines": 1
-            },
-            5: {
-                "label": "Number of Times Paused:",
-                "text": "2",
-                "color": "default",
-                "decor": "normal",
-                "x_pos": [4, 35],
-                "skip_lines": 1
-            },
-            6: {
-                "label": "Elapsed Pause Time:",
-                "text": "2 minutes, 34 seconds",
-                "color": "default",
-                "decor": "normal",
-                "x_pos": [4, 35],
-                "skip_lines": 3
-            },
-            7: {
-                "label": "Answers Per Question:",
-                "text": "[First] + - + + - + + + [Last]",
-                "color": "default",
-                "decor": "normal",
-                "x_pos": [4, 35],
-                "skip_lines": 1
-            },
-            8: {
-                "label": "Answers Over Time:",
-                "text": "[Start]     ++ +-- + -  --+  + [Stop]",
-                "color": "default",
-                "decor": "normal",
-                "x_pos": [4, 35],
-                "skip_lines": 3
-            },
-            9: {
-                "label": "Average Time Per Question:",
-                "text": "10.6 +/- 3.2 seconds",
-                "color": "default",
-                "decor": "normal",
-                "x_pos": [4, 35],
-                "skip_lines": 1
-            },
-            10: {
-                "label": "Median Time Per Question:",
-                "text": "11.3 seconds",
-                "color": "default",
-                "decor": "normal",
-                "x_pos": [4, 35],
-                "skip_lines": 1
-            }
-        }
+
+
+        #     9: {
+        #         "label": "Average Time Per Question:",
+        #         "text": "10.6 +/- 3.2 seconds",
+        #         "color": "default",
+        #         "decor": "normal",
+        #         "x_pos": [4, 35],
+        #         "skip_lines": 1
+        #     },
+        #     10: {
+        #         "label": "Median Time Per Question:",
+        #         "text": "11.3 seconds",
+        #         "color": "default",
+        #         "decor": "normal",
+        #         "x_pos": [4, 35],
+        #         "skip_lines": 1
+        #     }
+        # }
         return results
 
     def show_result(self):
@@ -823,6 +875,7 @@ class Exam:
         logger.info('Exam started')
 
         self.exam_begin_time = time()
+        self.exam_contents['exam']['exam_begin_timestamp'] = self.exam_begin_time
 
         # Start the independent timer thread for entire exam
         self.is_timer_timing = True
@@ -863,11 +916,18 @@ class Exam:
             # Calculate Progress
             self.questions_progress = (self.questions_complete / self.questions_total)
 
+
+        self.exam_contents['exam']['exam_end_timestamp'] = time()
+
         # Stop independent exam timer
         self.is_timer_timing = False
         exam_timer_thread.join()
 
+        # Evaluate the exam
+        self.__evaluate_exam()
+
         # pprint(self.exam_contents)
+        # exit()
 
 
 
