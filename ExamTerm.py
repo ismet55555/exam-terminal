@@ -76,8 +76,8 @@ class Exam:
             question['question_number'] = index
 
             # Create empty list for answer indexes
-            question['answer_indexes'] = []
-            question['answer_bool'] = []
+            question['question_answer_indexes'] = []
+            question['question_answer_bool'] = []
 
             # Looping over selection for each question
             for i, s in enumerate(question['selection']):
@@ -90,8 +90,8 @@ class Exam:
                     # Save the correct answer
                     if s[first_key]:
                         # Is True (correct answer)
-                        question['answer_indexes'].append(i)
-                        question['answer_bool'].append(True)
+                        question['question_answer_indexes'].append(i)
+                        question['question_answer_bool'].append(True)
                     else:
                         # Is True (incorrect answer)
                         question['answer_bool'].append(False)
@@ -101,16 +101,17 @@ class Exam:
 
                 else:
                     # No value, assumed False answer
-                    question['answer_bool'].append(False)
+                    question['question_answer_bool'].append(False)
 
             # Determine if it is a multi-selection question
-            question['multiselect'] = sum(question['answer_bool']) > 1
-            question['min_selection_count'] = sum(question['answer_bool'])
+            question['question_multiselect'] = sum(question['question_answer_bool']) > 1
+            question['question_min_selection_count'] = sum(question['question_answer_bool'])
+
+            # Set answered status
+            question['answered'] = False
 
         # Get the total number of questions
         self.questions_total = len(self.exam_contents['questions'])
-
-        # pprint(self.exam_contents)
 
         return self.exam_contents
 
@@ -213,7 +214,7 @@ class Exam:
 
         # Defining colors [foreground/font, background]
         color_definition = {
-            'default':      [curses.COLOR_WHITE, 0],
+            'default':      [curses.COLOR_WHITE, 0],    # FIXME: Rename to "normal" to match decor
             'red':          [curses.COLOR_RED, 0],
             'green':        [curses.COLOR_GREEN, 0],
             'blue':         [curses.COLOR_BLUE, 0],
@@ -305,10 +306,10 @@ class Exam:
             ########################################################################################
 
             # Check user keyboard input
-            if k in KEYS['DOWN']:
+            if k in KEYS['DOWN'] or k in KEYS['RIGHT']:
                 self.selection_index += 1
 
-            elif k in KEYS['UP']:
+            elif k in KEYS['UP'] or k in KEYS['LEFT']:
                 self.selection_index -= 1
 
             elif k in KEYS['ENTER']:
@@ -354,8 +355,6 @@ class Exam:
             wrapper_menu_item = textwrap.TextWrapper(width=term_width - 35)
 
             start_y = 5
-
-            y = 4
             start_x = [6, 25]
 
             line = f"{self.exam_contents['exam']['exam_title']}"
@@ -414,6 +413,8 @@ class Exam:
             longest_selection_text = len(max(selections, key = len))
             x_begin = term_width // 2 - longest_selection_text // 2 - 3
             x_end = term_width // 2 + longest_selection_text // 2 + 2
+
+            y = 4
 
             for s, selection in enumerate(selections):
                 if s == self.selection_index:
@@ -493,7 +494,7 @@ class Exam:
 
                 elif not self.exam_paused:
                     index = self.selection_index
-                    correct = question['answer_bool'][self.selection_index]
+                    correct = question['question_answer_bool'][self.selection_index]
                     answer = question['selection'][self.selection_index]
 
                     # Return the entered answer
@@ -645,10 +646,10 @@ class Exam:
             ########################################################################################
 
             # Check user keyboard input
-            if k in KEYS['DOWN']:
+            if k in KEYS['DOWN'] or k in KEYS['RIGHT']:
                 self.selection_index += 1
 
-            elif k in KEYS['UP']:
+            elif k in KEYS['UP'] or k in KEYS['LEFT']:
                 self.selection_index -= 1
 
             elif k in KEYS['ENTER']:
@@ -698,6 +699,15 @@ class Exam:
             #       - Main Menu
             #       - Quit
 
+            start_y = 2
+
+            results = self.__assemble_exam_results()
+
+            for index, item in results.items():
+                scr.addstr(start_y , item['x_pos'][0], item['label'], self.color['default'])
+                scr.addstr(start_y , item['x_pos'][1], item['text'], self.color[item['color']] | self.decor[item['decor']])
+                start_y += item['skip_lines']
+
             ########################################################################################
 
             # Refresh the screen
@@ -705,6 +715,104 @@ class Exam:
 
             # Get User input
             k = scr.getch()
+
+    def __assemble_exam_results(self) -> dict:
+
+        pprint(self.exam_contents)
+
+        # TODO: Do this in pieces, appending the results dict
+
+        results = {
+            0: {
+                "label": "Exam Title:",
+                "text": "This is a Sample Exam Just To Test Things, Certification",
+                "color": "default",
+                "decor": "bold",
+                "x_pos": [4, 35],
+                "skip_lines": 1
+            },
+            1: {
+                "label": "Result:",
+                "text": "PASSED",
+                "color": "green",
+                "decor": "bold",
+                "x_pos": [4, 35],
+                "skip_lines": 1
+            },
+            2: {
+                "label": "Correct:",
+                "text": "79% (45 / 60)",
+                "color": "default",
+                "decor": "normal",
+                "x_pos": [4, 35],
+                "skip_lines": 1
+            },
+            3: {
+                "label": "Elapsed Exam Time:",
+                "text": "56 minutes, 46 seconds",
+                "color": "default",
+                "decor": "normal",
+                "x_pos": [4, 35],
+                "skip_lines": 1
+            },
+            4: {
+                "label": "Exam Time Range:",
+                "text": "05/04/2020:15:54 -> 05/04/2020:16:54",
+                "color": "default",
+                "decor": "normal",
+                "x_pos": [4, 35],
+                "skip_lines": 1
+            },
+            5: {
+                "label": "Number of Times Paused:",
+                "text": "2",
+                "color": "default",
+                "decor": "normal",
+                "x_pos": [4, 35],
+                "skip_lines": 1
+            },
+            6: {
+                "label": "Elapsed Pause Time:",
+                "text": "2 minutes, 34 seconds",
+                "color": "default",
+                "decor": "normal",
+                "x_pos": [4, 35],
+                "skip_lines": 3
+            },
+            7: {
+                "label": "Answers Per Question:",
+                "text": "[First] + - + + - + + + [Last]",
+                "color": "default",
+                "decor": "normal",
+                "x_pos": [4, 35],
+                "skip_lines": 1
+            },
+            8: {
+                "label": "Answers Over Time:",
+                "text": "[Start]     ++ +-- + -  --+  + [Stop]",
+                "color": "default",
+                "decor": "normal",
+                "x_pos": [4, 35],
+                "skip_lines": 3
+            },
+            9: {
+                "label": "Average Time Per Question:",
+                "text": "10.6 +/- 3.2 seconds",
+                "color": "default",
+                "decor": "normal",
+                "x_pos": [4, 35],
+                "skip_lines": 1
+            },
+            10: {
+                "label": "Median Time Per Question:",
+                "text": "11.3 seconds",
+                "color": "default",
+                "decor": "normal",
+                "x_pos": [4, 35],
+                "skip_lines": 1
+            }
+        }
+        return results
 
     def show_result(self):
         return curses.wrapper(self.draw_result)
@@ -727,6 +835,7 @@ class Exam:
         for q, question in enumerate(self.exam_contents['questions']):
             # Start timer for current question
             question_elapsed_time = time()
+            self.exam_contents['questions'][q]['question_presented_timestamp'] = question_elapsed_time
 
             # Show the question
             index, answer, correct = exam.show_question(question)
@@ -736,6 +845,7 @@ class Exam:
                 break
 
             # Log answer metadata
+            self.exam_contents['questions'][q]['answered'] = True
             self.exam_contents['questions'][q]['answered_timestamp'] = time()
             self.exam_contents['questions'][q]['answered_exam_time'] = self.exam_elapsed_time
             self.exam_contents['questions'][q]['answered_question_time'] = time() - question_elapsed_time
