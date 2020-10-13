@@ -709,6 +709,7 @@ class Exam:
     def show_result(self):
         return curses.wrapper(self.draw_result)
 
+    ###############################################################################################
 
     def begin_exam(self):
         logger.info('Exam started')
@@ -764,7 +765,7 @@ class Exam:
 exam = Exam(exam_filepath="exam.yml")
 menu_result = exam.show_menu()
 if menu_result:
-     exam.begin_exam()
+    exam.begin_exam()
 
     exam.show_result()
 

@@ -11,6 +11,10 @@
 ## Main Menu
 - Add some useful information next to program title
 - Small animations
+- Options menu
+  - Immediate feedback
+  - Show Time
+  - Show Progress
 
 ## Exam Loading
 - Better way to format and load exam
