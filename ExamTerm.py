@@ -762,10 +762,10 @@ class Exam:
 
 
 exam = Exam(exam_filepath="exam.yml")
-# menu_result = exam.show_menu()
-# if menu_result:
-#     exam.begin_exam()
+menu_result = exam.show_menu()
+if menu_result:
+     exam.begin_exam()
 
-exam.show_result()
+    exam.show_result()
 
 
