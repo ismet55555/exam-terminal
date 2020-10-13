@@ -8,6 +8,7 @@ import threading
 import logging
 import textwrap
 from datetime import datetime
+from statistics import mean, stdev, median
 
 # NOTE: https://docs.python.org/2/library/curses.html
 
@@ -746,6 +747,7 @@ class Exam:
         }
         index += 1
 
+
         results[index] = {
             "label": "Result:",
             "text": self.exam_contents['exam']['evaluation_label'],
@@ -755,6 +757,7 @@ class Exam:
             "skip_lines": 1
         }
         index += 1
+
 
         results[index] = {
             "label": "Correct:",
@@ -766,8 +769,35 @@ class Exam:
         }
         index += 1
 
+
         results[index] = {
-            "label": "Elapsed Exam Time:",
+            "label": "Incorrect:",
+            "text": f"{100 - self.exam_contents['exam']['evaluation_percent']:3.1f}% ({self.exam_contents['exam']['exam_questions_count'] - self.questions_correct} of {self.exam_contents['exam']['exam_questions_count']})",
+            "color": "default",
+            "decor": "normal",
+            "x_pos": [4, 35],
+            "skip_lines": 1
+        }
+        index += 1
+
+
+        answered = 0
+        for question in self.exam_contents['questions']:
+            if question['answered']:
+                answered += 1
+        results[index] = {
+            "label": "Questions Answered:",
+            "text": f"{answered} of {self.exam_contents['exam']['exam_questions_count']}",
+            "color": "default",
+            "decor": "normal",
+            "x_pos": [4, 35],
+            "skip_lines": 1
+        }
+        index += 1
+
+
+        results[index] = {
+            "label": "Exam Complete Time:",
             "text": f"{self.exam_elapsed_time:3.1f} seconds",  # TODO: Convert to hr, min, sec
             "color": "default",
             "decor": "normal",
@@ -776,18 +806,20 @@ class Exam:
         }
         index += 1
 
-        exam_begin_time = datetime.fromtimestamp(self.exam_contents['exam']['exam_begin_timestamp'])
-        exam_end_time = datetime.fromtimestamp(self.exam_contents['exam']['exam_end_timestamp'])
+
+        exam_begin_time = datetime.fromtimestamp(self.exam_contents['exam']['exam_begin_timestamp']).strftime("%m/%d/%Y %H:%M:%S")
+        exam_end_time = datetime.fromtimestamp(self.exam_contents['exam']['exam_end_timestamp']).strftime("%m/%d/%Y, %H:%M:%S")
         results[index] = {
             "label": "Exam Time Range:",
             "text": f"{exam_begin_time} -> {exam_end_time}",
             "color": "default",
             "decor": "normal",
             "x_pos": [4, 35],
-            "skip_lines": 1
+            "skip_lines": 3
         }
         index += 1
-        
+
+
         results[index] = {
             "label": "Number of Times Paused:",
             "text": str(self.exam_paused_count),
@@ -798,15 +830,17 @@ class Exam:
         }
         index += 1
 
+
         results[index] = {
             "label": "Elapsed Pauseed Time:",
             "text": f"{self.exam_paused_elapsed_time:3.1f} seconds",  # TODO: Convert to hr, min, sec
             "color": "default",
             "decor": "normal",
             "x_pos": [4, 35],
-            "skip_lines": 3
+            "skip_lines": 1
         }
         index += 1
+
 
         answer_distribution = ""
         for question in self.exam_contents['questions']:
@@ -821,49 +855,69 @@ class Exam:
             "color": "default",
             "decor": "normal",
             "x_pos": [4, 35],
-            "skip_lines": 1
-        }
-        index += 1
-        
-        width = 30
-        answer_distribution = [' '] * width       
-        for question in self.exam_contents['questions']:
-            if question['answered']:
-                index = int((question['answered_exam_time'] / self.exam_elapsed_time) * width)
-                answer_distribution[index-1] = "*"
-        results[index] = {
-            "label": "Answers Over Time:",
-            "text": f"[0s] {''.join(answer_distribution)} [{self.exam_elapsed_time:.0f}s]",
-            "color": "default",
-            "decor": "normal",
-            "x_pos": [4, 35],
             "skip_lines": 3
         }
         index += 1
 
 
-        # TODO: Do this in pieces, appending the results dict
-        #       Number skipped
+        width = 35
+        answer_distribution = [' '] * width
+        for question in self.exam_contents['questions']:
+            if question['answered']:
+                answer_distribution[int((question['answered_exam_time'] / self.exam_elapsed_time) * width) - 1] = "*"
+        results[index] = {
+            "label": "Answers Over Exam Time:",
+            "text": f"[ 0.0s ]{''.join(answer_distribution)}[ {self.exam_elapsed_time:.1f}s ]",
+            "color": "default",
+            "decor": "normal",
+            "x_pos": [4, 35],
+            "skip_lines": 1
+        }
+        index += 1
 
 
+        answer_times = []
+        for question in self.exam_contents['questions']:
+            if question['answered']:
+                answer_times.append(question['answered_question_time'])
 
-        #     9: {
-        #         "label": "Average Time Per Question:",
-        #         "text": "10.6 +/- 3.2 seconds",
-        #         "color": "default",
-        #         "decor": "normal",
-        #         "x_pos": [4, 35],
-        #         "skip_lines": 1
-        #     },
-        #     10: {
-        #         "label": "Median Time Per Question:",
-        #         "text": "11.3 seconds",
-        #         "color": "default",
-        #         "decor": "normal",
-        #         "x_pos": [4, 35],
-        #         "skip_lines": 1
-        #     }
-        # }
+
+        end_time = max(answer_times) * 1.25
+        width = 35
+        answer_distribution = [' '] * width
+        for answer_time in answer_times:
+            answer_distribution[int((answer_time / end_time) * width) - 1] = "*"
+
+        results[index] = {
+            "label": "Answer Times:",
+            "text": f"[ 0.0s ]{''.join(answer_distribution)}[ {end_time:.1f}s ]",
+            "color": "default",
+            "decor": "normal",
+            "x_pos": [4, 35],
+            "skip_lines": 1
+        }
+        index += 1
+
+        results[index] = {
+            "label": "Average Time Per Answer:",
+            "text": f"{mean(answer_times):.1f} +/- {stdev(answer_times):.2f} seconds",
+            "color": "default",
+            "decor": "normal",
+            "x_pos": [4, 35],
+            "skip_lines": 1
+        }
+        index += 1
+
+        results[index] = {
+            "label": "Median Time Per Answer:",
+            "text": f"{median(answer_times):.1f} seconds",
+            "color": "default",
+            "decor": "normal",
+            "x_pos": [4, 35],
+            "skip_lines": 1
+        }
+        index += 1
+
         return results
 
     def show_result(self):
@@ -931,12 +985,9 @@ class Exam:
 
 
 
-
 exam = Exam(exam_filepath="exam.yml")
 menu_result = exam.show_menu()
 if menu_result:
     exam.begin_exam()
 
     exam.show_result()
-
-
