@@ -6,9 +6,11 @@
   - DCA
   - AWS Practitioner
   - Ansible
+- Simple database? or just a file?
 
 ## Main Menu
 - Add some useful information next to program title
+- Small animations
 
 ## Exam Loading
 - Better way to format and load exam
@@ -16,10 +18,10 @@
   - Both Yaml and markdown?
 
 ## Exam Formatting and Navigation
-- Queston and selection text wrap to screen width
 - Go back and forth with questions
 - Have a answered/unanswered questions indicator 
 - Set up where multiple choice selection yields something backce
+- Small animations
 
 ## Pause/Resume Exam
 - Encrypt the exam file with a password so you can send it to someone?

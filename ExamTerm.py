@@ -627,6 +627,89 @@ class Exam:
 
     ###############################################################################################
 
+    def draw_result(self, scr):
+        # Setting up basic stuff for curses and load keys
+        self.__basic_screen_setup(scr)
+        KEYS = self.__load_keys()
+
+        self.selection_index = 0
+
+        # User key input (ASCII)
+        k = 0
+
+        # Main Loop
+        while True:
+            # Clearing the screen at each loop iteration before constructing the frame
+            scr.clear()
+
+            ########################################################################################
+
+            # Check user keyboard input
+            if k in KEYS['DOWN']:
+                self.selection_index += 1
+
+            elif k in KEYS['UP']:
+                self.selection_index -= 1
+
+            elif k in KEYS['ENTER']:
+                if self.selection_index == 0:
+                    # TODO: Prompt or countdown?
+                    return True
+                elif self.selection_index == 1:
+                    # TODO: Are you sure prompt
+                    return False
+
+            elif k in KEYS['QUIT']:
+                # TODO: Are you sure prompt
+                return False
+
+            ########################################################################################
+
+            term_height, term_width = scr.getmaxyx()          
+
+            ########################################################################################
+
+            # Check terminal size
+            terminal_size_good = self.__check_terminal_size(scr)
+            if not terminal_size_good:
+                # TODO: Do something here ...
+                pass
+
+            # Drawing the screen border
+            self.__draw_screen_border(scr, self.color['grey-dark'])
+
+            ########################################################################################
+
+            # TODO
+            #   - Exam title
+            #   - Passed / Failed
+            #   - Percent Correct, Number of total correct
+            #   - Elapsed Time
+            #   - Start datetime - End datetime
+            #   - Number of time paused
+            #   - Total paused time
+            #   - Linear Chart [---++---+++--+-+++_] of questions missed and good
+            #   - Linear chart [__-__+__--____++++++] over elapsed time
+            #   - Mean/Median/Std time for questions
+            #   
+            #   - Selections
+            #       - Review Questions
+            #       - Print
+            #       - Main Menu
+            #       - Quit
+
+            ########################################################################################
+
+            # Refresh the screen
+            scr.refresh()
+
+            # Get User input
+            k = scr.getch()
+
+    def show_result(self):
+        return curses.wrapper(self.draw_result)
+
+
     def begin_exam(self):
         logger.info('Exam started')
 
@@ -679,8 +762,10 @@ class Exam:
 
 
 exam = Exam(exam_filepath="exam.yml")
-menu_result = exam.show_menu()
-if menu_result:
-    exam.begin_exam()
+# menu_result = exam.show_menu()
+# if menu_result:
+#     exam.begin_exam()
+
+exam.show_result()
 
 
