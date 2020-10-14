@@ -194,7 +194,7 @@ class Exam:
 
         # TODO
 
-    def __draw_selection_menu(self, scr, selections:list, y:int) -> None:
+    def __draw_selection_menu(self, scr, selections:list, start_y:int):
         # Getting the terminal size
         _, term_width = scr.getmaxyx()  
 
@@ -213,11 +213,12 @@ class Exam:
             if s == self.selection_index:
                 # Color for highlighted selection text
                 color = self.color['default'] | self.decor['bold']
-                scr.addstr(y + s + 1 + y, x_begin, '|', color)
-                scr.addstr(y + s + 1 + y, x_end, '|', color)
+                scr.addstr(y + s + 1 + start_y, x_begin, '|', color)
+                scr.addstr(y + s + 1 + start_y, x_end, '|', color)
             else:
                 color = self.color['grey-light']
-            scr.addstr(y + s + 1 + y, term_width // 2 - len(selection) // 2, selection, color)
+            scr.addstr(y + s + 1 + start_y, term_width // 2 - len(selection) // 2, selection, color)
+
 
     def __draw_message_box(self, scr, message_lines: list) -> None:
         term_height, term_width = scr.getmaxyx()
