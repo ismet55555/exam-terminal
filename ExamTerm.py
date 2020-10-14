@@ -8,6 +8,7 @@ from datetime import datetime
 from pprint import pprint
 from statistics import mean, median, stdev
 from time import sleep, time
+from typing import Tuple
 
 import yaml
 
@@ -119,7 +120,7 @@ class Exam:
 
         return self.exam_contents
 
-    def __basic_screen_setup(self, scr):
+    def __basic_screen_setup(self, scr) -> None:
         # Hiding the cursor
         curses.curs_set(0)
 
@@ -174,12 +175,12 @@ class Exam:
             k = scr.getch()
 
 
-    def __draw_screen_border(self, scr, color) -> None:
+    def __draw_screen_border(self, scr, color:list) -> None:
         scr.attron(color)
         scr.border(0)
         scr.attroff(color)
 
-    def __draw_horizontal_seperator(self, scr, y, color) -> None:
+    def __draw_horizontal_seperator(self, scr, y:int, color:list) -> None:
         # Getting the screen height and width
         term_height, term_width = scr.getmaxyx()
 
@@ -187,13 +188,13 @@ class Exam:
             for x in range(term_width - 2):
                 scr.addstr(y, x + 1, '-', color)
 
-    def __draw_vertical_seperator(self, scr, x, color) -> None:
+    def __draw_vertical_seperator(self, scr, x:int, color:list) -> None:
         # Getting the screen height and width
         term_height, term_width = scr.getmaxyx()
 
         # TODO
 
-    def __draw_selection_menu(self, scr, selections, start_y):
+    def __draw_selection_menu(self, scr, selections:list, y:int) -> None:
         # Getting the terminal size
         _, term_width = scr.getmaxyx()  
 
@@ -212,11 +213,11 @@ class Exam:
             if s == self.selection_index:
                 # Color for highlighted selection text
                 color = self.color['default'] | self.decor['bold']
-                scr.addstr(y + s + 1 + start_y, x_begin, '|', color)
-                scr.addstr(y + s + 1 + start_y, x_end, '|', color)
+                scr.addstr(y + s + 1 + y, x_begin, '|', color)
+                scr.addstr(y + s + 1 + y, x_end, '|', color)
             else:
                 color = self.color['grey-light']
-            scr.addstr(y + s + 1 + start_y, term_width // 2 - len(selection) // 2, selection, color)
+            scr.addstr(y + s + 1 + y, term_width // 2 - len(selection) // 2, selection, color)
 
     def __draw_message_box(self, scr, message_lines: list) -> None:
         term_height, term_width = scr.getmaxyx()
@@ -236,7 +237,7 @@ class Exam:
         message_box.refresh()
 
 
-    def __get_message_box_size(self, term_height, term_width, message_lines):
+    def __get_message_box_size(self, term_height:int, term_width:int, message_lines:list) -> Tuple[int, int, int, int]:
         # Create a box (Height, Width, y, x) (Positions are top left)
         box_height = len(message_lines) + 4
         box_width = int(term_width / 1.5)  # Alternative: len(max(message_lines, key=len)) + 12
@@ -260,7 +261,7 @@ class Exam:
     ###############################################################################################
 
     @staticmethod
-    def __load_curses_colors_decor() -> tuple:
+    def __load_curses_colors_decor() -> Tuple[dict, dict]:
         # In code usage example:
         #       scr.addstr(y, x, "hello", self.color['blue'])
         #       scr.addstr(y, x, "hello", self.color['blue'] | self.decor['bold'])
@@ -313,17 +314,17 @@ class Exam:
         return color, decor
 
     @staticmethod
-    def __load_keys():
+    def __load_keys() -> dict:
         KEYS = {
-            "ENTER": (curses.KEY_ENTER, ord('\n'), ord('\r')),
-            "SPACE": (32, ord(' ')),
-            "UP": (curses.KEY_UP, ord('k')),
-            "DOWN": (curses.KEY_DOWN, ord('j')),
-            "RIGHT": (curses.KEY_RIGHT, ord('l')),
-            "LEFT": (curses.KEY_LEFT, ord('h')),
-            "PAUSE": (ord('p'), ord('P')),
+            "ENTER":  (curses.KEY_ENTER, ord('\n'), ord('\r')),
+            "SPACE":  (32, ord(' ')),
+            "UP":     (curses.KEY_UP, ord('k')),
+            "DOWN":   (curses.KEY_DOWN, ord('j')),
+            "RIGHT":  (curses.KEY_RIGHT, ord('l')),
+            "LEFT":   (curses.KEY_LEFT, ord('h')),
+            "PAUSE":  (ord('p'), ord('P')),
             "RESUME": (ord('r'), ord('R')),
-            "QUIT": (27 , ord('q'), ord('Q'))
+            "QUIT":   (27 , ord('q'), ord('Q'))
         }
         return KEYS
 
@@ -340,16 +341,16 @@ class Exam:
         return software_name
 
     @staticmethod
-    def __center_x(display_width, line) -> int:
+    def __center_x(display_width:int, line:str) -> int:
         return display_width // 2 - len(line) // 2
 
     @staticmethod
-    def __center_y(display_height) -> int:
+    def __center_y(display_height:int) -> int:
         return display_height // 2
 
     ###############################################################################################
 
-    def draw_menu(self, scr) -> bool:
+    def draw_menu(self, scr):  # FIXME: Type hinting   TODO: Return something useful
         # Setting up basic stuff for curses and load keys
         self.__basic_screen_setup(scr)
         KEYS = self.__load_keys()
@@ -469,12 +470,12 @@ class Exam:
             # Get User input
             k = scr.getch()
 
-    def show_menu(self) -> bool:
+    def show_menu(self) -> bool:  # FIXME: Type hinting
         return curses.wrapper(self.draw_menu)
 
     ###############################################################################################
 
-    def exam_timer_thread(self):
+    def exam_timer_thread(self) -> None:
         # FIXME: Account for terminal size message error
         while self.is_timer_timing:
             self.global_elapsed_time = time() - self.exam_begin_time 
@@ -490,7 +491,7 @@ class Exam:
                 # Time Spend paused
                 self.exam_paused_elapsed_time = self.global_elapsed_time - self.exam_elapsed_time
 
-    def draw_question(self, scr, question):
+    def draw_question(self, scr, question:dict) -> Tuple[int, str, bool]:
         # Setting up basic stuff for curses and load keys
         self.__basic_screen_setup(scr)
         KEYS = self.__load_keys()
@@ -660,12 +661,12 @@ class Exam:
 
         return -1, 'quit', False
 
-    def show_question(self, question):
+    def show_question(self, question:dict):  # FIXME: Type hinting
         return curses.wrapper(self.draw_question, question)
 
     ###############################################################################################
 
-    def draw_result(self, scr):
+    def draw_result(self, scr):  # FIXME: Type hinting  TODO: Return something useful
         # Setting up basic stuff for curses and load keys
         self.__basic_screen_setup(scr)
         KEYS = self.__load_keys()
@@ -758,7 +759,7 @@ class Exam:
             # Get User input
             k = scr.getch()
 
-    def __evaluate_exam(self):
+    def __evaluate_exam(self) -> None:
         questions_count = len(self.exam_contents['questions'])
 
         # Get the score
@@ -949,12 +950,12 @@ class Exam:
 
         return results
 
-    def show_result(self):
+    def show_result(self):  # FIXME: Type hinting
         return curses.wrapper(self.draw_result)
 
     ###############################################################################################
 
-    def begin_exam(self):
+    def begin_exam(self) -> None:  # TODO: Return something useful
         logger.debug('Exam started')
 
         self.exam_begin_time = time()
@@ -1011,6 +1012,12 @@ class Exam:
 
         # pprint(self.exam_contents)
         # exit()
+
+
+
+
+###############################################################################################
+###############################################################################################
 
 
 exam = Exam(exam_filepath="exam.yml")
