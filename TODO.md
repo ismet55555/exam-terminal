@@ -7,6 +7,7 @@
   - AWS Practitioner
   - Ansible
 - Simple database? or just a file?
+- Put software name in bottom corner for space
 
 ## Main Menu
 - Add some useful information next to program title
@@ -15,6 +16,8 @@
   - Immediate feedback
   - Show Time
   - Show Progress
+- Truncate text if above some description character count or wrapped lines!!
+- Save all variables to the exam_contents dict
 
 ## Exam Loading
 - Better way to format and load exam
@@ -26,6 +29,7 @@
 - Have a answered/unanswered questions indicator 
 - Set up where multiple choice selection yields something backce
 - Small animations
+- Horizontal seperator from question
 
 ## Pause/Resume Exam
 - Encrypt the exam file with a password so you can send it to someone?

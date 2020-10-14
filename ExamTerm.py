@@ -1,21 +1,20 @@
 #!/usr/bin/env python
 
 import curses
-from pprint import pprint
-from time import sleep, time
-import yaml
-import threading
 import logging
 import textwrap
+import threading
 from datetime import datetime
-from statistics import mean, stdev, median
+from pprint import pprint
+from statistics import mean, median, stdev
+from time import sleep, time
 
-# NOTE: https://docs.python.org/2/library/curses.html
+import yaml
 
 # Creating a message logger, all dependent scripts will inhearent this logger
 logging.basicConfig(format='[%(asctime)s][%(levelname)-8s] [%(filename)-30s:%(lineno)4s] %(message)s', datefmt='%m/%d-%H:%M:%S')
 logger = logging.getLogger()
-logger.setLevel(logging.FATAL)  # NOTE: No detailed logs shown when set to "logging.INFO"
+logger.setLevel(logging.ERROR)
 
 
 class Exam:
@@ -26,8 +25,9 @@ class Exam:
         self.color = {}
         self.decor = {}
 
-        self.height_limit = 20
-        self.width_limit = 80
+        self.height_limit = 27
+        self.width_limit = 85
+        self.terminal_size_good = True
 
         self.questions_total = len(self.exam_contents['questions'])
         self.questions_complete = 0
@@ -49,6 +49,7 @@ class Exam:
         self.exam_paused_count = 0
 
         self.exam_quit = False
+        self.exam_exit = False  # Straight exit entire program
 
         self.is_timer_timing = False
 
@@ -144,26 +145,44 @@ class Exam:
             for x in range(term_width - 2):
                 scr.addstr(y, x + 1, '-', color)
 
-    def __check_terminal_size(self, scr) -> bool:
-        terminal_size_good = True
-
+    def __check_terminal_size(self, scr) -> None:
         # Getting the screen height and width
         term_height, term_width = scr.getmaxyx()
         
-        # Check Height
-        if term_height < self.height_limit:
-            scr.addstr(1, 1, f"Terminal height must be more than {self.height_limit} characters!", curses.color_pair(1))
-            terminal_size_good = False
+        # Check Height and width
+        self.terminal_size_good = term_height >= self.height_limit and term_width >= self.width_limit
 
-        # Check Width
-        if term_width < self.width_limit:
-            scr.addstr(2, 1, f"Terminal width must be more than {self.width_limit} characters!", curses.color_pair(1))
-            terminal_size_good = False
+        scr.addstr(1, 1, f"[Terminal Size: W:{term_width}, H:{term_height}]", self.color['grey-light'])
 
-        # if terminal_size_good:
-        #     scr.addstr(1, 1, f"[Terminal Size: W:{term_width}, H:{term_height}]", curses.color_pair(1))
+        scr.nodelay(self.terminal_size_good) 
+        k = 0
+        KEYS = self.__load_keys()
+        while not self.terminal_size_good:
+            if k in KEYS['QUIT']:
+                self.exam_exit = True
+                break
 
-        return terminal_size_good
+            # Re-evaluate the screen size
+            term_height, term_width = scr.getmaxyx()
+            self.terminal_size_good = term_height >= self.height_limit and term_width >= self.width_limit
+
+            # if not self.exam_paused and not self.exam_quit:
+            message_lines = [
+                'Uh-Oh! Window size too small!',
+                '',
+                f'Current size is W:{term_width} by H:{term_height}',
+                f'Size must be at least W:{self.width_limit} by H:{self.height_limit}',
+                '',
+                'Please resize window to continue',
+                ''
+                'To quit program press "Q" or "ESC"'
+                ]
+            # self.__show_message_box(scr, message_lines)
+            for y, line in enumerate(message_lines):
+                scr.addstr(1 + y, 1, line, self.decor['bold'])
+
+            scr.refresh()
+            k = scr.getch()
 
     def __get_message_box_size(self, term_height, term_width, message_lines):
         # Create a box (Height, Width, y, x) (Positions are top left)
@@ -275,6 +294,7 @@ class Exam:
 
     @staticmethod
     def __load_software_ascii_name() -> list:
+        # TODO: Do something with this, probably not needed
         software_name = [
             " _____        _   _            _____              _         _ ",
             "|_   _|__ ___| |_|_|___ ___   |_   _|__ ___ _____|_|___ ___| |",
@@ -282,14 +302,15 @@ class Exam:
             "  |_||___|___|_| |_|_|_|_  |    |_||___|_| |_|_|_|_|_|_|__,|_|",
             "                       |___|                                  ",
         ]
-        software_name = [
-            "Testing Terminal v0.1"
-        ]
         return software_name
 
     @staticmethod
     def __center_x(display_width, line) -> int:
         return display_width // 2 - len(line) // 2
+
+    @staticmethod
+    def __center_y(display_height) -> int:
+        return display_height // 2
 
     ###############################################################################################
 
@@ -334,10 +355,8 @@ class Exam:
             ########################################################################################
 
             # Check terminal size
-            terminal_size_good = self.__check_terminal_size(scr)
-            if not terminal_size_good:
-                # TODO: Do something here ...
-                pass
+            self.__check_terminal_size(scr)
+            scr.nodelay(self.terminal_size_good)
 
             # Drawing the screen border
             self.__draw_screen_border(scr, self.color['grey-dark'])
@@ -345,20 +364,14 @@ class Exam:
             ########################################################################################
 
             # Show software name/title
-            software_name = self.__load_software_ascii_name()
-            start_x = term_width // 2 - len(software_name[0]) // 2
-            for y, line in enumerate(software_name):
-                scr.addstr(1 + y, start_x, line, self.color['grey-dark'])
-
-            # Horizontal Seperator
-            self.__draw_horizontal_sceen_seperator(scr, y + 2, self.color['grey-dark'])
+            scr.addstr(term_height - 2, 2, "Testing Terminal v0.1", self.color['grey-dark'])
 
             ########################################################################################
 
-            wrapper_menu_item = textwrap.TextWrapper(width=term_width - 35)
+            wrapper_menu_item = textwrap.TextWrapper(width=term_width - 25)
 
-            start_y = 5
-            start_x = [6, 25]
+            start_y = 2
+            start_x = [5, 22]
 
             line = f"{self.exam_contents['exam']['exam_title']}"
             scr.addstr(start_y, self.__center_x(term_width, line), line, self.decor['bold'])
@@ -370,7 +383,7 @@ class Exam:
 
             line = f"{self.exam_contents['exam']['exam_edit_date']}"
             scr.addstr(start_y, self.__center_x(term_width, line), line, self.color['grey-light'])
-            start_y += 4
+            start_y += 3
 
 
             lines = ["Description:", f"{self.exam_contents['exam']['exam_description']}"]
@@ -436,6 +449,12 @@ class Exam:
 
             ########################################################################################
 
+            # Straight exist software
+            if self.exam_exit:
+                exit()
+
+            ########################################################################################
+
             # Refresh the screen
             scr.refresh()
 
@@ -448,6 +467,7 @@ class Exam:
     ###############################################################################################
 
     def exam_timer_thread(self):
+        # FIXME: Account for terminal size message error
         while self.is_timer_timing:
             self.global_elapsed_time = time() - self.exam_begin_time 
             if not self.exam_paused:
@@ -519,8 +539,7 @@ class Exam:
 
             # Check terminal size
             terminal_size_good = self.__check_terminal_size(scr)
-            if not terminal_size_good:
-                pass
+            scr.nodelay(self.terminal_size_good)  # TODO: Move to one location ...
 
             # Drawing the screen border
             self.__draw_screen_border(scr, self.color['grey-dark'])
@@ -535,16 +554,19 @@ class Exam:
 
             # Create text wrappers wrapping text over number of characters
             term_height, term_width = scr.getmaxyx()
-            wrapper_question = textwrap.TextWrapper(width=term_width - 10)
-            wrapper_selection = textwrap.TextWrapper(width=term_width - 20)
+            wrapper_question = textwrap.TextWrapper(width=term_width - 5)
+            wrapper_selection = textwrap.TextWrapper(width=term_width - 10)
 
             # Wrap and show the question
             question_wrap = wrapper_question.wrap(text=question['question']) 
             for l, line in enumerate(question_wrap):
-                scr.addstr(start_y + l - 1, question_x, line)
+                scr.addstr(start_y + l - 1, question_x, line, self.color['default'] | self.decor['bold'])
+
+            self.__draw_horizontal_sceen_seperator(scr, len(question_wrap) + 3, self.color['grey-dark'])
+
 
             # Set the offset to the next line
-            selection_offset = len(question_wrap) + 2
+            selection_offset = len(question_wrap) + 3
 
             # Wrap and show selection
             for s, selection in enumerate(question['selection']):
@@ -613,6 +635,10 @@ class Exam:
                 if self.exam_quit > 1:
                     break
 
+            # Straight exist software
+            if self.exam_exit:
+                exit()
+
             # Exam timed out message box
             if self.is_exam_time_out:
                 message_lines = ['Exam time has expired', 'Press "ENTER" to evalute']
@@ -676,9 +702,7 @@ class Exam:
 
             # Check terminal size
             terminal_size_good = self.__check_terminal_size(scr)
-            if not terminal_size_good:
-                # TODO: Do something here ...
-                pass
+            scr.nodelay(self.terminal_size_good)  # TODO: Move to one location
 
             # Drawing the screen border
             self.__draw_screen_border(scr, self.color['grey-dark'])
@@ -686,17 +710,6 @@ class Exam:
             ########################################################################################
 
             # TODO
-            #   - Exam title
-            #   - Passed / Failed
-            #   - Percent Correct, Number of total correct
-            #   - Elapsed Time
-            #   - Start datetime - End datetime
-            #   - Number of time paused
-            #   - Total paused time
-            #   - Linear Chart [---++---+++--+-+++_] of questions missed and good
-            #   - Linear chart [__-__+__--____++++++] over elapsed time
-            #   - Mean/Median/Std time for questions
-            #   
             #   - Selections
             #       - Review Questions
             #       - Print
@@ -705,12 +718,26 @@ class Exam:
 
             start_y = 2
 
-            results = self.__assemble_exam_results()
+            # Heading
+            line = f"Exam Result Summary"
+            scr.addstr(start_y, self.__center_x(term_width, line), line, self.decor['bold'])
+            start_y += 2
 
+            self.__draw_horizontal_sceen_seperator(scr, start_y, self.color['grey-dark'])
+            start_y += 2
+
+            start_x = [4, 30]
+            results = self.__assemble_exam_results()
             for index, item in results.items():
-                scr.addstr(start_y , item['x_pos'][0], item['label'], self.color['default'])
-                scr.addstr(start_y , item['x_pos'][1], item['text'], self.color[item['color']] | self.decor[item['decor']])
+                scr.addstr(start_y , start_x[0], item['label'], self.color['default'])
+                scr.addstr(start_y , start_x[1], item['text'], self.color[item['color']] | self.decor[item['decor']])
                 start_y += item['skip_lines']
+
+            ########################################################################################
+
+            # Straight exist software
+            if self.exam_exit:
+                exit()
 
             ########################################################################################
 
@@ -739,10 +766,10 @@ class Exam:
 
         results[index] = {
             "label": "Exam Title:",
-            "text": self.exam_contents['exam']['exam_title'],
+            "text": self.exam_contents['exam']['exam_title'],  # TODO: Wrap or truncate
             "color": "default",
             "decor": "bold",
-            "x_pos": [4, 35],
+            "x_pos": [4, 30],
             "skip_lines": 1
         }
         index += 1
@@ -770,15 +797,15 @@ class Exam:
         index += 1
 
 
-        results[index] = {
-            "label": "Incorrect:",
-            "text": f"{100 - self.exam_contents['exam']['evaluation_percent']:3.1f}% ({self.exam_contents['exam']['exam_questions_count'] - self.questions_correct} of {self.exam_contents['exam']['exam_questions_count']})",
-            "color": "default",
-            "decor": "normal",
-            "x_pos": [4, 35],
-            "skip_lines": 1
-        }
-        index += 1
+        # results[index] = {
+        #     "label": "Incorrect:",
+        #     "text": f"{100 - self.exam_contents['exam']['evaluation_percent']:3.1f}% ({self.exam_contents['exam']['exam_questions_count'] - self.questions_correct} of {self.exam_contents['exam']['exam_questions_count']})",
+        #     "color": "default",
+        #     "decor": "normal",
+        #     "x_pos": [4, 35],
+        #     "skip_lines": 1
+        # }
+        # index += 1
 
 
         answered = 0
@@ -815,7 +842,7 @@ class Exam:
             "color": "default",
             "decor": "normal",
             "x_pos": [4, 35],
-            "skip_lines": 3
+            "skip_lines": 2
         }
         index += 1
 
@@ -842,29 +869,29 @@ class Exam:
         index += 1
 
 
-        answer_distribution = ""
-        for question in self.exam_contents['questions']:
-            if question['answered']:
-                if question['answered_correctly']:
-                    answer_distribution += ' +'
-                else:
-                    answer_distribution += ' -'
-        results[index] = {
-            "label": "Answers Per Question:",
-            "text": f"[First]{answer_distribution} [Last]",
-            "color": "default",
-            "decor": "normal",
-            "x_pos": [4, 35],
-            "skip_lines": 3
-        }
-        index += 1
+        # answer_distribution = ""
+        # for question in self.exam_contents['questions']:
+        #     if question['answered']:
+        #         if question['answered_correctly']:
+        #             answer_distribution += ' +'
+        #         else:
+        #             answer_distribution += ' -'
+        # results[index] = {
+        #     "label": "Answers Per Question:",
+        #     "text": f"[First]{answer_distribution} [Last]",
+        #     "color": "default",
+        #     "decor": "normal",
+        #     "x_pos": [4, 35],
+        #     "skip_lines": 2
+        # }
+        # index += 1
 
 
         width = 35
-        answer_distribution = [' '] * width
+        answer_distribution = ['.'] * width
         for question in self.exam_contents['questions']:
             if question['answered']:
-                answer_distribution[int((question['answered_exam_time'] / self.exam_elapsed_time) * width) - 1] = "*"
+                answer_distribution[int((question['answered_exam_time'] / self.exam_elapsed_time) * width) - 1] = "x"
         results[index] = {
             "label": "Answers Over Exam Time:",
             "text": f"[ 0.0s ]{''.join(answer_distribution)}[ {self.exam_elapsed_time:.1f}s ]",
@@ -884,9 +911,9 @@ class Exam:
 
         end_time = max(answer_times) * 1.25
         width = 35
-        answer_distribution = [' '] * width
+        answer_distribution = ['.'] * width
         for answer_time in answer_times:
-            answer_distribution[int((answer_time / end_time) * width) - 1] = "*"
+            answer_distribution[int((answer_time / end_time) * width) - 1] = "x"
 
         results[index] = {
             "label": "Answer Times:",
