@@ -48,6 +48,9 @@
   - The Test Terminal
   - Terminal Test
 
+## Random
+- Icon is the terminal symbol but with a check mark
+
 
 # Resources:
 - https://dbader.org/blog/how-to-make-command-line-commands-with-python
