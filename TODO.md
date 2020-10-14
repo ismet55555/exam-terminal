@@ -7,13 +7,12 @@
   - AWS Practitioner
   - Ansible
 - Simple database? or just a file?
-- Put software name in bottom corner for space
 
 ## Main Menu
-- Add some useful information next to program title
+- Add a About, Settings, Help Options (Horizontal? Two Lines?)
 - Small animations
 - Options menu
-  - Immediate feedback
+  - Immediate result feedback
   - Show Time
   - Show Progress
 - Truncate text if above some description character count or wrapped lines!!
@@ -29,7 +28,6 @@
 - Have a answered/unanswered questions indicator 
 - Set up where multiple choice selection yields something backce
 - Small animations
-- Horizontal seperator from question
 
 ## Pause/Resume Exam
 - Encrypt the exam file with a password so you can send it to someone?
@@ -40,10 +38,7 @@
 ## Results
 - Save a summary
   - For passing, save a certificate???
-- Show
-  - Time plot 
-  - Per question plot
-- Average/Median/Std time per question
+
 
 ## Name Ideas
   - Console / Terminal
@@ -52,3 +47,7 @@
 
   - The Test Terminal
   - Terminal Test
+
+
+# Resources:
+- https://dbader.org/blog/how-to-make-command-line-commands-with-python

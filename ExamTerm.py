@@ -14,7 +14,7 @@ import yaml
 # Creating a message logger, all dependent scripts will inhearent this logger
 logging.basicConfig(format='[%(asctime)s][%(levelname)-8s] [%(filename)-30s:%(lineno)4s] %(message)s', datefmt='%m/%d-%H:%M:%S')
 logger = logging.getLogger()
-logger.setLevel(logging.ERROR)
+logger.setLevel(logging.INFO)
 
 
 class Exam:
@@ -53,13 +53,13 @@ class Exam:
 
         self.is_timer_timing = False
 
-        logger.info('Exam was created and exam file loaded')
+        logger.debug('Exam was created and exam file loaded')
 
     ###############################################################################################
 
     def __load_parse_examfile(self, filepath: str) -> dict:
         # Load the examp file
-        logger.info(f"Loading specified exam file: '{filepath}' ...")
+        logger.debug(f"Loading specified exam file: '{filepath}' ...")
         try:
             with open(filepath) as file:
                 self.exam_contents = yaml.load(file, Loader=yaml.FullLoader)
@@ -73,7 +73,7 @@ class Exam:
 
         # TODO: Calculate exam time in seconds? minutes?
 
-        logger.info('Parsing the loaded exam information ...')
+        logger.debug('Parsing the loaded exam information ...')
         # Loop through all the questions
         for index, question in enumerate(self.exam_contents['questions']):
             # Store the question number
@@ -132,19 +132,6 @@ class Exam:
         # Non-blocking for user
         scr.nodelay(True)
 
-    def __draw_screen_border(self, scr, color) -> None:
-        scr.attron(color)
-        scr.border(0)
-        scr.attroff(color)
-
-    def __draw_horizontal_sceen_seperator(self, scr, y, color) -> None:
-        # Getting the screen height and width
-        term_height, term_width = scr.getmaxyx()
-
-        if y < term_height - 2 and y > 1:
-            for x in range(term_width - 2):
-                scr.addstr(y, x + 1, '-', color)
-
     def __check_terminal_size(self, scr) -> None:
         # Getting the screen height and width
         term_height, term_width = scr.getmaxyx()
@@ -152,7 +139,9 @@ class Exam:
         # Check Height and width
         self.terminal_size_good = term_height >= self.height_limit and term_width >= self.width_limit
 
-        scr.addstr(1, 1, f"[Terminal Size: W:{term_width}, H:{term_height}]", self.color['grey-light'])
+        # Debug Terminal Size
+        if logger.level == logging.DEBUG:
+            scr.addstr(1, 1, f"[Terminal Size: W:{term_width}, H:{term_height}]", self.color['grey-light'])
 
         scr.nodelay(self.terminal_size_good) 
         k = 0
@@ -177,23 +166,59 @@ class Exam:
                 ''
                 'To quit program press "Q" or "ESC"'
                 ]
-            # self.__show_message_box(scr, message_lines)
+            # self.__draw_message_box(scr, message_lines)
             for y, line in enumerate(message_lines):
                 scr.addstr(1 + y, 1, line, self.decor['bold'])
 
             scr.refresh()
             k = scr.getch()
 
-    def __get_message_box_size(self, term_height, term_width, message_lines):
-        # Create a box (Height, Width, y, x) (Positions are top left)
-        box_height = len(message_lines) + 4
-        box_width = int(term_width / 1.5)  # Alternative: len(max(message_lines, key=len)) + 12
-        box_y = int(term_height / 2 - box_height / 2)
-        box_x = int(term_width / 2 - box_width / 2)
-        
-        return box_height, box_width, box_y, box_x
 
-    def __show_message_box(self, scr, message_lines: list) -> None:
+    def __draw_screen_border(self, scr, color) -> None:
+        scr.attron(color)
+        scr.border(0)
+        scr.attroff(color)
+
+    def __draw_horizontal_seperator(self, scr, y, color) -> None:
+        # Getting the screen height and width
+        term_height, term_width = scr.getmaxyx()
+
+        if y < term_height - 2 and y > 1:
+            for x in range(term_width - 2):
+                scr.addstr(y, x + 1, '-', color)
+
+    def __draw_vertical_seperator(self, scr, x, color) -> None:
+        # Getting the screen height and width
+        term_height, term_width = scr.getmaxyx()
+
+        # TODO
+
+    def __draw_selection_menu(self, scr, selections, start_y):
+        # Getting the terminal size
+        _, term_width = scr.getmaxyx()  
+
+        # Check if within boundaries of selection indexes
+        self.selection_index = max(self.selection_index, 0)
+        self.selection_index = min(self.selection_index, len(selections) - 1)
+
+        # Get the x position of selection indicator
+        longest_selection_text = len(max(selections, key = len))
+        x_begin = term_width // 2 - longest_selection_text // 2 - 3
+        x_end = term_width // 2 + longest_selection_text // 2 + 2
+
+        y = 4
+
+        for s, selection in enumerate(selections):
+            if s == self.selection_index:
+                # Color for highlighted selection text
+                color = self.color['default'] | self.decor['bold']
+                scr.addstr(y + s + 1 + start_y, x_begin, '|', color)
+                scr.addstr(y + s + 1 + start_y, x_end, '|', color)
+            else:
+                color = self.color['grey-light']
+            scr.addstr(y + s + 1 + start_y, term_width // 2 - len(selection) // 2, selection, color)
+
+    def __draw_message_box(self, scr, message_lines: list) -> None:
         term_height, term_width = scr.getmaxyx()
 
         height, width, y, x = self.__get_message_box_size(term_height, term_width, message_lines)
@@ -209,6 +234,16 @@ class Exam:
 
         # Refresh the messgae box
         message_box.refresh()
+
+
+    def __get_message_box_size(self, term_height, term_width, message_lines):
+        # Create a box (Height, Width, y, x) (Positions are top left)
+        box_height = len(message_lines) + 4
+        box_width = int(term_width / 1.5)  # Alternative: len(max(message_lines, key=len)) + 12
+        box_y = int(term_height / 2 - box_height / 2)
+        box_x = int(term_width / 2 - box_width / 2)
+        
+        return box_height, box_width, box_y, box_x
 
     def __get_progress_bar(self, exam_progress, bar_char_width=60, bar_char_full='|', bar_char_empty='-') -> str:
         progress_str = []
@@ -361,8 +396,6 @@ class Exam:
             # Drawing the screen border
             self.__draw_screen_border(scr, self.color['grey-dark'])
 
-            ########################################################################################
-
             # Show software name/title
             scr.addstr(term_height - 2, 2, "Testing Terminal v0.1", self.color['grey-dark'])
 
@@ -417,35 +450,10 @@ class Exam:
 
             ########################################################################################
 
-            y_selection = term_height - 9
-
-            selections = ["Begin Exam","Quit"]
-
-            # Check if within boundaries of selection indexes
-            self.selection_index = max(self.selection_index, 0)
-            self.selection_index = min(self.selection_index, len(selections) - 1)
-
-            # Get the x position of selection indicator
-            longest_selection_text = len(max(selections, key = len))
-            x_begin = term_width // 2 - longest_selection_text // 2 - 3
-            x_end = term_width // 2 + longest_selection_text // 2 + 2
-
-            y = 4
-
-            for s, selection in enumerate(selections):
-                if s == self.selection_index:
-                    # Color for highlighted selection text
-                    color = self.color['default'] | self.decor['bold']
-                    scr.addstr(y + s + 1 + y_selection, x_begin, '|', color)
-                    scr.addstr(y + s + 1 + y_selection, x_end, '|', color)
-                else:
-                    color = self.color['grey-light']
-                scr.addstr(y + s + 1 + y_selection, term_width // 2 - len(selection) // 2, selection, color)
-
-            ########################################################################################
-
-            # Horizontal Seperator
-            self.__draw_horizontal_sceen_seperator(scr, term_height - 6, self.color['grey-dark'])
+            selections = ["Begin Exam", "Quit"]
+            self.__draw_horizontal_seperator(scr, term_height - len(selections) - 4, self.color['grey-dark'])
+            start_y = term_height - len(selections) - 7
+            self.__draw_selection_menu(scr, selections, start_y)
 
             ########################################################################################
 
@@ -562,8 +570,7 @@ class Exam:
             for l, line in enumerate(question_wrap):
                 scr.addstr(start_y + l - 1, question_x, line, self.color['default'] | self.decor['bold'])
 
-            self.__draw_horizontal_sceen_seperator(scr, len(question_wrap) + 3, self.color['grey-dark'])
-
+            self.__draw_horizontal_seperator(scr, len(question_wrap) + 3, self.color['grey-dark'])
 
             # Set the offset to the next line
             selection_offset = len(question_wrap) + 3
@@ -624,13 +631,13 @@ class Exam:
             # Exam pause message box
             if self.exam_paused and not self.exam_quit:
                 message_lines = ['Exam was paused', 'To resume exam press "R"']
-                self.__show_message_box(scr, message_lines)
+                self.__draw_message_box(scr, message_lines)
 
             # Exam quit message box
             if self.exam_quit:
                 self.exam_paused = True
                 message_lines = ['Are you sure you want to quit?', 'To quit press "Q"', 'To resume exam press "R"']
-                self.__show_message_box(scr, message_lines)
+                self.__draw_message_box(scr, message_lines)
                 # Quit Message confirmed (pressed twice)
                 if self.exam_quit > 1:
                     break
@@ -642,7 +649,7 @@ class Exam:
             # Exam timed out message box
             if self.is_exam_time_out:
                 message_lines = ['Exam time has expired', 'Press "ENTER" to evalute']
-                self.__show_message_box(scr, message_lines)
+                self.__draw_message_box(scr, message_lines)
 
             # TODO:  Only use a exit flag instead of break to outsource the checking (ensure loop is completed)
 
@@ -707,14 +714,10 @@ class Exam:
             # Drawing the screen border
             self.__draw_screen_border(scr, self.color['grey-dark'])
 
-            ########################################################################################
+            # Show software name/title
+            scr.addstr(term_height - 2, 2, "Testing Terminal v0.1", self.color['grey-dark'])
 
-            # TODO
-            #   - Selections
-            #       - Review Questions
-            #       - Print
-            #       - Main Menu
-            #       - Quit
+            ########################################################################################
 
             start_y = 2
 
@@ -723,15 +726,23 @@ class Exam:
             scr.addstr(start_y, self.__center_x(term_width, line), line, self.decor['bold'])
             start_y += 2
 
-            self.__draw_horizontal_sceen_seperator(scr, start_y, self.color['grey-dark'])
+            self.__draw_horizontal_seperator(scr, start_y, self.color['grey-dark'])
             start_y += 2
 
+            # Question
             start_x = [4, 30]
             results = self.__assemble_exam_results()
             for index, item in results.items():
                 scr.addstr(start_y , start_x[0], item['label'], self.color['default'])
                 scr.addstr(start_y , start_x[1], item['text'], self.color[item['color']] | self.decor[item['decor']])
                 start_y += item['skip_lines']
+
+            ########################################################################################
+
+            selections = ["Save Results", "Quit"]  # TODO: "Review Question"
+            self.__draw_horizontal_seperator(scr, term_height - len(selections) - 4, self.color['grey-dark'])
+            start_y = term_height - len(selections) - 7
+            self.__draw_selection_menu(scr, selections, start_y)
 
             ########################################################################################
 
@@ -774,7 +785,6 @@ class Exam:
         }
         index += 1
 
-
         results[index] = {
             "label": "Result:",
             "text": self.exam_contents['exam']['evaluation_label'],
@@ -785,17 +795,15 @@ class Exam:
         }
         index += 1
 
-
         results[index] = {
             "label": "Correct:",
-            "text": f"{self.exam_contents['exam']['evaluation_percent']:3.1f}% ({self.questions_correct} of {self.exam_contents['exam']['exam_questions_count']})",
+            "text": f"{self.exam_contents['exam']['evaluation_percent']:3.1f}% ({self.questions_correct} of {self.exam_contents['exam']['exam_questions_count']}) (Needed: {self.exam_contents['exam']['exam_passing_score']}%)",
             "color": "default",
             "decor": "normal",
             "x_pos": [4, 35],
             "skip_lines": 1
         }
         index += 1
-
 
         # results[index] = {
         #     "label": "Incorrect:",
@@ -833,7 +841,6 @@ class Exam:
         }
         index += 1
 
-
         exam_begin_time = datetime.fromtimestamp(self.exam_contents['exam']['exam_begin_timestamp']).strftime("%m/%d/%Y %H:%M:%S")
         exam_end_time = datetime.fromtimestamp(self.exam_contents['exam']['exam_end_timestamp']).strftime("%m/%d/%Y, %H:%M:%S")
         results[index] = {
@@ -846,7 +853,6 @@ class Exam:
         }
         index += 1
 
-
         results[index] = {
             "label": "Number of Times Paused:",
             "text": str(self.exam_paused_count),
@@ -857,7 +863,6 @@ class Exam:
         }
         index += 1
 
-
         results[index] = {
             "label": "Elapsed Pauseed Time:",
             "text": f"{self.exam_paused_elapsed_time:3.1f} seconds",  # TODO: Convert to hr, min, sec
@@ -867,7 +872,6 @@ class Exam:
             "skip_lines": 1
         }
         index += 1
-
 
         # answer_distribution = ""
         # for question in self.exam_contents['questions']:
@@ -886,7 +890,6 @@ class Exam:
         # }
         # index += 1
 
-
         width = 35
         answer_distribution = ['.'] * width
         for question in self.exam_contents['questions']:
@@ -901,7 +904,6 @@ class Exam:
             "skip_lines": 1
         }
         index += 1
-
 
         answer_times = []
         for question in self.exam_contents['questions']:
@@ -953,7 +955,7 @@ class Exam:
     ###############################################################################################
 
     def begin_exam(self):
-        logger.info('Exam started')
+        logger.debug('Exam started')
 
         self.exam_begin_time = time()
         self.exam_contents['exam']['exam_begin_timestamp'] = self.exam_begin_time
@@ -1009,7 +1011,6 @@ class Exam:
 
         # pprint(self.exam_contents)
         # exit()
-
 
 
 exam = Exam(exam_filepath="exam.yml")
