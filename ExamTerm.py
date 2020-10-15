@@ -15,7 +15,7 @@ import yaml
 # Creating a message logger, all dependent scripts will inhearent this logger
 logging.basicConfig(format='[%(asctime)s][%(levelname)-8s] [%(filename)-30s:%(lineno)4s] %(message)s', datefmt='%m/%d-%H:%M:%S')
 logger = logging.getLogger()
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 
 
 class Exam:
@@ -130,8 +130,8 @@ class Exam:
         # Turn off echo
         curses.noecho()
 
-        # Non-blocking for user
-        scr.nodelay(True)
+        # Block for 3/10 of a second
+        curses.halfdelay(3)
 
     def __check_terminal_size(self, scr) -> None:
         # Getting the screen height and width
@@ -144,7 +144,6 @@ class Exam:
         if logger.level == logging.DEBUG:
             scr.addstr(1, 1, f"[Terminal Size: W:{term_width}, H:{term_height}]", self.color['grey-light'])
 
-        scr.nodelay(self.terminal_size_good) 
         k = 0
         KEYS = self.__load_keys()
         while not self.terminal_size_good:
@@ -267,9 +266,13 @@ class Exam:
         #       scr.addstr(y, x, "hello", self.color['blue'])
         #       scr.addstr(y, x, "hello", self.color['blue'] | self.decor['bold'])
 
+
         # Start colors in curses
-        try: curses.start_color()
-        except: pass
+        curses.start_color()
+
+        logger.fatal(curses.has_colors())
+        logger.fatal(curses.can_change_color())
+
 
         # Defining colors [foreground/font, background]
         color_definition = {
@@ -287,12 +290,21 @@ class Exam:
             'white-red':    [curses.COLOR_WHITE, curses.COLOR_RED]
         }
 
+        # If terminal does not support colors, reset everything to white
+        if not curses.has_colors() or not curses.can_change_color():
+            for color in color_definition:
+                color_definition[color] = [curses.COLOR_WHITE, 0]
+
         # Initiating curses color and saving for quick reference
         color = {}
         for index, (key, value) in enumerate(color_definition.items()):
-            curses.init_pair(index + 1, value[0], value[1])
+            try:
+                curses.init_pair(index + 1, value[0], value[1])
+            except:
+                curses.init_pair(index + 1, 0, 0)
             color[key] = curses.color_pair(index + 1)
 
+        # Defining font decorations
         decoration_definition ={
             'normal' : curses.A_NORMAL,         # Normal display (no highlight)
             'standout': curses.A_STANDOUT,      # Best highlighting mode of the terminal
@@ -393,7 +405,6 @@ class Exam:
 
             # Check terminal size
             self.__check_terminal_size(scr)
-            scr.nodelay(self.terminal_size_good)
 
             # Drawing the screen border
             self.__draw_screen_border(scr, self.color['grey-dark'])
@@ -549,7 +560,6 @@ class Exam:
 
             # Check terminal size
             terminal_size_good = self.__check_terminal_size(scr)
-            scr.nodelay(self.terminal_size_good)  # TODO: Move to one location ...
 
             # Drawing the screen border
             self.__draw_screen_border(scr, self.color['grey-dark'])
@@ -626,9 +636,6 @@ class Exam:
             scr.refresh()
 
             ########################################################################################
-
-            # If prompts are shown, ensure that no nodelay is False, and vice versa
-            scr.nodelay(not any([self.exam_paused, self.exam_quit, self.is_exam_time_out])) 
 
             # Exam pause message box
             if self.exam_paused and not self.exam_quit:
@@ -711,7 +718,6 @@ class Exam:
 
             # Check terminal size
             terminal_size_good = self.__check_terminal_size(scr)
-            scr.nodelay(self.terminal_size_good)  # TODO: Move to one location
 
             # Drawing the screen border
             self.__draw_screen_border(scr, self.color['grey-dark'])
