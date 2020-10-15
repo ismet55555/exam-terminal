@@ -7,7 +7,7 @@ import threading
 from datetime import datetime
 from pprint import pprint
 from statistics import mean, median, stdev
-from time import sleep, time
+from time import sleep, time, strftime, gmtime
 from typing import Tuple
 
 import yaml
@@ -15,7 +15,7 @@ import yaml
 # Creating a message logger, all dependent scripts will inhearent this logger
 logging.basicConfig(format='[%(asctime)s][%(levelname)-8s] [%(filename)-30s:%(lineno)4s] %(message)s', datefmt='%m/%d-%H:%M:%S')
 logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 
 class Exam:
@@ -270,10 +270,6 @@ class Exam:
         # Start colors in curses
         curses.start_color()
 
-        logger.fatal(curses.has_colors())
-        logger.fatal(curses.can_change_color())
-
-
         # Defining colors [foreground/font, background]
         color_definition = {
             'default':      [curses.COLOR_WHITE, 0],    # FIXME: Rename to "normal" to match decor
@@ -363,7 +359,7 @@ class Exam:
 
     ###############################################################################################
 
-    def draw_menu(self, scr):  # FIXME: Type hinting   TODO: Return something useful
+    def draw_menu(self, scr) -> bool:  # TODO: Return something useful
         # Setting up basic stuff for curses and load keys
         self.__basic_screen_setup(scr)
         KEYS = self.__load_keys()
@@ -482,12 +478,12 @@ class Exam:
             # Get User input
             k = scr.getch()
 
-    def show_menu(self) -> bool:  # FIXME: Type hinting
+    def show_menu(self) -> bool:
         return curses.wrapper(self.draw_menu)
 
     ###############################################################################################
 
-    def exam_timer_thread(self) -> None:
+    def __exam_timer_thread(self) -> None:
         # FIXME: Account for terminal size message error
         while self.is_timer_timing:
             self.global_elapsed_time = time() - self.exam_begin_time 
@@ -669,12 +665,164 @@ class Exam:
 
         return -1, 'quit', False
 
-    def show_question(self, question:dict):  # FIXME: Type hinting
+    def show_question(self, question:dict) -> Tuple[int, str, bool]:
         return curses.wrapper(self.draw_question, question)
 
     ###############################################################################################
 
-    def draw_result(self, scr):  # FIXME: Type hinting  TODO: Return something useful
+    def __evaluate_exam(self) -> None:
+        questions_count = len(self.exam_contents['questions'])
+
+        # Get the score
+        self.exam_contents['exam']['evaluation_percent'] = (self.questions_correct / questions_count) * 100
+
+        # Get the score label/text
+        if self.exam_contents['exam']['evaluation_percent'] >= self.exam_contents['exam']['exam_passing_score']:
+            self.exam_contents['exam']['evaluation_label'] = "PASSED"
+        else:
+            self.exam_contents['exam']['evaluation_label'] = "FAILED"
+
+    def __assemble_exam_results(self) -> dict:
+        results = {}
+        index = 0
+
+        results[index] = {
+            "label": "Exam Title:",
+            "text": self.exam_contents['exam']['exam_title'],  # TODO: Wrap or truncate
+            "color": "default",
+            "decor": "bold",
+            "x_pos": [4, 30],
+            "skip_lines": 1
+        }
+        index += 1
+
+        results[index] = {
+            "label": "Result:",
+            "text": self.exam_contents['exam']['evaluation_label'],
+            "color": "blue",
+            "decor": "bold",
+            "x_pos": [4, 35],
+            "skip_lines": 1
+        }
+        index += 1
+
+        results[index] = {
+            "label": "Correct:",
+            "text": f"{self.exam_contents['exam']['evaluation_percent']:3.1f}% ({self.questions_correct} of {self.exam_contents['exam']['exam_questions_count']}) (Needed: {self.exam_contents['exam']['exam_passing_score']}%)",
+            "color": "default",
+            "decor": "normal",
+            "x_pos": [4, 35],
+            "skip_lines": 1
+        }
+        index += 1
+
+        results[index] = {
+            "label": "Questions Answered:",
+            "text": f"{self.exam_contents['exam']['exam_questions_answered']} of {self.exam_contents['exam']['exam_questions_count']}",
+            "color": "default",
+            "decor": "normal",
+            "x_pos": [4, 35],
+            "skip_lines": 1
+        }
+        index += 1
+
+        results[index] = {
+            "label": "Exam Complete Time:",
+            "text": f"{strftime('%H:%M:%S', gmtime(self.exam_elapsed_time))}",
+            "color": "default",
+            "decor": "normal",
+            "x_pos": [4, 35],
+            "skip_lines": 1
+        }
+        index += 1
+
+        results[index] = {
+            "label": "Exam Time Range:",
+            "text": f"{self.exam_contents['exam']['exam_begin_datestring']} -> {self.exam_contents['exam']['exam_end_datestring']}",
+            "color": "default",
+            "decor": "normal",
+            "x_pos": [4, 35],
+            "skip_lines": 2
+        }
+        index += 1
+
+        results[index] = {
+            "label": "Number of Times Paused:",
+            "text": str(self.exam_paused_count),
+            "color": "default",
+            "decor": "normal",
+            "x_pos": [4, 35],
+            "skip_lines": 1
+        }
+        index += 1
+
+        results[index] = {
+            "label": "Elapsed Pauseed Time:",
+            "text": f"{strftime('%H:%M:%S', gmtime(self.exam_paused_elapsed_time))}",
+            "color": "default",
+            "decor": "normal",
+            "x_pos": [4, 35],
+            "skip_lines": 1
+        }
+        index += 1
+
+        width = 35
+        answer_distribution = ['.'] * width
+        for question in self.exam_contents['questions']:
+            if question['answered']:
+                answer_distribution[int((question['answered_exam_time'] / self.exam_elapsed_time) * width) - 1] = "x"
+        results[index] = {
+            "label": "Answers Over Exam Time:",
+            "text": f"[ 0.0s ]{''.join(answer_distribution)}[ {self.exam_elapsed_time:.1f}s ]",
+            "color": "default",
+            "decor": "normal",
+            "x_pos": [4, 35],
+            "skip_lines": 1
+        }
+        index += 1
+
+        answer_times = []
+        for question in self.exam_contents['questions']:
+            if question['answered']:
+                answer_times.append(question['answered_question_time'])
+        end_time = max(answer_times) * 1.25
+        width = 35
+        answer_distribution = ['.'] * width
+        for answer_time in answer_times:
+            answer_distribution[int((answer_time / end_time) * width) - 1] = "x"
+        results[index] = {
+            "label": "Answer Times:",
+            "text": f"[ 0.0s ]{''.join(answer_distribution)}[ {end_time:.1f}s ]",
+            "color": "default",
+            "decor": "normal",
+            "x_pos": [4, 35],
+            "skip_lines": 1
+        }
+        index += 1
+
+        results[index] = {
+            "label": "Average Time Per Answer:",
+            "text": f"{mean(answer_times):.1f} +/- {stdev(answer_times):.2f} seconds",
+            "color": "default",
+            "decor": "normal",
+            "x_pos": [4, 35],
+            "skip_lines": 1
+        }
+        index += 1
+
+        results[index] = {
+            "label": "Median Time Per Answer:",
+            "text": f"{median(answer_times):.1f} seconds",
+            "color": "default",
+            "decor": "normal",
+            "x_pos": [4, 35],
+            "skip_lines": 1
+        }
+        index += 1
+
+        return results
+
+    def draw_result(self, scr) -> bool:  # TODO: Return something useful
         # Setting up basic stuff for curses and load keys
         self.__basic_screen_setup(scr)
         KEYS = self.__load_keys()
@@ -766,197 +914,6 @@ class Exam:
             # Get User input
             k = scr.getch()
 
-    def __evaluate_exam(self) -> None:
-        questions_count = len(self.exam_contents['questions'])
-
-        # Get the score
-        self.exam_contents['exam']['evaluation_percent'] = (self.questions_correct / questions_count) * 100
-
-        # Get the score label/text
-        if self.exam_contents['exam']['evaluation_percent'] >= self.exam_contents['exam']['exam_passing_score']:
-            self.exam_contents['exam']['evaluation_label'] = "PASSED"
-        else:
-            self.exam_contents['exam']['evaluation_label'] = "FAILED"
-
-    def __assemble_exam_results(self) -> dict:
-        results = {}
-
-        index = 0
-
-        results[index] = {
-            "label": "Exam Title:",
-            "text": self.exam_contents['exam']['exam_title'],  # TODO: Wrap or truncate
-            "color": "default",
-            "decor": "bold",
-            "x_pos": [4, 30],
-            "skip_lines": 1
-        }
-        index += 1
-
-        results[index] = {
-            "label": "Result:",
-            "text": self.exam_contents['exam']['evaluation_label'],
-            "color": "blue",
-            "decor": "bold",
-            "x_pos": [4, 35],
-            "skip_lines": 1
-        }
-        index += 1
-
-        results[index] = {
-            "label": "Correct:",
-            "text": f"{self.exam_contents['exam']['evaluation_percent']:3.1f}% ({self.questions_correct} of {self.exam_contents['exam']['exam_questions_count']}) (Needed: {self.exam_contents['exam']['exam_passing_score']}%)",
-            "color": "default",
-            "decor": "normal",
-            "x_pos": [4, 35],
-            "skip_lines": 1
-        }
-        index += 1
-
-        # results[index] = {
-        #     "label": "Incorrect:",
-        #     "text": f"{100 - self.exam_contents['exam']['evaluation_percent']:3.1f}% ({self.exam_contents['exam']['exam_questions_count'] - self.questions_correct} of {self.exam_contents['exam']['exam_questions_count']})",
-        #     "color": "default",
-        #     "decor": "normal",
-        #     "x_pos": [4, 35],
-        #     "skip_lines": 1
-        # }
-        # index += 1
-
-
-        answered = 0
-        for question in self.exam_contents['questions']:
-            if question['answered']:
-                answered += 1
-        results[index] = {
-            "label": "Questions Answered:",
-            "text": f"{answered} of {self.exam_contents['exam']['exam_questions_count']}",
-            "color": "default",
-            "decor": "normal",
-            "x_pos": [4, 35],
-            "skip_lines": 1
-        }
-        index += 1
-
-
-        results[index] = {
-            "label": "Exam Complete Time:",
-            "text": f"{self.exam_elapsed_time:3.1f} seconds",  # TODO: Convert to hr, min, sec
-            "color": "default",
-            "decor": "normal",
-            "x_pos": [4, 35],
-            "skip_lines": 1
-        }
-        index += 1
-
-        exam_begin_time = datetime.fromtimestamp(self.exam_contents['exam']['exam_begin_timestamp']).strftime("%m/%d/%Y %H:%M:%S")
-        exam_end_time = datetime.fromtimestamp(self.exam_contents['exam']['exam_end_timestamp']).strftime("%m/%d/%Y, %H:%M:%S")
-        results[index] = {
-            "label": "Exam Time Range:",
-            "text": f"{exam_begin_time} -> {exam_end_time}",
-            "color": "default",
-            "decor": "normal",
-            "x_pos": [4, 35],
-            "skip_lines": 2
-        }
-        index += 1
-
-        results[index] = {
-            "label": "Number of Times Paused:",
-            "text": str(self.exam_paused_count),
-            "color": "default",
-            "decor": "normal",
-            "x_pos": [4, 35],
-            "skip_lines": 1
-        }
-        index += 1
-
-        results[index] = {
-            "label": "Elapsed Pauseed Time:",
-            "text": f"{self.exam_paused_elapsed_time:3.1f} seconds",  # TODO: Convert to hr, min, sec
-            "color": "default",
-            "decor": "normal",
-            "x_pos": [4, 35],
-            "skip_lines": 1
-        }
-        index += 1
-
-        # answer_distribution = ""
-        # for question in self.exam_contents['questions']:
-        #     if question['answered']:
-        #         if question['answered_correctly']:
-        #             answer_distribution += ' +'
-        #         else:
-        #             answer_distribution += ' -'
-        # results[index] = {
-        #     "label": "Answers Per Question:",
-        #     "text": f"[First]{answer_distribution} [Last]",
-        #     "color": "default",
-        #     "decor": "normal",
-        #     "x_pos": [4, 35],
-        #     "skip_lines": 2
-        # }
-        # index += 1
-
-        width = 35
-        answer_distribution = ['.'] * width
-        for question in self.exam_contents['questions']:
-            if question['answered']:
-                answer_distribution[int((question['answered_exam_time'] / self.exam_elapsed_time) * width) - 1] = "x"
-        results[index] = {
-            "label": "Answers Over Exam Time:",
-            "text": f"[ 0.0s ]{''.join(answer_distribution)}[ {self.exam_elapsed_time:.1f}s ]",
-            "color": "default",
-            "decor": "normal",
-            "x_pos": [4, 35],
-            "skip_lines": 1
-        }
-        index += 1
-
-        answer_times = []
-        for question in self.exam_contents['questions']:
-            if question['answered']:
-                answer_times.append(question['answered_question_time'])
-
-
-        end_time = max(answer_times) * 1.25
-        width = 35
-        answer_distribution = ['.'] * width
-        for answer_time in answer_times:
-            answer_distribution[int((answer_time / end_time) * width) - 1] = "x"
-
-        results[index] = {
-            "label": "Answer Times:",
-            "text": f"[ 0.0s ]{''.join(answer_distribution)}[ {end_time:.1f}s ]",
-            "color": "default",
-            "decor": "normal",
-            "x_pos": [4, 35],
-            "skip_lines": 1
-        }
-        index += 1
-
-        results[index] = {
-            "label": "Average Time Per Answer:",
-            "text": f"{mean(answer_times):.1f} +/- {stdev(answer_times):.2f} seconds",
-            "color": "default",
-            "decor": "normal",
-            "x_pos": [4, 35],
-            "skip_lines": 1
-        }
-        index += 1
-
-        results[index] = {
-            "label": "Median Time Per Answer:",
-            "text": f"{median(answer_times):.1f} seconds",
-            "color": "default",
-            "decor": "normal",
-            "x_pos": [4, 35],
-            "skip_lines": 1
-        }
-        index += 1
-
-        return results
-
     def show_result(self):  # FIXME: Type hinting
         return curses.wrapper(self.draw_result)
 
@@ -964,17 +921,13 @@ class Exam:
 
     def begin_exam(self) -> None:  # TODO: Return something useful
         logger.debug('Exam started')
-
         self.exam_begin_time = time()
-        self.exam_contents['exam']['exam_begin_timestamp'] = self.exam_begin_time
 
         # Start the independent timer thread for entire exam
         self.is_timer_timing = True
-        exam_timer_thread = threading.Thread(target=self.exam_timer_thread, args=())
+        exam_timer_thread = threading.Thread(target=self.__exam_timer_thread, args=())
         exam_timer_thread.daemon = True
         exam_timer_thread.start()
-
-        # TODO: Add option to go back and forth on questions
 
         for q, question in enumerate(self.exam_contents['questions']):
             # Start timer for current question
@@ -995,20 +948,32 @@ class Exam:
             self.exam_contents['questions'][q]['answered_question_time'] = time() - question_elapsed_time
             self.exam_contents['questions'][q]['answered_correctly'] = correct
 
-            # Increment correct or wrong answer
+            # Increment completed question and correct or wrong answer
+            self.questions_complete += 1
             if correct:
                 self.questions_correct += 1
             else:
                 self.questions_wrong += 1
 
-            # Increment questions compelted
-            self.questions_complete += 1
-
             # Calculate Progress
             self.questions_progress = (self.questions_complete / self.questions_total)
 
-
+        # Log exam attributes
+        self.exam_contents['exam']['exam_begin_timestamp'] = self.exam_begin_time
         self.exam_contents['exam']['exam_end_timestamp'] = time()
+        self.exam_contents['exam']['exam_begin_datestring'] = datetime.fromtimestamp(self.exam_contents['exam']['exam_begin_timestamp']).strftime("%m/%d/%Y, %H:%M:%S")
+        self.exam_contents['exam']['exam_end_datestring'] = datetime.fromtimestamp(self.exam_contents['exam']['exam_end_timestamp']).strftime("%m/%d/%Y, %H:%M:%S")
+
+        self.exam_contents['exam']['exam_questions_complete'] = self.questions_complete
+        self.exam_contents['exam']['exam_questions_correct'] = self.questions_correct
+        self.exam_contents['exam']['exam_questions_wrong'] = self.questions_wrong
+
+        answered = 0
+        for question in self.exam_contents['questions']:
+            if question['answered']:
+                answered += 1
+        self.exam_contents['exam']['exam_questions_answered'] = answered
+
 
         # Stop independent exam timer
         self.is_timer_timing = False
@@ -1033,3 +998,4 @@ if menu_result:
     exam.begin_exam()
 
     exam.show_result()
+
