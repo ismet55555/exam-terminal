@@ -914,8 +914,60 @@ class Exam:
             # Get User input
             k = scr.getch()
 
-    def show_result(self):  # FIXME: Type hinting
+    def show_result(self) -> bool:
         return curses.wrapper(self.draw_result)
+
+    def export_results_to_pdf(self) -> bool:
+        from fpdf import FPDF
+
+        page_width = 210
+        page_height = 297
+
+        page_left_margin = 10
+        page_right_margin = 10
+        page_top_margin = 10
+        page_bottom_margin = 10
+
+        page_x_area = page_width - page_left_margin - page_right_margin
+        page_y_area = page_height - page_top_margin - page_bottom_margin
+
+        pdf = FPDF(orientation='P', unit='mm', format='A4')
+
+        pdf.set_author("Author Test Terminal")
+        pdf.set_creator("Creator Test Terminal")
+        pdf.set_subject("Exam Results")
+
+        pdf.add_page(orientation = 'P', format = 'A4', same = False)
+        pdf.set_left_margin(margin=10)
+        pdf.set_right_margin(margin=10)
+
+        pdf.alias_nb_pages()
+
+        # Draw border
+        pdf.line(10, 10, 200, 10)
+        pdf.line(10, 277, 200, 277)
+        pdf.line(10, 10, 10, 277)
+        pdf.line(200, 10, 200, 277)
+
+        # Title
+        pdf.set_font('Arial', 'B', 12)  # Italics I, underline U
+        color = [0, 0, 0]
+        pdf.set_text_color(*color) 
+        pdf.cell(w=page_x_area, h=20, txt='Exam Results', border=1, align='C')
+
+        # Stats
+        # TODO
+
+        # Export the pdf to file
+        #  F: Save local, I or D: standard out
+        pdf.output(name='tuto1.pdf', dest='F')
+
+        # Close
+        pdf.close()
+
+
+
+        return True
 
     ###############################################################################################
 
@@ -998,4 +1050,6 @@ if menu_result:
     exam.begin_exam()
 
     exam.show_result()
+
+    exam.save_results()
 

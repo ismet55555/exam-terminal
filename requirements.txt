@@ -1,5 +1,4 @@
-# beautifulsoup4==4.9.1
-Markdown==3.2.2
-markdown-to-json==1.0.0
-PyYAML==5.3.1
-# soupsieve==2.0.1
+Markdown
+markdown-to-json
+PyYAML
+fpdf2
