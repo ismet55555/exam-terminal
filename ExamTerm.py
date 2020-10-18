@@ -950,17 +950,35 @@ class Exam:
         pdf.line(200, 10, 200, 277)
 
         # Title
-        pdf.set_font('Arial', 'B', 12)  # Italics I, underline U
-        color = [0, 0, 0]
-        pdf.set_text_color(*color) 
+        pdf.set_font('Arial', 'B', 16)  # Italics I, underline U
+        pdf.set_text_color(*[0, 0, 0]) 
+        print(page_x_area, 20, 'Exam Results')
         pdf.cell(w=page_x_area, h=20, txt='Exam Results', border=1, align='C')
 
         # Stats
-        # TODO
+        results = self.__assemble_exam_results()
+        pdf.set_font('Arial', 'B', 11)  # Italics I, underline U
+        pdf.set_text_color(*[0, 0, 0])
+        start_x = [20, 70]
+        start_y = 40
+        line_height = 8
+        for index, item in results.items():
+            pdf.set_xy(x=start_x[0], y=start_y)
+            pdf.cell(w=60, h=line_height, txt=item['label'], border=0, align='L')
+
+            pdf.set_xy(x=start_x[1], y=start_y)
+            pdf.cell(w=60, h=line_height, txt=item['text'], border=0, align='L')
+            
+            start_y += item['skip_lines'] * 8
+
+
+        # TODO:
+        # Text color and decor?
+        # Software mark?
 
         # Export the pdf to file
         #  F: Save local, I or D: standard out
-        pdf.output(name='tuto1.pdf', dest='F')
+        pdf.output(name='[Datetime]_Exam_Result_Summary.pdf', dest='F')
 
         # Close
         pdf.close()
@@ -1051,5 +1069,5 @@ if menu_result:
 
     exam.show_result()
 
-    exam.save_results()
+    exam.export_results_to_pdf()
 
