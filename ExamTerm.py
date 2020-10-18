@@ -679,8 +679,10 @@ class Exam:
         # Get the score label/text
         if self.exam_contents['exam']['evaluation_percent'] >= self.exam_contents['exam']['exam_passing_score']:
             self.exam_contents['exam']['evaluation_label'] = "PASSED"
+            self.exam_contents['exam']['evaluation_bool'] = True
         else:
             self.exam_contents['exam']['evaluation_label'] = "FAILED"
+            self.exam_contents['exam']['evaluation_bool'] = False
 
     def __assemble_exam_results(self) -> dict:
         results = {}
@@ -931,16 +933,14 @@ class Exam:
         page_x_area = page_width - page_left_margin - page_right_margin
         page_y_area = page_height - page_top_margin - page_bottom_margin
 
+        # Setup Page
         pdf = FPDF(orientation='P', unit='mm', format='A4')
-
         pdf.set_author("Author Test Terminal")
         pdf.set_creator("Creator Test Terminal")
         pdf.set_subject("Exam Results")
-
         pdf.add_page(orientation = 'P', format = 'A4', same = False)
         pdf.set_left_margin(margin=10)
         pdf.set_right_margin(margin=10)
-
         pdf.alias_nb_pages()
 
         # Draw border
@@ -949,17 +949,23 @@ class Exam:
         pdf.line(10, 10, 10, 277)
         pdf.line(200, 10, 200, 277)
 
-        # Title
+        # if 
+        if self.exam_contents['exam']['evaluation_bool']:
+            pdf.set_fill_color(r=220, g=255, b=220)
+        else:
+            pdf.set_fill_color(r=255, g=220, b=220)
+
+        # Add Title
         pdf.set_font('Arial', 'B', 16)  # Italics I, underline U
         pdf.set_text_color(*[0, 0, 0]) 
         print(page_x_area, 20, 'Exam Results')
-        pdf.cell(w=page_x_area, h=20, txt='Exam Results', border=1, align='C')
+        pdf.cell(w=page_x_area, h=20, txt='Exam Results', border=1, align='C', fill=1)
 
-        # Stats
+        # Add Content
         results = self.__assemble_exam_results()
         pdf.set_font('Arial', 'B', 11)  # Italics I, underline U
         pdf.set_text_color(*[0, 0, 0])
-        start_x = [20, 70]
+        start_x = [20, 77]
         start_y = 40
         line_height = 8
         for index, item in results.items():
@@ -974,6 +980,10 @@ class Exam:
 
         # TODO:
         # Text color and decor?
+        # Passed, check, Failed, X  (bottom right corner in a box?)
+        # Red banner at the bottom too?
+        # Section titles
+        #       - Stats, Timing, etc...
         # Software mark?
 
         # Export the pdf to file
