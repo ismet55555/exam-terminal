@@ -1072,12 +1072,12 @@ class ExamTerminal:
 ###############################################################################################
 
 
-# exam = ExamTerminal(exam_filepath="exam.yml")
-# menu_result = exam.show_menu()
-# if menu_result:
-#     exam.begin_exam()
+exam = ExamTerminal(exam_filepath="../exams/exam.yml")
+menu_result = exam.show_menu()
+if menu_result:
+    exam.begin_exam()
 
-#     exam.show_result()
+    exam.show_result()
 
-#     exam.export_results_to_pdf()
+    exam.export_results_to_pdf()
 
