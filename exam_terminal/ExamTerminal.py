@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import curses
 import logging
@@ -18,7 +18,7 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 
-class Exam:
+class ExamTerminal:
     def __init__(self, exam_filepath: str) -> None:
         # Loading exam contents
         self.exam_contents = self.__load_parse_examfile(exam_filepath)
@@ -704,7 +704,7 @@ class Exam:
             "color": "blue",
             "decor": "bold",
             "x_pos": [4, 35],
-            "skip_lines": 1
+            "skip_lines": 2
         }
         index += 1
 
@@ -1072,12 +1072,12 @@ class Exam:
 ###############################################################################################
 
 
-exam = Exam(exam_filepath="exam.yml")
-menu_result = exam.show_menu()
-if menu_result:
-    exam.begin_exam()
+# exam = ExamTerminal(exam_filepath="exam.yml")
+# menu_result = exam.show_menu()
+# if menu_result:
+#     exam.begin_exam()
 
-    exam.show_result()
+#     exam.show_result()
 
-    exam.export_results_to_pdf()
+#     exam.export_results_to_pdf()
 

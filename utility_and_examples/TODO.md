@@ -48,6 +48,10 @@
   - The Test Terminal
   - Terminal Test
 
+## Packaging
+- pipx
+- script that installs itself into path, bin directory
+
 ## Random
 - Icon is the terminal symbol but with a check mark
 
