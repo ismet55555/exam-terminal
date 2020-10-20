@@ -9,6 +9,7 @@
 - Simple database? or just a file?
 - Enter exam taker name?
 - Animations on switch screen?  Side fille, bottom fill?
+- Run out of a Docker image (make the Dockerfile)
 
 
 ## Main Menu

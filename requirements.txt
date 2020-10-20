@@ -1,4 +1,4 @@
-setuptools
+setuptools==latest
 flake8
 # Markdown
 # markdown-to-json
