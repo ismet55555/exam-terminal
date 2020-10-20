@@ -1,6 +1,6 @@
 setuptools
+flake8
 Markdown
 markdown-to-json
 PyYAML
 fpdf2
-windows-curses

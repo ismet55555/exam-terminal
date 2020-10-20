@@ -3,6 +3,12 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# PhpStorm
+.idea
+
+# VSCode
+.vscode
+
 # C extensions
 *.so
 
