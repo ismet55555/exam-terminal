@@ -7,10 +7,12 @@
   - AWS Practitioner
   - Ansible
 - Simple database? or just a file?
+- Enter exam taker name?
+- Animations on switch screen?  Side fille, bottom fill?
+
 
 ## Main Menu
 - Add a About, Settings, Help Options (Horizontal? Two Lines?)
-- Small animations
 - Options menu
   - Immediate result feedback
   - Show Time
@@ -27,7 +29,6 @@
 - Go back and forth with questions
 - Have a answered/unanswered questions indicator 
 - Set up where multiple choice selection yields something backce
-- Small animations
 
 ## Pause/Resume Exam
 - Encrypt the exam file with a password so you can send it to someone?
@@ -36,15 +37,13 @@
 - Auto Timeout on question taking too long (maybe X% of total test ...)
 
 ## Results
-- Save a summary
-  - For passing, save a certificate???
-
+- Ability to send exam results via email?
 
 ## Name Ideas
+  - Exam Terminal <-----
   - Console / Terminal
   - Exam / Test(ing) / Assessment / Pilot?
   - Cursed Console Test
-
   - The Test Terminal
   - Terminal Test
 
@@ -57,4 +56,4 @@
 
 
 # Resources:
-- https://dbader.org/blog/how-to-make-command-line-commands-with-python
+- None

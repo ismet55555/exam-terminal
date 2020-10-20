@@ -1,4 +1,6 @@
+setuptools
 Markdown
 markdown-to-json
 PyYAML
 fpdf2
+windows-curses

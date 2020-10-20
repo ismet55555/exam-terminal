@@ -2,20 +2,19 @@
 
 import curses
 import logging
+import os
 import textwrap
 import threading
 from datetime import datetime
 from pprint import pprint
 from statistics import mean, median, stdev
-from time import sleep, time, strftime, gmtime
+from time import gmtime, sleep, strftime, time
 from typing import Tuple
 
 import yaml
+from fpdf import FPDF
 
-# Creating a message logger, all dependent scripts will inhearent this logger
-# logging.basicConfig(format='[%(asctime)s][%(levelname)-8s] [%(filename)-30s:%(lineno)4s] %(message)s', datefmt='%m/%d-%H:%M:%S')
 logger = logging.getLogger()
-# logger.setLevel(logging.INFO)
 
 
 class ExamTerminal:
@@ -130,8 +129,8 @@ class ExamTerminal:
         # Turn off echo
         curses.noecho()
 
-        # Block for 3/10 of a second
-        curses.halfdelay(3)
+        # Block for 5/10 of a second
+        curses.halfdelay(5)
 
     def __check_terminal_size(self, scr) -> None:
         # Getting the screen height and width
@@ -338,16 +337,12 @@ class ExamTerminal:
         return KEYS
 
     @staticmethod
-    def __load_software_ascii_name() -> list:
-        # TODO: Do something with this, probably not needed
-        software_name = [
-            " _____        _   _            _____              _         _ ",
-            "|_   _|__ ___| |_|_|___ ___   |_   _|__ ___ _____|_|___ ___| |",
-            "  | || -_|_ -|  _| |   | . |    | || -_|  _|     | |   | .'| |",
-            "  |_||___|___|_| |_|_|_|_  |    |_||___|_| |_|_|_|_|_|_|__,|_|",
-            "                       |___|                                  ",
-        ]
-        return software_name
+    def __load_software_ascii_name() -> str:
+        # TODO: Smarter, automatic loading of version
+        
+        software_name = "Exam Terminal"
+        software_version = "0.0.1"
+        return software_name + ' v' + software_version
 
     @staticmethod
     def __center_x(display_width:int, line:str) -> int:
@@ -356,6 +351,14 @@ class ExamTerminal:
     @staticmethod
     def __center_y(display_height:int) -> int:
         return display_height // 2
+
+    @staticmethod
+    def __truncate_text(text:str, length:int) -> str:
+        truncated_text = text
+        if len(text) >= length - 3:
+            truncated_text = text[0:length - 3] + '...'
+
+        return truncated_text
 
     ###############################################################################################
 
@@ -406,7 +409,7 @@ class ExamTerminal:
             self.__draw_screen_border(scr, self.color['grey-dark'])
 
             # Show software name/title
-            scr.addstr(term_height - 2, 2, "Testing Terminal v0.1", self.color['grey-dark'])
+            scr.addstr(term_height - 2, 2, self.__load_software_ascii_name(), self.color['grey-dark'])
 
             ########################################################################################
 
@@ -693,7 +696,7 @@ class ExamTerminal:
             "text": self.exam_contents['exam']['exam_title'],  # TODO: Wrap or truncate
             "color": "default",
             "decor": "bold",
-            "x_pos": [4, 30],
+            "font_width": '',
             "skip_lines": 1
         }
         index += 1
@@ -703,7 +706,7 @@ class ExamTerminal:
             "text": self.exam_contents['exam']['evaluation_label'],
             "color": "blue",
             "decor": "bold",
-            "x_pos": [4, 35],
+            "font_width": '',
             "skip_lines": 2
         }
         index += 1
@@ -713,7 +716,7 @@ class ExamTerminal:
             "text": f"{self.exam_contents['exam']['evaluation_percent']:3.1f}% ({self.questions_correct} of {self.exam_contents['exam']['exam_questions_count']}) (Needed: {self.exam_contents['exam']['exam_passing_score']}%)",
             "color": "default",
             "decor": "normal",
-            "x_pos": [4, 35],
+            "font_width": '',
             "skip_lines": 1
         }
         index += 1
@@ -723,7 +726,7 @@ class ExamTerminal:
             "text": f"{self.exam_contents['exam']['exam_questions_answered']} of {self.exam_contents['exam']['exam_questions_count']}",
             "color": "default",
             "decor": "normal",
-            "x_pos": [4, 35],
+            "font_width": '',
             "skip_lines": 1
         }
         index += 1
@@ -733,7 +736,7 @@ class ExamTerminal:
             "text": f"{strftime('%H:%M:%S', gmtime(self.exam_elapsed_time))}",
             "color": "default",
             "decor": "normal",
-            "x_pos": [4, 35],
+            "font_width": '',
             "skip_lines": 1
         }
         index += 1
@@ -743,7 +746,7 @@ class ExamTerminal:
             "text": f"{self.exam_contents['exam']['exam_begin_datestring']} -> {self.exam_contents['exam']['exam_end_datestring']}",
             "color": "default",
             "decor": "normal",
-            "x_pos": [4, 35],
+            "font_width": '',
             "skip_lines": 2
         }
         index += 1
@@ -753,7 +756,7 @@ class ExamTerminal:
             "text": str(self.exam_paused_count),
             "color": "default",
             "decor": "normal",
-            "x_pos": [4, 35],
+            "font_width": '',
             "skip_lines": 1
         }
         index += 1
@@ -763,12 +766,12 @@ class ExamTerminal:
             "text": f"{strftime('%H:%M:%S', gmtime(self.exam_paused_elapsed_time))}",
             "color": "default",
             "decor": "normal",
-            "x_pos": [4, 35],
+            "font_width": '',
             "skip_lines": 1
         }
         index += 1
 
-        width = 35
+        width = 33
         answer_distribution = ['.'] * width
         for question in self.exam_contents['questions']:
             if question['answered']:
@@ -778,7 +781,7 @@ class ExamTerminal:
             "text": f"[ 0.0s ]{''.join(answer_distribution)}[ {self.exam_elapsed_time:.1f}s ]",
             "color": "default",
             "decor": "normal",
-            "x_pos": [4, 35],
+            "font_width": 'fixed',
             "skip_lines": 1
         }
         index += 1
@@ -788,7 +791,7 @@ class ExamTerminal:
             if question['answered']:
                 answer_times.append(question['answered_question_time'])
         end_time = max(answer_times) * 1.25
-        width = 35
+        width = 33
         answer_distribution = ['.'] * width
         for answer_time in answer_times:
             answer_distribution[int((answer_time / end_time) * width) - 1] = "x"
@@ -797,7 +800,7 @@ class ExamTerminal:
             "text": f"[ 0.0s ]{''.join(answer_distribution)}[ {end_time:.1f}s ]",
             "color": "default",
             "decor": "normal",
-            "x_pos": [4, 35],
+            "font_width": 'fixed',
             "skip_lines": 1
         }
         index += 1
@@ -807,7 +810,7 @@ class ExamTerminal:
             "text": f"{mean(answer_times):.1f} +/- {stdev(answer_times):.2f} seconds",
             "color": "default",
             "decor": "normal",
-            "x_pos": [4, 35],
+            "font_width": '',
             "skip_lines": 1
         }
         index += 1
@@ -817,7 +820,7 @@ class ExamTerminal:
             "text": f"{median(answer_times):.1f} seconds",
             "color": "default",
             "decor": "normal",
-            "x_pos": [4, 35],
+            "font_width": '',
             "skip_lines": 1
         }
         index += 1
@@ -873,7 +876,7 @@ class ExamTerminal:
             self.__draw_screen_border(scr, self.color['grey-dark'])
 
             # Show software name/title
-            scr.addstr(term_height - 2, 2, "Testing Terminal v0.1", self.color['grey-dark'])
+            scr.addstr(term_height - 2, 2, self.__load_software_ascii_name(), self.color['grey-dark'])
 
             ########################################################################################
 
@@ -887,12 +890,12 @@ class ExamTerminal:
             self.__draw_horizontal_seperator(scr, start_y, self.color['grey-dark'])
             start_y += 2
 
-            # Question
+            # Draw items
             start_x = [4, 30]
             results = self.__assemble_exam_results()
             for index, item in results.items():
                 scr.addstr(start_y , start_x[0], item['label'], self.color['default'])
-                scr.addstr(start_y , start_x[1], item['text'], self.color[item['color']] | self.decor[item['decor']])
+                scr.addstr(start_y , start_x[1], self.__truncate_text(item['text'], self.width_limit - 30), self.color[item['color']] | self.decor[item['decor']])
                 start_y += item['skip_lines']
 
             ########################################################################################
@@ -920,8 +923,6 @@ class ExamTerminal:
         return curses.wrapper(self.draw_result)
 
     def export_results_to_pdf(self) -> bool:
-        from fpdf import FPDF
-
         page_width = 210
         page_height = 297
 
@@ -951,7 +952,7 @@ class ExamTerminal:
         pdf.line(10, 10, 10, 277)
         pdf.line(200, 10, 200, 277)
 
-        # if 
+        # Set the color depending on exam result label
         if self.exam_contents['exam']['evaluation_bool']:
             pdf.set_fill_color(r=220, g=255, b=220)
         else:
@@ -962,43 +963,51 @@ class ExamTerminal:
         pdf.cell(w=page_x_area, h=20, txt='Exam Results', border=1, align='C', fill=1)
 
         # Add Footer
-        pdf.set_font('Helvetica', '', 24)  # Italics I, underline U
+        pdf.set_font('Helvetica', '', 24) 
         pdf.set_xy(x=page_width - page_right_margin - 70, y=page_height - page_bottom_margin - 50)
         pdf.cell(w=60, h=30, txt=self.exam_contents['exam']['evaluation_label'], border=1, align='C', fill=1)
 
         # Add Content
         results = self.__assemble_exam_results()
-        pdf.set_font('Helvetica', 'B', 11)  # Italics I, underline U
         pdf.set_text_color(*[0, 0, 0])
         start_x = [20, 77]
         start_y = 40
         line_height = 8
         for index, item in results.items():
+            pdf.set_font('Helvetica', 'B', 11)
             pdf.set_xy(x=start_x[0], y=start_y)
             pdf.cell(w=60, h=line_height, txt=item['label'], border=0, align='L')
 
+            if item['font_width'] == 'fixed':
+                pdf.set_font('Courier', '', 11)
+            else:
+                pdf.set_font('Helvetica', '', 11)
             pdf.set_xy(x=start_x[1], y=start_y)
-            pdf.cell(w=60, h=line_height, txt=item['text'], border=0, align='L')
+            pdf.cell(w=60, h=line_height, txt=self.__truncate_text(item['text'], self.width_limit - 25), border=0, align='L')
             
             start_y += item['skip_lines'] * 8
 
+        # Add divider lines
+        # pdf.line(page_width // 4, 60, 3*page_width // 4, 60)
+        # pdf.line(page_width // 4, 100, 3*page_width // 4, 100)
 
         # TODO:
-        # Text color and decor?
-        # Passed, check, Failed, X  (bottom right corner in a box?)
-        # Red banner at the bottom too?
         # Section titles
         #       - Stats, Timing, etc...
         # Software mark?
 
         # Export the pdf to file
-        #  F: Save local, I or D: standard out
-        pdf.output(name='[Datetime]_Exam_Result_Summary.pdf', dest='F')
+        pdf_filepath = os.path.abspath(os.path.join('.', '[Datetime]_Exam_Result_Summary.pdf'))
+        try:
+            pdf.output(name=pdf_filepath, dest='F')
+            logger.info(f'Successfully saved exam results PDF: {pdf_filepath}')
+        except Exception as e:
+            logger.error(f'Failed to save exam results PDF document to "{pdf_filepath}". Exception: {e}')
+            logger.error(f'PDF documment may be open?')
+            # TODO: A message pop up in the therminal
 
         # Close
         pdf.close()
-
-
 
         return True
 
