@@ -6,7 +6,7 @@ from exam_terminal import exam_terminal
 
 
 def main():
-    exitcode = exam_terminal.exam_terminal()
+    exitcode = exam_terminal()
     sys.exit(exitcode)
 
 

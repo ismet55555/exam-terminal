@@ -13,9 +13,9 @@ from typing import Tuple
 import yaml
 
 # Creating a message logger, all dependent scripts will inhearent this logger
-logging.basicConfig(format='[%(asctime)s][%(levelname)-8s] [%(filename)-30s:%(lineno)4s] %(message)s', datefmt='%m/%d-%H:%M:%S')
+# logging.basicConfig(format='[%(asctime)s][%(levelname)-8s] [%(filename)-30s:%(lineno)4s] %(message)s', datefmt='%m/%d-%H:%M:%S')
 logger = logging.getLogger()
-logger.setLevel(logging.INFO)
+# logger.setLevel(logging.INFO)
 
 
 class ExamTerminal:
@@ -941,6 +941,8 @@ class ExamTerminal:
         pdf.add_page(orientation = 'P', format = 'A4', same = False)
         pdf.set_left_margin(margin=10)
         pdf.set_right_margin(margin=10)
+        pdf.set_top_margin(margin=10)
+        pdf.set_font('Helvetica', 'B', 18)  # Italics I, underline U
         pdf.alias_nb_pages()
 
         # Draw border
@@ -956,14 +958,17 @@ class ExamTerminal:
             pdf.set_fill_color(r=255, g=220, b=220)
 
         # Add Title
-        pdf.set_font('Arial', 'B', 16)  # Italics I, underline U
         pdf.set_text_color(*[0, 0, 0]) 
-        print(page_x_area, 20, 'Exam Results')
         pdf.cell(w=page_x_area, h=20, txt='Exam Results', border=1, align='C', fill=1)
+
+        # Add Footer
+        pdf.set_font('Helvetica', '', 24)  # Italics I, underline U
+        pdf.set_xy(x=page_width - page_right_margin - 70, y=page_height - page_bottom_margin - 50)
+        pdf.cell(w=60, h=30, txt=self.exam_contents['exam']['evaluation_label'], border=1, align='C', fill=1)
 
         # Add Content
         results = self.__assemble_exam_results()
-        pdf.set_font('Arial', 'B', 11)  # Italics I, underline U
+        pdf.set_font('Helvetica', 'B', 11)  # Italics I, underline U
         pdf.set_text_color(*[0, 0, 0])
         start_x = [20, 77]
         start_y = 40
@@ -1015,7 +1020,7 @@ class ExamTerminal:
             self.exam_contents['questions'][q]['question_presented_timestamp'] = question_elapsed_time
 
             # Show the question
-            index, answer, correct = exam.show_question(question)
+            index, answer, correct = self.show_question(question)
 
             # Exam quit
             if index == -1:
@@ -1064,20 +1069,4 @@ class ExamTerminal:
 
         # pprint(self.exam_contents)
         # exit()
-
-
-
-
-###############################################################################################
-###############################################################################################
-
-
-exam = ExamTerminal(exam_filepath="../exams/exam.yml")
-menu_result = exam.show_menu()
-if menu_result:
-    exam.begin_exam()
-
-    exam.show_result()
-
-    exam.export_results_to_pdf()
 
