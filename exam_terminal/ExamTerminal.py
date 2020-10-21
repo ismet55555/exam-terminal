@@ -1041,7 +1041,7 @@ class ExamTerminal:
 
 
         # Export the pdf to file
-        datetime_text = datetime.fromtimestamp(self.exam_contents['exam']['exam_end_timestamp']).strftime("[%m-%d][%H:%M]")
+        datetime_text = datetime.fromtimestamp(self.exam_contents['exam']['exam_end_timestamp']).strftime("[%m-%d][%H-%M]")
         pdf_filepath = os.path.abspath(os.path.join('.', f'{datetime_text}_Exam_Result_Summary.pdf'))
         try:
             pdf.output(name=pdf_filepath, dest='F')
