@@ -1,7 +1,7 @@
 # TODO 
 
 ## General
-- README.md
+- README.md <----------------------------
 - A few sample exams
   - DCA
   - AWS Practitioner
@@ -18,7 +18,6 @@
   - Immediate result feedback
   - Show Time
   - Show Progress
-- Truncate text if above some description character count or wrapped lines!!
 - Save all variables to the exam_contents dict
 
 ## Exam Loading
@@ -55,6 +54,9 @@
 ## Random
 - Icon is the terminal symbol but with a check mark
 
+
+# Bugs
+- 
 
 # Resources:
 - None
