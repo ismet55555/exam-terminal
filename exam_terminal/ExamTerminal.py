@@ -389,12 +389,15 @@ class ExamTerminal:
                     # TODO: Prompt or countdown?
                     return True
                 elif self.selection_index == 1:
-                    # TODO: Are you sure prompt
-                    return False
+                    if not self.is_exam_time_out:
+                        self.exam_quit += 1
+
+            elif k in KEYS['RESUME']:
+                self.exam_quit = False
 
             elif k in KEYS['QUIT']:
-                # TODO: Are you sure prompt
-                return False
+                if not self.is_exam_time_out:
+                    self.exam_quit += 1
 
             ########################################################################################
 
@@ -469,14 +472,24 @@ class ExamTerminal:
 
             ########################################################################################
 
+            # Refresh the screen
+            scr.refresh()
+
+            ########################################################################################
+
+            # Exam quit message box
+            if self.exam_quit:
+                message_lines = ['Are you sure you want to quit?', 'To quit press "Q"', 'To return press "R"']
+                self.__draw_message_box(scr, message_lines)
+                # Quit Message confirmed (pressed twice)
+                if self.exam_quit > 1:
+                    break
+
             # Straight exist software
             if self.exam_exit:
                 exit()
 
             ########################################################################################
-
-            # Refresh the screen
-            scr.refresh()
 
             # Get User input
             k = scr.getch()
@@ -644,7 +657,7 @@ class ExamTerminal:
             # Exam quit message box
             if self.exam_quit:
                 self.exam_paused = True
-                message_lines = ['Are you sure you want to quit?', 'To quit press "Q"', 'To resume exam press "R"']
+                message_lines = ['Are you sure you want to quit and evalute exam?', 'To quit and evaluate press "Q"', 'To resume exam press "R"']
                 self.__draw_message_box(scr, message_lines)
                 # Quit Message confirmed (pressed twice)
                 if self.exam_quit > 1:
@@ -656,7 +669,7 @@ class ExamTerminal:
 
             # Exam timed out message box
             if self.is_exam_time_out:
-                message_lines = ['Exam time has expired', 'Press "ENTER" to evalute']
+                message_lines = ['Exam time has expired', 'Press "ENTER" to evalute exam']
                 self.__draw_message_box(scr, message_lines)
 
             # TODO:  Only use a exit flag instead of break to outsource the checking (ensure loop is completed)
@@ -762,7 +775,7 @@ class ExamTerminal:
         index += 1
 
         results[index] = {
-            "label": "Elapsed Pauseed Time:",
+            "label": "Elapsed Paused Time:",
             "text": f"{strftime('%H:%M:%S', gmtime(self.exam_paused_elapsed_time))}",
             "color": "default",
             "decor": "normal",
@@ -790,7 +803,10 @@ class ExamTerminal:
         for question in self.exam_contents['questions']:
             if question['answered']:
                 answer_times.append(question['answered_question_time'])
-        end_time = max(answer_times) * 1.25
+        if answer_times:
+            end_time = max(answer_times) * 1.25
+        else:
+            end_time = 1
         width = 33
         answer_distribution = ['.'] * width
         for answer_time in answer_times:
@@ -805,9 +821,19 @@ class ExamTerminal:
         }
         index += 1
 
+        if len(answer_times) > 1:
+            times_mean = mean(answer_times)
+            times_std = stdev(answer_times)
+            times_median = median(answer_times)
+
+        else:
+            times_mean = 0
+            times_std = 0
+            times_median = 0
+
         results[index] = {
             "label": "Average Time Per Answer:",
-            "text": f"{mean(answer_times):.1f} +/- {stdev(answer_times):.2f} seconds",
+            "text": f"{times_mean:.1f} +/- {times_std:.2f} seconds",
             "color": "default",
             "decor": "normal",
             "font_width": '',
@@ -817,7 +843,7 @@ class ExamTerminal:
 
         results[index] = {
             "label": "Median Time Per Answer:",
-            "text": f"{median(answer_times):.1f} seconds",
+            "text": f"{times_median:.1f} seconds",
             "color": "default",
             "decor": "normal",
             "font_width": '',
@@ -853,15 +879,19 @@ class ExamTerminal:
 
             elif k in KEYS['ENTER']:
                 if self.selection_index == 0:
-                    # TODO: Prompt or countdown?
+                    # Save result PDF
                     return True
                 elif self.selection_index == 1:
-                    # TODO: Are you sure prompt
-                    return False
+                    # Quit
+                    if not self.is_exam_time_out:
+                        self.exam_quit += 1
+
+            elif k in KEYS['RESUME']:
+                self.exam_quit = False
 
             elif k in KEYS['QUIT']:
-                # TODO: Are you sure prompt
-                return False
+                if not self.is_exam_time_out:
+                    self.exam_quit += 1
 
             ########################################################################################
 
@@ -870,7 +900,7 @@ class ExamTerminal:
             ########################################################################################
 
             # Check terminal size
-            terminal_size_good = self.__check_terminal_size(scr)
+            self.__check_terminal_size(scr)
 
             # Drawing the screen border
             self.__draw_screen_border(scr, self.color['grey-dark'])
@@ -895,26 +925,37 @@ class ExamTerminal:
             results = self.__assemble_exam_results()
             for index, item in results.items():
                 scr.addstr(start_y , start_x[0], item['label'], self.color['default'])
-                scr.addstr(start_y , start_x[1], self.__truncate_text(item['text'], self.width_limit - 30), self.color[item['color']] | self.decor[item['decor']])
+                scr.addstr(start_y , start_x[1], self.__truncate_text(item['text'], term_width - 32), self.color[item['color']] | self.decor[item['decor']])
                 start_y += item['skip_lines']
 
             ########################################################################################
 
-            selections = ["Save Results", "Quit"]  # TODO: "Review Question"
+            selections = ["Save Result PDF", "Quit"]  # TODO: "Review Question"
             self.__draw_horizontal_seperator(scr, term_height - len(selections) - 4, self.color['grey-dark'])
             start_y = term_height - len(selections) - 7
             self.__draw_selection_menu(scr, selections, start_y)
 
+
             ########################################################################################
+
+            # Refresh the screen
+            scr.refresh()
+
+            ########################################################################################
+
+            # Exam quit message box
+            if self.exam_quit:
+                message_lines = ['Are you sure you want to quit?', 'To quit press "Q"', 'To return press "R"']
+                self.__draw_message_box(scr, message_lines)
+                # Quit Message confirmed (pressed twice)
+                if self.exam_quit > 1:
+                    break
 
             # Straight exist software
             if self.exam_exit:
                 exit()
 
             ########################################################################################
-
-            # Refresh the screen
-            scr.refresh()
 
             # Get User input
             k = scr.getch()
@@ -929,7 +970,7 @@ class ExamTerminal:
         page_left_margin = 10
         page_right_margin = 10
         page_top_margin = 10
-        page_bottom_margin = 10
+        page_bottom_margin = 20
 
         page_x_area = page_width - page_left_margin - page_right_margin
         page_y_area = page_height - page_top_margin - page_bottom_margin
@@ -964,7 +1005,7 @@ class ExamTerminal:
 
         # Add Footer
         pdf.set_font('Helvetica', '', 24) 
-        pdf.set_xy(x=page_width - page_right_margin - 70, y=page_height - page_bottom_margin - 50)
+        pdf.set_xy(x=page_width - page_right_margin - 70, y=page_height - page_bottom_margin - 40)
         pdf.cell(w=60, h=30, txt=self.exam_contents['exam']['evaluation_label'], border=1, align='C', fill=1)
 
         # Add Content
@@ -991,20 +1032,23 @@ class ExamTerminal:
         # pdf.line(page_width // 4, 60, 3*page_width // 4, 60)
         # pdf.line(page_width // 4, 100, 3*page_width // 4, 100)
 
-        # TODO:
-        # Section titles
-        #       - Stats, Timing, etc...
-        # Software mark?
+        # TODO: Section titles
+
+        pdf.set_text_color(*[100, 100, 100])
+        pdf.set_font('Helvetica', 'I', 8) 
+        pdf.set_xy(x=page_left_margin + 3, y=page_height - page_bottom_margin - 8)
+        pdf.cell(w=0, h=5, txt=f"Created with {self.__load_software_ascii_name()}", border=0, align='L')
+
 
         # Export the pdf to file
-        pdf_filepath = os.path.abspath(os.path.join('.', '[Datetime]_Exam_Result_Summary.pdf'))
+        datetime_text = datetime.fromtimestamp(self.exam_contents['exam']['exam_end_timestamp']).strftime("[%m-%d][%H:%M]")
+        pdf_filepath = os.path.abspath(os.path.join('.', f'{datetime_text}_Exam_Result_Summary.pdf'))
         try:
             pdf.output(name=pdf_filepath, dest='F')
             logger.info(f'Successfully saved exam results PDF: {pdf_filepath}')
         except Exception as e:
             logger.error(f'Failed to save exam results PDF document to "{pdf_filepath}". Exception: {e}')
-            logger.error(f'PDF documment may be open?')
-            # TODO: A message pop up in the therminal
+            return False
 
         # Close
         pdf.close()
