@@ -25,6 +25,8 @@ class ExamTerminal:
         self.color = {}
         self.decor = {}
 
+        self.halfdelay_screen_refresh = 5  # 10th of a second
+
         self.height_limit = 27
         self.width_limit = 85
         self.terminal_size_good = True
@@ -129,8 +131,8 @@ class ExamTerminal:
         # Turn off echo
         curses.noecho()
 
-        # Block for 5/10 of a second
-        curses.halfdelay(5)
+        # Screen delay/block for 10th of a second
+        curses.halfdelay(self.halfdelay_screen_refresh)
 
     def __check_terminal_size(self, scr) -> None:
         # Getting the screen height and width
@@ -259,109 +261,6 @@ class ExamTerminal:
 
     ###############################################################################################
 
-    @staticmethod
-    def __load_curses_colors_decor() -> Tuple[dict, dict]:
-        # In code usage example:
-        #       scr.addstr(y, x, "hello", self.color['blue'])
-        #       scr.addstr(y, x, "hello", self.color['blue'] | self.decor['bold'])
-
-
-        # Start colors in curses
-        curses.start_color()
-
-        # Defining colors [foreground/font, background]
-        color_definition = {
-            'default':      [curses.COLOR_WHITE, 0],    # FIXME: Rename to "normal" to match decor
-            'red':          [curses.COLOR_RED, 0],
-            'green':        [curses.COLOR_GREEN, 0],
-            'blue':         [curses.COLOR_BLUE, 0],
-            'yellow':       [curses.COLOR_YELLOW, 0],
-            'orange':       [209, 0],
-            'cyan':         [curses.COLOR_CYAN, 0],
-            'magenta':      [curses.COLOR_MAGENTA, 0],
-            'grey-dark':    [240, 0],
-            'grey-light':   [248, 0],
-            'black-white':  [curses.COLOR_BLACK, curses.COLOR_WHITE],
-            'white-red':    [curses.COLOR_WHITE, curses.COLOR_RED]
-        }
-
-        # If terminal does not support colors, reset everything to white
-        if not curses.has_colors() or not curses.can_change_color():
-            for color in color_definition:
-                color_definition[color] = [curses.COLOR_WHITE, 0]
-
-        # Initiating curses color and saving for quick reference
-        color = {}
-        for index, (key, value) in enumerate(color_definition.items()):
-            try:
-                curses.init_pair(index + 1, value[0], value[1])
-            except:
-                curses.init_pair(index + 1, 0, 0)
-            color[key] = curses.color_pair(index + 1)
-
-        # Defining font decorations
-        decoration_definition ={
-            'normal' : curses.A_NORMAL,         # Normal display (no highlight)
-            'standout': curses.A_STANDOUT,      # Best highlighting mode of the terminal
-            'underline': curses.A_UNDERLINE,    # Underlining
-            'reverse': curses.A_REVERSE,        # Reverse video
-            'blink': curses.A_BLINK,            # Blinking
-            'dim': curses.A_DIM,                # Half bright
-            'bold': curses.A_BOLD,              # Extra bright or bold
-            'protect': curses.A_PROTECT,        # Protected mode
-            'invisible': curses.A_INVIS,        # Invisible or blank mode
-            'alt-char': curses.A_ALTCHARSET,    # Alternate character set
-            'char': curses.A_CHARTEXT           # Bit-mask to extract a character
-        }
-
-        # Initiating curses color and saving for quick reference
-        decor = {}
-        for key, value in decoration_definition.items():
-            decor[key] = value
-
-        return color, decor
-
-    @staticmethod
-    def __load_keys() -> dict:
-        KEYS = {
-            "ENTER":  (curses.KEY_ENTER, ord('\n'), ord('\r')),
-            "SPACE":  (32, ord(' ')),
-            "UP":     (curses.KEY_UP, ord('k')),
-            "DOWN":   (curses.KEY_DOWN, ord('j')),
-            "RIGHT":  (curses.KEY_RIGHT, ord('l')),
-            "LEFT":   (curses.KEY_LEFT, ord('h')),
-            "PAUSE":  (ord('p'), ord('P')),
-            "RESUME": (ord('r'), ord('R')),
-            "QUIT":   (27 , ord('q'), ord('Q'))
-        }
-        return KEYS
-
-    @staticmethod
-    def __load_software_ascii_name() -> str:
-        # TODO: Smarter, automatic loading of version
-        
-        software_name = "Exam Terminal"
-        software_version = "0.0.1"
-        return software_name + ' v' + software_version
-
-    @staticmethod
-    def __center_x(display_width:int, line:str) -> int:
-        return display_width // 2 - len(line) // 2
-
-    @staticmethod
-    def __center_y(display_height:int) -> int:
-        return display_height // 2
-
-    @staticmethod
-    def __truncate_text(text:str, length:int) -> str:
-        truncated_text = text
-        if len(text) >= length - 3:
-            truncated_text = text[0:length - 3] + '...'
-
-        return truncated_text
-
-    ###############################################################################################
-
     def draw_menu(self, scr) -> bool:  # TODO: Return something useful
         # Setting up basic stuff for curses and load keys
         self.__basic_screen_setup(scr)
@@ -479,11 +378,14 @@ class ExamTerminal:
 
             # Exam quit message box
             if self.exam_quit:
+                curses.halfdelay(255)
                 message_lines = ['Are you sure you want to quit?', 'To quit press "Q"', 'To return press "R"']
                 self.__draw_message_box(scr, message_lines)
                 # Quit Message confirmed (pressed twice)
                 if self.exam_quit > 1:
                     break
+            else:
+                curses.halfdelay(self.halfdelay_screen_refresh)
 
             # Straight exist software
             if self.exam_exit:
@@ -493,6 +395,8 @@ class ExamTerminal:
 
             # Get User input
             k = scr.getch()
+        
+        return True
 
     def show_menu(self) -> bool:
         return curses.wrapper(self.draw_menu)
@@ -656,12 +560,15 @@ class ExamTerminal:
 
             # Exam quit message box
             if self.exam_quit:
+                curses.halfdelay(255)
                 self.exam_paused = True
                 message_lines = ['Are you sure you want to quit and evalute exam?', 'To quit and evaluate press "Q"', 'To resume exam press "R"']
                 self.__draw_message_box(scr, message_lines)
                 # Quit Message confirmed (pressed twice)
                 if self.exam_quit > 1:
                     break
+            else:
+                curses.halfdelay(self.halfdelay_screen_refresh)
 
             # Straight exist software
             if self.exam_exit:
@@ -872,10 +779,12 @@ class ExamTerminal:
 
             # Check user keyboard input
             if k in KEYS['DOWN'] or k in KEYS['RIGHT']:
-                self.selection_index += 1
+                if not self.exam_quit:
+                    self.selection_index += 1
 
             elif k in KEYS['UP'] or k in KEYS['LEFT']:
-                self.selection_index -= 1
+                if not self.exam_quit:
+                    self.selection_index -= 1
 
             elif k in KEYS['ENTER']:
                 if self.selection_index == 0:
@@ -883,15 +792,13 @@ class ExamTerminal:
                     return True
                 elif self.selection_index == 1:
                     # Quit
-                    if not self.is_exam_time_out:
-                        self.exam_quit += 1
+                    self.exam_quit += 1
 
             elif k in KEYS['RESUME']:
                 self.exam_quit = False
 
             elif k in KEYS['QUIT']:
-                if not self.is_exam_time_out:
-                    self.exam_quit += 1
+                self.exam_quit += 1
 
             ########################################################################################
 
@@ -945,11 +852,14 @@ class ExamTerminal:
 
             # Exam quit message box
             if self.exam_quit:
+                curses.halfdelay(255)
                 message_lines = ['Are you sure you want to quit?', 'To quit press "Q"', 'To return press "R"']
                 self.__draw_message_box(scr, message_lines)
                 # Quit Message confirmed (pressed twice)
                 if self.exam_quit > 1:
                     break
+            else:
+                curses.halfdelay(self.halfdelay_screen_refresh)
 
             # Straight exist software
             if self.exam_exit:
@@ -959,6 +869,8 @@ class ExamTerminal:
 
             # Get User input
             k = scr.getch()
+
+        return True
 
     def show_result(self) -> bool:
         return curses.wrapper(self.draw_result)
@@ -1034,18 +946,18 @@ class ExamTerminal:
 
         # TODO: Section titles
 
+        # Add the software watermark thingy
         pdf.set_text_color(*[100, 100, 100])
         pdf.set_font('Helvetica', 'I', 8) 
         pdf.set_xy(x=page_left_margin + 3, y=page_height - page_bottom_margin - 8)
         pdf.cell(w=0, h=5, txt=f"Created with {self.__load_software_ascii_name()}", border=0, align='L')
-
 
         # Export the pdf to file
         datetime_text = datetime.fromtimestamp(self.exam_contents['exam']['exam_end_timestamp']).strftime("[%m-%d][%H-%M]")
         pdf_filepath = os.path.abspath(os.path.join('.', f'{datetime_text}_Exam_Result_Summary.pdf'))
         try:
             pdf.output(name=pdf_filepath, dest='F')
-            logger.info(f'Successfully saved exam results PDF: {pdf_filepath}')
+            logger.debug(f'Successfully saved exam results PDF: {pdf_filepath}')
         except Exception as e:
             logger.error(f'Failed to save exam results PDF document to "{pdf_filepath}". Exception: {e}')
             return False
@@ -1123,3 +1035,105 @@ class ExamTerminal:
         # pprint(self.exam_contents)
         # exit()
 
+    ###############################################################################################
+
+    @staticmethod
+    def __load_curses_colors_decor() -> Tuple[dict, dict]:
+        # In code usage example:
+        #       scr.addstr(y, x, "hello", self.color['blue'])
+        #       scr.addstr(y, x, "hello", self.color['blue'] | self.decor['bold'])
+
+
+        # Start colors in curses
+        curses.start_color()
+
+        # Defining colors [foreground/font, background]
+        color_definition = {
+            'default':      [curses.COLOR_WHITE, 0],    # FIXME: Rename to "normal" to match decor
+            'red':          [curses.COLOR_RED, 0],
+            'green':        [curses.COLOR_GREEN, 0],
+            'blue':         [curses.COLOR_BLUE, 0],
+            'yellow':       [curses.COLOR_YELLOW, 0],
+            'orange':       [209, 0],
+            'cyan':         [curses.COLOR_CYAN, 0],
+            'magenta':      [curses.COLOR_MAGENTA, 0],
+            'grey-dark':    [240, 0],
+            'grey-light':   [248, 0],
+            'black-white':  [curses.COLOR_BLACK, curses.COLOR_WHITE],
+            'white-red':    [curses.COLOR_WHITE, curses.COLOR_RED]
+        }
+
+        # If terminal does not support colors, reset everything to white
+        if not curses.has_colors() or not curses.can_change_color():
+            for color in color_definition:
+                color_definition[color] = [curses.COLOR_WHITE, 0]
+
+        # Initiating curses color and saving for quick reference
+        color = {}
+        for index, (key, value) in enumerate(color_definition.items()):
+            try:
+                curses.init_pair(index + 1, value[0], value[1])
+            except:
+                curses.init_pair(index + 1, 0, 0)
+            color[key] = curses.color_pair(index + 1)
+
+        # Defining font decorations
+        decoration_definition ={
+            'normal' : curses.A_NORMAL,         # Normal display (no highlight)
+            'standout': curses.A_STANDOUT,      # Best highlighting mode of the terminal
+            'underline': curses.A_UNDERLINE,    # Underlining
+            'reverse': curses.A_REVERSE,        # Reverse video
+            'blink': curses.A_BLINK,            # Blinking
+            'dim': curses.A_DIM,                # Half bright
+            'bold': curses.A_BOLD,              # Extra bright or bold
+            'protect': curses.A_PROTECT,        # Protected mode
+            'invisible': curses.A_INVIS,        # Invisible or blank mode
+            'alt-char': curses.A_ALTCHARSET,    # Alternate character set
+            'char': curses.A_CHARTEXT           # Bit-mask to extract a character
+        }
+
+        # Initiating curses color and saving for quick reference
+        decor = {}
+        for key, value in decoration_definition.items():
+            decor[key] = value
+
+        return color, decor
+
+    @staticmethod
+    def __load_keys() -> dict:
+        KEYS = {
+            "ENTER":  (curses.KEY_ENTER, ord('\n'), ord('\r')),
+            "SPACE":  (32, ord(' ')),
+            "UP":     (curses.KEY_UP, ord('k')),
+            "DOWN":   (curses.KEY_DOWN, ord('j')),
+            "RIGHT":  (curses.KEY_RIGHT, ord('l')),
+            "LEFT":   (curses.KEY_LEFT, ord('h')),
+            "PAUSE":  (ord('p'), ord('P')),
+            "RESUME": (ord('r'), ord('R')),
+            "QUIT":   (27 , ord('q'), ord('Q'))
+        }
+        return KEYS
+
+    @staticmethod
+    def __load_software_ascii_name() -> str:
+        # TODO: Smarter, automatic loading of version
+        
+        software_name = "Exam Terminal"
+        software_version = "0.0.1"
+        return software_name + ' v' + software_version
+
+    @staticmethod
+    def __center_x(display_width:int, line:str) -> int:
+        return display_width // 2 - len(line) // 2
+
+    @staticmethod
+    def __center_y(display_height:int) -> int:
+        return display_height // 2
+
+    @staticmethod
+    def __truncate_text(text:str, length:int) -> str:
+        truncated_text = text
+        if len(text) >= length - 3:
+            truncated_text = text[0:length - 3] + '...'
+
+        return truncated_text
