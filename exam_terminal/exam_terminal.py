@@ -11,17 +11,23 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 def exam_terminal() -> int:
-    """Code here"""
+    """
+    Beginning of program. Called from __main__.py
+
+    Parameters: None
+    Returns:
+            exit code (int): Program exit code
+
+    """
 
     logger.debug(f"Current directory: {os.getcwd()}")
 
-    # Create the exam object and loading the exam file
-    exam = ExamTerminal(exam_filepath="exams/exam.yml")
-
     # TODO: Smarter menu navigation
-    # FIXME: Must clear exam results!
 
     while True:
+        # Create the exam object and loading the exam file
+        exam = ExamTerminal(exam_filepath="exams/exam.yml")
+
         # Show the intro 
         main_menu_selection = exam.show_menu()
 

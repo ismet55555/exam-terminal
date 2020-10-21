@@ -2,6 +2,7 @@
 
 ## General
 - README.md <----------------------------
+- Python DocStrings
 - A few sample exams
   - DCA
   - AWS Practitioner
