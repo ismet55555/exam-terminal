@@ -15,13 +15,29 @@ def exam_terminal() -> int:
 
     logger.debug(f"Current directory: {os.getcwd()}")
 
+    # Create the exam object and loading the exam file
     exam = ExamTerminal(exam_filepath="exams/exam.yml")
-    menu_result = exam.show_menu()
-    if menu_result:
-        exam.begin_exam()
 
-        exam.show_result()
+    # TODO: Smarter menu navigation
+    # FIXME: Must clear exam results!
 
-        exam.export_results_to_pdf()
+    while True:
+        # Show the intro 
+        main_menu_selection = exam.show_menu()
+
+        if main_menu_selection[0] == 'begin':
+            # Begin the exam
+            exam.begin_exam()
+
+            # Show exam results
+            result_menu_selection = exam.show_result()
+
+            # If selected export the results to pdf
+            if result_menu_selection[0] == 'save':
+                exam.export_results_to_pdf()
+            else:
+                break
+        else:
+            break
 
     return 0

@@ -50,7 +50,7 @@ class ExamTerminal:
         self.exam_paused_elapsed_time = 0
         self.exam_paused_count = 0
 
-        self.exam_quit = False
+        self.exam_quit = 0
         self.exam_exit = False  # Straight exit entire program
 
         self.is_timer_timing = False
@@ -121,7 +121,7 @@ class ExamTerminal:
 
         return self.exam_contents
 
-    def __basic_screen_setup(self, scr) -> None:
+    def __basic_screen_setup(self, scr, halfdelay: bool) -> None:
         # Hiding the cursor
         curses.curs_set(0)
 
@@ -132,7 +132,10 @@ class ExamTerminal:
         curses.noecho()
 
         # Screen delay/block for 10th of a second
-        curses.halfdelay(self.halfdelay_screen_refresh)
+        if halfdelay:
+            curses.halfdelay(self.halfdelay_screen_refresh)
+        else:
+            curses.halfdelay(255)
 
     def __check_terminal_size(self, scr) -> None:
         # Getting the screen height and width
@@ -261,9 +264,9 @@ class ExamTerminal:
 
     ###############################################################################################
 
-    def draw_menu(self, scr) -> bool:  # TODO: Return something useful
+    def draw_menu(self, scr) -> Tuple[str, bool]:
         # Setting up basic stuff for curses and load keys
-        self.__basic_screen_setup(scr)
+        self.__basic_screen_setup(scr, halfdelay=False)
         KEYS = self.__load_keys()
 
         # User key input (ASCII)
@@ -285,14 +288,15 @@ class ExamTerminal:
 
             elif k in KEYS['ENTER']:
                 if self.selection_index == 0:
-                    # TODO: Prompt or countdown?
-                    return True
+                    # Start the Exam  # TODO: Prompt or countdown?
+                    return 'begin', True
                 elif self.selection_index == 1:
+                    # Quit Program
                     if not self.is_exam_time_out:
                         self.exam_quit += 1
 
             elif k in KEYS['RESUME']:
-                self.exam_quit = False
+                self.exam_quit = 0
 
             elif k in KEYS['QUIT']:
                 if not self.is_exam_time_out:
@@ -383,7 +387,7 @@ class ExamTerminal:
                 self.__draw_message_box(scr, message_lines)
                 # Quit Message confirmed (pressed twice)
                 if self.exam_quit > 1:
-                    break
+                    return 'quit', True
             else:
                 curses.halfdelay(self.halfdelay_screen_refresh)
 
@@ -395,10 +399,8 @@ class ExamTerminal:
 
             # Get User input
             k = scr.getch()
-        
-        return True
 
-    def show_menu(self) -> bool:
+    def show_menu(self) -> Tuple[str, bool]:
         return curses.wrapper(self.draw_menu)
 
     ###############################################################################################
@@ -419,9 +421,9 @@ class ExamTerminal:
                 # Time Spend paused
                 self.exam_paused_elapsed_time = self.global_elapsed_time - self.exam_elapsed_time
 
-    def draw_question(self, scr, question:dict) -> Tuple[int, str, bool]:
+    def draw_question(self, scr, question:dict) -> Tuple[str, bool]:
         # Setting up basic stuff for curses and load keys
-        self.__basic_screen_setup(scr)
+        self.__basic_screen_setup(scr, halfdelay=True)
         KEYS = self.__load_keys()
 
         start_y = 3
@@ -450,15 +452,14 @@ class ExamTerminal:
 
             elif k in KEYS['ENTER']:
                 if self.is_exam_time_out:
-                    return -1, 'quit', False
+                    return 'quit', False
 
                 elif not self.exam_paused:
-                    index = self.selection_index
                     correct = question['question_answer_bool'][self.selection_index]
                     answer = question['selection'][self.selection_index]
 
                     # Return the entered answer
-                    return index, answer, correct
+                    return answer, correct
 
             elif k in KEYS['PAUSE']:
                 self.exam_paused = True
@@ -466,7 +467,7 @@ class ExamTerminal:
 
             elif k in KEYS['RESUME']:
                 self.exam_paused = False
-                self.exam_quit = False
+                self.exam_quit = 0
 
             elif k in KEYS['QUIT']:
                 if not self.is_exam_time_out:
@@ -475,7 +476,7 @@ class ExamTerminal:
             ########################################################################################
 
             # Check terminal size
-            terminal_size_good = self.__check_terminal_size(scr)
+            self.__check_terminal_size(scr)
 
             # Drawing the screen border
             self.__draw_screen_border(scr, self.color['grey-dark'])
@@ -564,9 +565,9 @@ class ExamTerminal:
                 self.exam_paused = True
                 message_lines = ['Are you sure you want to quit and evalute exam?', 'To quit and evaluate press "Q"', 'To resume exam press "R"']
                 self.__draw_message_box(scr, message_lines)
-                # Quit Message confirmed (pressed twice)
                 if self.exam_quit > 1:
-                    break
+                    # Quit Message confirmed (pressed twice)
+                    return 'quit', False
             else:
                 curses.halfdelay(self.halfdelay_screen_refresh)
 
@@ -579,21 +580,18 @@ class ExamTerminal:
                 message_lines = ['Exam time has expired', 'Press "ENTER" to evalute exam']
                 self.__draw_message_box(scr, message_lines)
 
-            # TODO:  Only use a exit flag instead of break to outsource the checking (ensure loop is completed)
-
             ########################################################################################
 
             # Get User input
             k = scr.getch()
 
-        return -1, 'quit', False
-
-    def show_question(self, question:dict) -> Tuple[int, str, bool]:
+    def show_question(self, question:dict) -> Tuple[str, bool]:
         return curses.wrapper(self.draw_question, question)
 
     ###############################################################################################
 
     def __evaluate_exam(self) -> None:
+        logger.debug('Evaluating exam ...')
         questions_count = len(self.exam_contents['questions'])
 
         # Get the score
@@ -760,9 +758,9 @@ class ExamTerminal:
 
         return results
 
-    def draw_result(self, scr) -> bool:  # TODO: Return something useful
+    def draw_result(self, scr) -> Tuple[str, bool]:
         # Setting up basic stuff for curses and load keys
-        self.__basic_screen_setup(scr)
+        self.__basic_screen_setup(scr, halfdelay=False)
         KEYS = self.__load_keys()
 
         self.selection_index = 0
@@ -789,13 +787,13 @@ class ExamTerminal:
             elif k in KEYS['ENTER']:
                 if self.selection_index == 0:
                     # Save result PDF
-                    return True
+                    return 'save', True
                 elif self.selection_index == 1:
                     # Quit
                     self.exam_quit += 1
 
             elif k in KEYS['RESUME']:
-                self.exam_quit = False
+                self.exam_quit = 0
 
             elif k in KEYS['QUIT']:
                 self.exam_quit += 1
@@ -857,7 +855,7 @@ class ExamTerminal:
                 self.__draw_message_box(scr, message_lines)
                 # Quit Message confirmed (pressed twice)
                 if self.exam_quit > 1:
-                    break
+                    return 'quit', True
             else:
                 curses.halfdelay(self.halfdelay_screen_refresh)
 
@@ -870,9 +868,7 @@ class ExamTerminal:
             # Get User input
             k = scr.getch()
 
-        return True
-
-    def show_result(self) -> bool:
+    def show_result(self) -> Tuple[str, bool]:
         return curses.wrapper(self.draw_result)
 
     def export_results_to_pdf(self) -> bool:
@@ -969,7 +965,7 @@ class ExamTerminal:
 
     ###############################################################################################
 
-    def begin_exam(self) -> None:  # TODO: Return something useful
+    def begin_exam(self) -> None:
         logger.debug('Exam started')
         self.exam_begin_time = time()
 
@@ -979,16 +975,17 @@ class ExamTerminal:
         exam_timer_thread.daemon = True
         exam_timer_thread.start()
 
+        # Looping over all listed questions
         for q, question in enumerate(self.exam_contents['questions']):
             # Start timer for current question
             question_elapsed_time = time()
             self.exam_contents['questions'][q]['question_presented_timestamp'] = question_elapsed_time
 
             # Show the question
-            index, answer, correct = self.show_question(question)
+            answer, correct = self.show_question(question)
 
             # Exam quit
-            if index == -1:
+            if answer == 'quit':
                 break
 
             # Log answer metadata
@@ -1018,12 +1015,12 @@ class ExamTerminal:
         self.exam_contents['exam']['exam_questions_correct'] = self.questions_correct
         self.exam_contents['exam']['exam_questions_wrong'] = self.questions_wrong
 
+        # Count exam question answered
         answered = 0
         for question in self.exam_contents['questions']:
             if question['answered']:
                 answered += 1
         self.exam_contents['exam']['exam_questions_answered'] = answered
-
 
         # Stop independent exam timer
         self.is_timer_timing = False
@@ -1032,9 +1029,6 @@ class ExamTerminal:
         # Evaluate the exam
         self.__evaluate_exam()
 
-        # pprint(self.exam_contents)
-        # exit()
-
     ###############################################################################################
 
     @staticmethod
@@ -1042,7 +1036,6 @@ class ExamTerminal:
         # In code usage example:
         #       scr.addstr(y, x, "hello", self.color['blue'])
         #       scr.addstr(y, x, "hello", self.color['blue'] | self.decor['bold'])
-
 
         # Start colors in curses
         curses.start_color()
