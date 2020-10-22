@@ -12,6 +12,7 @@
 - Animations on switch screen?  Side fille, bottom fill?
 - Run out of a Docker image (make the Dockerfile)
 - See example https://github.com/PyCQA/redbaron for flairs and tests
+- Upgrade to pipenv instead of requirements.txt
 
 
 ## Main Menu
