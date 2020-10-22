@@ -21,7 +21,7 @@ def requirements():
 
 
 setuptools.setup(
-    name="exam_terminal",
+    name="exam-terminal",
     version="0.0.3",
     author="Ismet Handzic",
     author_email="ismet.handzic@gmail.com",
@@ -58,5 +58,5 @@ setuptools.setup(
     ],
     py_modules=["exam_terminal"],
     entry_points={"console_scripts": [
-        "exam_terminal = exam_terminal.__main__:main"]},
+        "exam-terminal = exam_terminal.__main__:main"]},
 )
