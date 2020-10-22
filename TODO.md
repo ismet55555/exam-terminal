@@ -11,6 +11,7 @@
 - Enter exam taker name?
 - Animations on switch screen?  Side fille, bottom fill?
 - Run out of a Docker image (make the Dockerfile)
+- See example https://github.com/PyCQA/redbaron for flairs and tests
 
 
 ## Main Menu
