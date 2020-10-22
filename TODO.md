@@ -51,7 +51,7 @@
 
 ## Packaging
 - pipx
-- script that installs itself into path, bin directory
+- Automatic twine PYPI publishing: https://github.com/mingrammer/awesome-finder/blob/master/setup.py
 
 ## Random
 - Icon is the terminal symbol but with a check mark
