@@ -789,6 +789,9 @@ class ExamTerminal:
                     # Save result PDF
                     return 'save', True
                 elif self.selection_index == 1:
+                    # Return to main menu
+                    return 'menu', True
+                elif self.selection_index == 2:
                     # Quit
                     self.exam_quit += 1
 
@@ -835,7 +838,7 @@ class ExamTerminal:
 
             ########################################################################################
 
-            selections = ["Save Result PDF", "Quit"]  # TODO: "Review Question"
+            selections = ["Save Result PDF and Quit", "Main Menu", "Quit"]  # TODO: "Review Question"
             self.__draw_horizontal_seperator(scr, term_height - len(selections) - 4, self.color['grey-dark'])
             start_y = term_height - len(selections) - 7
             self.__draw_selection_menu(scr, selections, start_y)

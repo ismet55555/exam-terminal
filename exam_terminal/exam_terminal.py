@@ -41,6 +41,9 @@ def exam_terminal() -> int:
             # If selected export the results to pdf
             if result_menu_selection[0] == 'save':
                 exam.export_results_to_pdf()
+                break
+            elif result_menu_selection[0] == 'menu':
+                pass
             else:
                 break
         else:
