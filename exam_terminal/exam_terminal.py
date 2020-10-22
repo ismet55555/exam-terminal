@@ -1,14 +1,14 @@
 
 #!/usr/bin/env python3
 
-from ExamTerminal import ExamTerminal
+from . import ExamTerminal
 import os
 import logging
 
 # Creating a message logger, all dependent scripts will inhearent this logger
 logging.basicConfig(format='[%(asctime)s][%(levelname)-8s] [%(filename)-30s:%(lineno)4s] %(message)s', datefmt='%m/%d-%H:%M:%S')
 logger = logging.getLogger()
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 
 def exam_terminal() -> int:
     """
@@ -26,7 +26,8 @@ def exam_terminal() -> int:
 
     while True:
         # Create the exam object and loading the exam file
-        exam = ExamTerminal(exam_filepath="exams/exam.yml")
+        # TODO: Fix importing of exam files, make click argument
+        exam = ExamTerminal.ExamTerminal(exam_filepath="../exams/exam.yml")
 
         # Show the intro 
         main_menu_selection = exam.show_menu()

@@ -1,6 +1,10 @@
-setuptools==latest
+setuptools
+Click
 flake8
-# Markdown
-# markdown-to-json
 PyYAML
 fpdf2
+
+# For development:
+#    python3 -m venv env
+#    source env/bin/activate
+#    pip install --editable .
