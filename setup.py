@@ -22,7 +22,7 @@ def requirements():
 
 setuptools.setup(
     name="exam_terminal",
-    version="0.0.1",
+    version="0.0.3",
     author="Ismet Handzic",
     author_email="ismet.handzic@gmail.com",
     maintainer="Ismet Handzic",
@@ -36,16 +36,25 @@ setuptools.setup(
     long_description_content_type='text/markdown',
     python_requires='>=3.5',
     classifiers=[
-        "Development Status :: 3 - Alpha",
-        "Topic :: Education",
-        "License :: OSI Approved :: Apache-2.0 License",
+        'Development Status :: 4 - Beta',
+        'Topic :: Education',
+        'License :: OSI Approved :: Apache-2.0 License',
+        'Natural Language :: English',
+        'Intended Audience :: Education',
+        'Topic :: Education',
+        'Topic :: Education :: Testing',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+        "Environment :: Console",
+        "Environment :: Console :: Curses",
+        'Operating System :: OS Independent',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
-        'Programming Language :: Python :: 3 :: Only',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3 :: Only'
     ],
     py_modules=["exam_terminal"],
     entry_points={"console_scripts": [

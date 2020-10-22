@@ -1,33 +1,31 @@
 
 #!/usr/bin/env python3
 
-from . import ExamTerminal
-import os
 import logging
+import os
 
-# Creating a message logger, all dependent scripts will inhearent this logger
-logging.basicConfig(format='[%(asctime)s][%(levelname)-8s] [%(filename)-30s:%(lineno)4s] %(message)s', datefmt='%m/%d-%H:%M:%S')
+from . import ExamTerminal
+
 logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
 
-def exam_terminal() -> int:
+def exam_terminal(exam_filepath) -> int:
     """
     Beginning of program. Called from __main__.py
 
-    Parameters: None
+    Parameters:
+        exam_terminal (path or str): Relative or absolute file path to exam file
     Returns:
-            exit code (int): Program exit code
+        exit code (int): Program exit code
 
     """
-
-    logger.debug(f"Current directory: {os.getcwd()}")
+    current_working_dir = os.getcwd()
+    logger.debug(f"Current directory: {current_working_dir}")
 
     # TODO: Smarter menu navigation
 
     while True:
         # Create the exam object and loading the exam file
-        # TODO: Fix importing of exam files, make click argument
-        exam = ExamTerminal.ExamTerminal(exam_filepath="../exams/exam.yml")
+        exam = ExamTerminal.ExamTerminal(exam_filepath=exam_filepath)
 
         # Show the intro 
         main_menu_selection = exam.show_menu()

@@ -3,13 +3,14 @@
 import curses
 import logging
 import os
+import sys
 import textwrap
 import threading
 from datetime import datetime
 from pprint import pprint
 from statistics import mean, median, stdev
 from time import gmtime, sleep, strftime, time
-from typing import Tuple
+from typing import Tuple, Dict
 
 import yaml
 from fpdf import FPDF
@@ -21,6 +22,9 @@ class ExamTerminal:
     def __init__(self, exam_filepath: str) -> None:
         # Loading exam contents
         self.exam_contents = self.__load_parse_examfile(exam_filepath)
+        if not self.exam_contents:
+            logger.error('Exiting ...')
+            sys.exit(1)
 
         self.color = {}
         self.decor = {}
@@ -55,19 +59,18 @@ class ExamTerminal:
 
         self.is_timer_timing = False
 
-        logger.debug('Exam was created and exam file loaded')
-
     ###############################################################################################
 
-    def __load_parse_examfile(self, filepath: str) -> dict:
+    def __load_parse_examfile(self, filepath: str) -> Dict:
         # Load the examp file
         logger.debug(f"Loading specified exam file: '{filepath}' ...")
         try:
             with open(filepath) as file:
                 self.exam_contents = yaml.load(file, Loader=yaml.FullLoader)
+            logger.debug(f"Successfully loaded exam file")
         except Exception as e:
-            logger.error(f"Failed to load specified exam file: '{filepath}'")
-            return False
+            logger.error(f"Failed to load specified exam file: '{filepath}'. Exception: {e}")
+            return {}
 
         # Get the total exam time
         self.exam_allowed_time = self.exam_contents['exam']['exam_allowed_time']
@@ -75,7 +78,7 @@ class ExamTerminal:
 
         # TODO: Calculate exam time in seconds? minutes?
 
-        logger.debug('Parsing the loaded exam information ...')
+        logger.debug(f"Parsing the loaded exam file. Loading {len(self.exam_contents['questions'])} questions ...")
         # Loop through all the questions
         for index, question in enumerate(self.exam_contents['questions']):
             # Store the question number
@@ -118,6 +121,8 @@ class ExamTerminal:
 
         # Get the total number of questions
         self.exam_contents['exam']['exam_questions_count'] = len(self.exam_contents['questions'])
+
+        logger.debug('Successfully parsed exam information from file')
 
         return self.exam_contents
 
@@ -393,7 +398,7 @@ class ExamTerminal:
 
             # Straight exist software
             if self.exam_exit:
-                exit()
+                sys.exit(0)
 
             ########################################################################################
 
@@ -406,7 +411,8 @@ class ExamTerminal:
     ###############################################################################################
 
     def __exam_timer_thread(self) -> None:
-        # FIXME: Account for terminal size message error
+
+        logger.debug('Starting exam timer thread ...')
         while self.is_timer_timing:
             self.global_elapsed_time = time() - self.exam_begin_time 
             if not self.exam_paused:
@@ -420,6 +426,8 @@ class ExamTerminal:
             else:
                 # Time Spend paused
                 self.exam_paused_elapsed_time = self.global_elapsed_time - self.exam_elapsed_time
+
+        logger.debug('Exam timer thread ended')
 
     def draw_question(self, scr, question:dict) -> Tuple[str, bool]:
         # Setting up basic stuff for curses and load keys
@@ -573,7 +581,7 @@ class ExamTerminal:
 
             # Straight exist software
             if self.exam_exit:
-                exit()
+                sys.exit(0)
 
             # Exam timed out message box
             if self.is_exam_time_out:
@@ -591,7 +599,7 @@ class ExamTerminal:
     ###############################################################################################
 
     def __evaluate_exam(self) -> None:
-        logger.debug('Evaluating exam ...')
+        logger.debug('Evaluating exam results ...')
         questions_count = len(self.exam_contents['questions'])
 
         # Get the score
@@ -864,7 +872,7 @@ class ExamTerminal:
 
             # Straight exist software
             if self.exam_exit:
-                exit()
+                sys.exit(0)
 
             ########################################################################################
 
@@ -969,7 +977,7 @@ class ExamTerminal:
     ###############################################################################################
 
     def begin_exam(self) -> None:
-        logger.debug('Exam started')
+        logger.debug('Beginning Exam ...')
         self.exam_begin_time = time()
 
         # Start the independent timer thread for entire exam
@@ -1007,6 +1015,8 @@ class ExamTerminal:
 
             # Calculate Progress
             self.questions_progress = (self.questions_complete / self.questions_total)
+
+        logger.debug('Exam completed or stopped')
 
         # Log exam attributes
         self.exam_contents['exam']['exam_begin_timestamp'] = self.exam_begin_time
