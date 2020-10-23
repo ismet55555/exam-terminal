@@ -13,5 +13,4 @@ exam-terminal = {editable = true, path = "."}
 
 [packages]
 exam-terminal = {editable = false, path = "."}
-
 # See setup.py for exam-terminal dependencies
