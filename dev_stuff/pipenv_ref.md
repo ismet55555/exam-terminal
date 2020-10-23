@@ -12,6 +12,7 @@ Installation:
 - Create pipenv and install packages from Pipfile
   - `pipenv install [OPTIONS] [PROJECT DIRECTORY]`
   - Options:
+    - Don't try to lock: `--ignore-pipfile`
     - Actively editable env: `-e`
     - Python Major version: `--two` or `--three`
     - Use specific python version: `--python 3.6`
@@ -20,7 +21,7 @@ Installation:
     - `pipenv install --three --python 3.6 --dev -e .`
     - **NOTE**: Will include the `[dev-packages]` section in `Pipfile`
   - Production Example
-    - `pipenv install .`
+    - `pipenv install --ignore-pipfile`
 
 - Installing additional packages
   - `pipenv install <PACKAGE NAME>`
