@@ -12,7 +12,6 @@ pipenv-setup = '*'
 exam-terminal = {editable = true, path = "."}
 
 [packages]
-Pillow = ">=7.1.0"
 exam-terminal = {editable = false, path = "."}
 
 # See setup.py for exam-terminal dependencies

@@ -1,6 +1,10 @@
-os: linux
+os: 
+  - linux
+  - osx
 
-dist: bionic
+# dist: bionic
+
+# TODO: Figure out windows tests jobs
 
 language: python
 
@@ -33,5 +37,5 @@ script:
 # after_script:
 #     - bash <(curl -s https://codecov.io/bash)
 
-# Life cycle
-# https://docs.travis-ci.com/user/job-lifecycle/
+# Travis CI Life cycle
+#   https://docs.travis-ci.com/user/job-lifecycle/
