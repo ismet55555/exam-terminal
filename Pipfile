@@ -5,13 +5,13 @@ verify_ssl = true
 
 [dev-packages]
 bump = "*"
+pipenv-setup = '*'
 exam-terminal = {editable = true, path = "."}
 
 [packages]
-click = "*"
-flake8 = "*"
-fpdf2 = "*"
-PyYAML = "*"
+# click = "*"
+# flake8 = "*"
+# fpdf2 = "*"
+# PyYAML = "*"
 exam-terminal = {editable = false, path = "."}
-
 # windows-curses = {version = "*", sys_platform = "== 'win32'"}

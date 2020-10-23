@@ -1,40 +1,59 @@
-# pipenv basics
+# `pipenv` Basics
 
 Don't need pip, virtualenv, venv, or requirements.txt anymore!
 
-`pip install pipenv`
+Installation:
+  - `pip install pipenv` (or `sudo apt install pipenv`)
 
-## Basic Usage
-- Clone project
-- cd into project
+## Basics
 
-## For Development
+- Change directory into project directory
 
 - Create pipenv and install packages from Pipfile
-  - `pipenv install --three --dev -e .`
+  - `pipenv install [OPTIONS] [PROJECT DIRECTORY]`
+  - Options:
+    - Actively editable env: `-e`
+    - Python Major version: `--two` or `--three`
+    - Use specific python version: `--python 3.6`
+    - No standard output: `--quiet`
+  - Development Example
+    - `pipenv install --three --dev -e .`
+    - **NOTE**: Will include the `[dev-packages]` section in `Pipfile`
+  - Production Example
+    - `pipenv install .`
 
 - Installing additional packages
   - `pipenv install <PACKAGE NAME>`
   
-- Activate the current pipenv virtual environment
+- Activate the created pipenv virtual environment
   - `pipenv shell`
-
 
 - Locking the current pipenv dependencies and package versions
   - `pipeenv lock`
-
-- Find out what packages have changed upstream (upgraded)
-  - `pipenv update --outdated`
+  - **NOTE**: If `Pipfile` changes, this will happen automatically
 
 - Upgrade packages
   - `pipenv update <PACKAGE NAME>`
 
 - Uninstall the development packages
-  - `pipenv uninstall --all-dev`
+  - Specific package: `pipenv uninstall <PACKAGE NAME>`
+  - All development packages: `pipenv uninstall --all-dev`
+
+- Deactivating a active pipenv (reverse `pipenv shell`)
+  - `deactivate`
+  - Linux: `CTRL+D`
+  - Windows: `exit`
 
 - Removing the pyenv virtual environment
-  - `pipenv --rm`
+  - `pipenv --rm .`
 
-## For Production
 
-- TODO
+- Other useful things:
+  - Run single command in the created pipenv
+    - `pipenv run [COMMAND]`
+    - Example: `pipenv run python main.py`
+  - Install all packages specified in `Pipfile.lock`
+    - `pipenv sync`
+  - Find out what packages have changed upstream and update
+    - Runs lock than sync
+    - `pipenv update --outdated`

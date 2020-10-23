@@ -9,13 +9,20 @@ def read(fname):
 
 # Load packages in requirements.txt
 def requirements():
-    with open(os.path.join(os.path.dirname(__file__), "requirements.txt")) as handle:
-        packages = handle.readlines()
-    packages = [package.strip() for package in packages]
+    # with open(os.path.join(os.path.dirname(__file__), "requirements.txt")) as handle:
+    #     packages = handle.readlines()
+    # packages = [package.strip() for package in packages]
+    packages = [
+        'flake8',
+        'Click',
+        'PyYAML',
+        'fpdf2',
+        'windows-curses; platform_system=="Windows"'
+    ]
 
     # If windows, add curses for windows package
-    if os.name == 'nt':
-        packages.append('windows-curses')
+    # if os.name == 'nt':
+    #     packages.append('windows-curses')
 
     return packages
 

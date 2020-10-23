@@ -54,6 +54,12 @@
 ## Packaging
 - pipx
 - Automatic twine PYPI publishing example: https://github.com/mingrammer/awesome-finder/blob/master/setup.py
+- At install, Print out a nice ASCII sign with scripts=['scripts/xmlproc_parse', 'scripts/xmlproc_val'] or in requirements():
+- Include sample exams with https://packaging.python.org/guides/using-manifest-in/
+  - package_data  or  data_files 
+  - MANIFEST.in 
+  - include, recursive-include, global-include
+  - blob style pattern
 
 ## Random
 - Icon is the terminal symbol but with a check mark
