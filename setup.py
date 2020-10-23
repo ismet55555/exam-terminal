@@ -9,8 +9,6 @@ def read(fname):
 
 # Load packages in requirements.txt
 def requirements():
-
-
     with open(os.path.join(os.path.dirname(__file__), "requirements.txt")) as handle:
         packages = handle.readlines()
     packages = [package.strip() for package in packages]
@@ -23,7 +21,6 @@ def requirements():
 
 # TODO: 
 #   - At install, Print out a nice ASCII sign with scripts=['scripts/xmlproc_parse', 'scripts/xmlproc_val'] or in requirements():
-#   - Add a sample sample_exam.yml, that is called with option --sample
 #   - Include sample exams with https://packaging.python.org/guides/using-manifest-in/
 #       - package_data  or  data_files 
 #       - MANIFEST.in 

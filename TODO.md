@@ -27,6 +27,7 @@
 - Better way to format and load exam
   - Markdown?
   - Both Yaml and markdown?
+- Add a sample sample_exam.yml, that is called with option --sample
 
 ## Exam Formatting and Navigation
 - Go back and forth with questions
@@ -52,14 +53,11 @@
 
 ## Packaging
 - pipx
-- Automatic twine PYPI publishing: https://github.com/mingrammer/awesome-finder/blob/master/setup.py
+- Automatic twine PYPI publishing example: https://github.com/mingrammer/awesome-finder/blob/master/setup.py
 
 ## Random
 - Icon is the terminal symbol but with a check mark
 
 
 # Bugs
-- 
-
-# Resources:
-- None
+- I'm sure there are some lurking in the dark ...

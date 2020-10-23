@@ -1,0 +1,17 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+bump = "*"
+exam-terminal = {editable = true, path = "."}
+
+[packages]
+click = "*"
+flake8 = "*"
+fpdf2 = "*"
+PyYAML = "*"
+exam-terminal = {editable = false, path = "."}
+
+# windows-curses = {version = "*", sys_platform = "== 'win32'"}
