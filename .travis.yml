@@ -25,7 +25,7 @@ branches:
     - stable
 
 before_install:
-  - bash scripts/preflight.sh $TRAVIS_COMMIT || travis_terminate 1;
+  - bash scripts/preflight.sh $TRAVIS_COMMIT $TRAVIS_BRANCH || travis_terminate 1;
 
 install:
   - pip install pipenv --upgrade-strategy=only-if-needed
