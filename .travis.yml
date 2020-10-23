@@ -15,9 +15,7 @@ python:
 
 matrix:
     allow_failures:
-        - python: 
-            - "2.7"
-            - "nightly"
+        - python: "2.7"
 
 branches:
   only:
