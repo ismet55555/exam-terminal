@@ -29,7 +29,7 @@ setuptools.setup(
     install_requires=requirements(),
     long_description=read('README.md'),
     long_description_content_type='text/markdown',
-    python_requires='>=3.5',
+    python_requires='>=3.6',
     py_modules=["exam_terminal"],
     entry_points={"console_scripts": ["exam-terminal = exam_terminal.__main__:main"]},
     classifiers=[
@@ -45,7 +45,6 @@ setuptools.setup(
         "Environment :: Console :: Curses",
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',

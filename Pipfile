@@ -12,6 +12,5 @@ pipenv-setup = '*'
 exam-terminal = {editable = true, path = "."}
 
 [packages]
-zipp = '*'
 exam-terminal = {editable = false, path = "."}
 # See setup.py for exam-terminal dependencies
