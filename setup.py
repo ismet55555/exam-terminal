@@ -13,20 +13,7 @@ def requirements():
         packages = handle.readlines()
     packages = [package.strip() for package in packages]
 
-    # If windows, add curses for windows package
-    # if os.name == 'nt':
-    #     packages.append('windows-curses')
-
-    # packages = [
-    #     'flake8',
-    #     'Click',
-    #     'PyYAML',
-    #     'fpdf2',
-    #     'windows-curses; platform_system=="Windows"'
-    # ]
     return packages
-
-# TODO:  At install, Print out a nice ASCII sign with scripts=['scripts/xmlproc_parse', 'scripts/xmlproc_val'] or in requirements():
 
 setuptools.setup(
     name="exam-terminal",
@@ -58,7 +45,6 @@ setuptools.setup(
         "Environment :: Console :: Curses",
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',

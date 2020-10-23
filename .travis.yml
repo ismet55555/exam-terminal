@@ -25,10 +25,9 @@ branches:
 
 install:
     - pip install pipenv --upgrade-strategy=only-if-needed
-    - pipenv install --dev
+    - pipenv install --dev --ignore-pipfile
 
-script: echo "Just testing Travis CI" &&
-        ls -l &&
+script: ls -la &&
         exam-terminal --help
 
 # after_script:

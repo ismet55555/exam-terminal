@@ -25,7 +25,7 @@
         "exam-terminal": {
             "editable": false,
             "path": ".",
-            "version": "==0.0.4"
+            "version": "==0.0.5"
         },
         "fpdf2": {
             "hashes": [
@@ -251,7 +251,7 @@
         "exam-terminal": {
             "editable": false,
             "path": ".",
-            "version": "==0.0.4"
+            "version": "==0.0.5"
         },
         "first": {
             "hashes": [
