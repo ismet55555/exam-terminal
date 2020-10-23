@@ -1,4 +1,4 @@
-# Exam-Terminal
+# exam-terminal
 
 Hey Kris, buddy, you ok?...That's good.... if you want to test it really quick:
 
