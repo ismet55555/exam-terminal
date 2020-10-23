@@ -1,6 +1,4 @@
-setuptools
 Click
-flake8
 PyYAML
 fpdf2
 windows-curses; platform_system=="Windows"

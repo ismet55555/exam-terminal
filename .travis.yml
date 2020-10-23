@@ -1,0 +1,37 @@
+os: linux
+
+dist: bionic
+
+language: python
+
+cache: pip
+
+python:
+    - "3.5"
+    - "3.6"
+    - "3.7"
+    - "3.8"
+    - "3.9"
+    - "nightly"
+
+matrix:
+    allow_failures:
+        - python: "nightly"
+
+branches:
+  only:
+    - master
+    - stable
+
+install:
+    - pip install pipenv --upgrade-strategy=only-if-needed
+    - pipenv install --dev
+
+script:
+    - bash echo Testing_This_Travis_Thing
+
+# after_script:
+#     - bash <(curl -s https://codecov.io/bash)
+
+# Life cycle
+# https://docs.travis-ci.com/user/job-lifecycle/
