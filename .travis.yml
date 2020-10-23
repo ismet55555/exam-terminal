@@ -11,11 +11,13 @@ python:
     - "3.6"
     - "3.7"
     - "3.8"
+    - "2.7"
     - "nightly"
 
 matrix:
     allow_failures:
         - python: "2.7"
+        - python: "nightly"
 
 branches:
   only:
@@ -29,10 +31,6 @@ install:
 script: ls -la &&
         exam-terminal --help
 
-# after_script:
-#     - bash <(curl -s https://codecov.io/bash)
-
-# Travis CI Life cycle
-#   https://docs.travis-ci.com/user/job-lifecycle/
-
-# TODO: Figure out windows and osx tests jobs
+# TODO: 
+#   Figure out windows and osx tests jobs
+#   Code linting and formatting check (diff jobs?)
