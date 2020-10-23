@@ -1,4 +1,4 @@
-os: 
+os:
   - linux
 
 dist: bionic
@@ -8,29 +8,32 @@ language: python
 cache: pip
 
 python:
-    - "3.6"
-    - "3.7"
-    - "3.8"
-    - "2.7"
-    - "nightly"
+  - "3.6"
+  - "3.7"
+  - "3.8"
+  - "2.7"
+  - "nightly"
 
 matrix:
-    allow_failures:
-        - python: "2.7"
-        - python: "nightly"
+  allow_failures:
+    - python: "2.7"
+    - python: "nightly"
 
 branches:
   only:
     - master
     - stable
 
+before_install:
+  - bash scripts/preflight.sh
+
 install:
-    - pip install pipenv --upgrade-strategy=only-if-needed
-    - pipenv install --dev --ignore-pipfile
+  - pip install pipenv --upgrade-strategy=only-if-needed
+  - pipenv install --dev --ignore-pipfile
 
 script: ls -la &&
         exam-terminal --help
 
-# TODO: 
+# TODO:
 #   Figure out windows and osx tests jobs
 #   Code linting and formatting check (diff jobs?)
