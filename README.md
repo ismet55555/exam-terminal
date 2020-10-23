@@ -8,5 +8,5 @@ Hey Kris, buddy, you ok?...That's good.... if you want to test it really quick:
 If you want to do the cool kids `pipenv` thingy that I just learned and is common knowledge for everyone else except me:
 
 - Go to this directory
-- `pipenv install .`
+- `pipenv install`
 - `pipenv shell`
