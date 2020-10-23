@@ -41,6 +41,7 @@ if __name__ == "__main__":
     """
     Main entry point to the entire program.
     This file and this function will be called when running the program
+    TRAVIC TEST
 
     Parameters: None
     Returns: None

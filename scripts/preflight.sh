@@ -17,10 +17,9 @@ for CHANGED_FILE in $CHANGED_FILES; do
 done
 
 if [[ $ONLY_READMES == True ]]; then
-  echo "Only .md files found, exiting."
+  echo "Only .md files have changed. Exiting ..."
   travis_terminate 0
-  exit 1
+  exit 0
 else
-  echo "Non-.md files found, continuing with build."
-  python verify_files.py
+  echo "Non-.md files have changed. Continuing with build ..."
 fi
