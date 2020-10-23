@@ -1125,7 +1125,7 @@ class ExamTerminal:
         # TODO: Smarter, automatic loading of version
         
         software_name = "Exam Terminal"
-        software_version = "0.0.1"
+        software_version = "0.0.4"  # TODO: Pull from setup.py somehow
         return software_name + ' v' + software_version
 
     @staticmethod
