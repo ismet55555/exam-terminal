@@ -9,21 +9,21 @@ def read(fname):
 
 # Load packages in requirements.txt
 def requirements():
-    # with open(os.path.join(os.path.dirname(__file__), "requirements.txt")) as handle:
-    #     packages = handle.readlines()
-    # packages = [package.strip() for package in packages]
+    with open(os.path.join(os.path.dirname(__file__), "requirements.txt")) as handle:
+        packages = handle.readlines()
+    packages = [package.strip() for package in packages]
 
     # If windows, add curses for windows package
     # if os.name == 'nt':
     #     packages.append('windows-curses')
 
-    packages = [
-        'flake8',
-        'Click',
-        'PyYAML',
-        'fpdf2',
-        'windows-curses; platform_system=="Windows"'
-    ]
+    # packages = [
+    #     'flake8',
+    #     'Click',
+    #     'PyYAML',
+    #     'fpdf2',
+    #     'windows-curses; platform_system=="Windows"'
+    # ]
     return packages
 
 # TODO:  At install, Print out a nice ASCII sign with scripts=['scripts/xmlproc_parse', 'scripts/xmlproc_val'] or in requirements():

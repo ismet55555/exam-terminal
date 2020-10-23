@@ -1,18 +1,6 @@
-# Packages required
 setuptools
 Click
 flake8
 PyYAML
 fpdf2
-
-# Installing package in virtual envirnment:
-#    python3 -m venv env
-#    source env/bin/activate   (Windows: env\Scripts\activate)
-#    pip install --editable .
-
-# Install requirements seperatly 
-#   pip install -r requirements.txt
-
-# Bump package version
-#   pip install bump
-#   bump     (run in directory with setup.py)
+windows-curses; platform_system=="Windows"
