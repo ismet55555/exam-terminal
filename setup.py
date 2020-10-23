@@ -30,7 +30,7 @@ def requirements():
 
 setuptools.setup(
     name="exam-terminal",
-    version="0.0.4",
+    version="0.0.5",
     author="Ismet Handzic",
     author_email="ismet.handzic@gmail.com",
     maintainer="Ismet Handzic",
@@ -42,7 +42,7 @@ setuptools.setup(
     install_requires=requirements(),
     long_description=read('README.md'),
     long_description_content_type='text/markdown',
-    python_requires='>=3.4',
+    python_requires='>=3.5',
     py_modules=["exam_terminal"],
     entry_points={"console_scripts": ["exam-terminal = exam_terminal.__main__:main"]},
     classifiers=[

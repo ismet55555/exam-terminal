@@ -17,7 +17,7 @@ Installation:
     - Use specific python version: `--python 3.6`
     - No standard output: `--quiet`
   - Development Example
-    - `pipenv install --three --dev -e .`
+    - `pipenv install --three --python 3.6 --dev -e .`
     - **NOTE**: Will include the `[dev-packages]` section in `Pipfile`
   - Production Example
     - `pipenv install .`
@@ -40,12 +40,11 @@ Installation:
   - All development packages: `pipenv uninstall --all-dev`
 
 - Deactivating a active pipenv (reverse `pipenv shell`)
-  - `deactivate`
-  - Linux: `CTRL+D`
+  - Linux: `exit` or `CTRL+D`
   - Windows: `exit`
 
 - Removing the pyenv virtual environment
-  - `pipenv --rm .`
+  - `pipenv --rm`
 
 
 - Other useful things:
