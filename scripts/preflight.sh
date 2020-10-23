@@ -2,7 +2,7 @@
 
 set -e
 
-CURRENT_BRANCH='git rev-parse --abbrev-ref HEAD'
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 echo "Current branch: $CURRENT_BRANCH"
 
 TARGET_BRANCH='master'
@@ -13,7 +13,7 @@ MD=".md"
 echo "Files to ignore: ${MD}"
 
 echo "Looking for all changed files compared to target branch ..."
-CHANGED_FILES=`git diff --name-only ${TARGET_BRANCH}...${CURRENT_BRANCH}`
+CHANGED_FILES=$(git diff --name-only ${TARGET_BRANCH}...${CURRENT_BRANCH})
 
 for CHANGED_FILE in $CHANGED_FILES; do
   echo "Changed File: $CHANGED_FILE"
