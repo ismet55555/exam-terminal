@@ -12,6 +12,11 @@ def requirements():
     # with open(os.path.join(os.path.dirname(__file__), "requirements.txt")) as handle:
     #     packages = handle.readlines()
     # packages = [package.strip() for package in packages]
+
+    # If windows, add curses for windows package
+    # if os.name == 'nt':
+    #     packages.append('windows-curses')
+
     packages = [
         'flake8',
         'Click',
@@ -19,20 +24,9 @@ def requirements():
         'fpdf2',
         'windows-curses; platform_system=="Windows"'
     ]
-
-    # If windows, add curses for windows package
-    # if os.name == 'nt':
-    #     packages.append('windows-curses')
-
     return packages
 
-# TODO: 
-#   - At install, Print out a nice ASCII sign with scripts=['scripts/xmlproc_parse', 'scripts/xmlproc_val'] or in requirements():
-#   - Include sample exams with https://packaging.python.org/guides/using-manifest-in/
-#       - package_data  or  data_files 
-#       - MANIFEST.in 
-#           - include, recursive-include, global-include
-#           - blob style pattern
+# TODO:  At install, Print out a nice ASCII sign with scripts=['scripts/xmlproc_parse', 'scripts/xmlproc_val'] or in requirements():
 
 setuptools.setup(
     name="exam-terminal",

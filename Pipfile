@@ -9,9 +9,7 @@ pipenv-setup = '*'
 exam-terminal = {editable = true, path = "."}
 
 [packages]
-# click = "*"
-# flake8 = "*"
-# fpdf2 = "*"
-# PyYAML = "*"
+Pillow = ">=7.1.0"
 exam-terminal = {editable = false, path = "."}
-# windows-curses = {version = "*", sys_platform = "== 'win32'"}
+
+# See setup.py for exam-terminal dependencies
