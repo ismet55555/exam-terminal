@@ -1,10 +1,7 @@
 os: 
   - linux
-  - osx
 
-# dist: bionic
-
-# TODO: Figure out windows tests jobs
+dist: bionic
 
 language: python
 
@@ -32,10 +29,12 @@ install:
     - pipenv install --dev
 
 script:
-    - bash echo Testing_This_Travis_Thing
+    - echo "Just testing Travis CI"
 
 # after_script:
 #     - bash <(curl -s https://codecov.io/bash)
 
 # Travis CI Life cycle
 #   https://docs.travis-ci.com/user/job-lifecycle/
+
+# TODO: Figure out windows and osx tests jobs
