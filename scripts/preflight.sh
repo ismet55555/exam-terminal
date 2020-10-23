@@ -17,6 +17,8 @@ echo "Files to ignore: ${MD}"
 echo "Looking for all changed files compared to target branch ..."
 CHANGED_FILES=$(git diff --name-only ${TARGET_BRANCH}...${CURRENT_BRANCH})
 
+echo "$CHANGED_FILES"
+
 for CHANGED_FILE in $CHANGED_FILES; do
   echo "Changed File: $CHANGED_FILE"
   if ! [[ $CHANGED_FILE =~ $MD ]]; then
