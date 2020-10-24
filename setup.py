@@ -17,16 +17,16 @@ def requirements():
 
 setuptools.setup(
     name="exam-terminal",
-    version="0.0.5",
+    version="0.0.6",
     author="Ismet Handzic",
     author_email="ismet.handzic@gmail.com",
     maintainer="Ismet Handzic",
     description="A terminal-based exam, text, or survey tool for educators and learners",
-    license="Apache-2.0 License",
     keywords="exam quiz assessment survey teach learn",
     url="https://github.com/ismet55555/exam-terminal",
     packages=setuptools.find_packages(),
     install_requires=requirements(),
+    include_package_data=True,
     long_description=read('README.md'),
     long_description_content_type='text/markdown',
     python_requires='>=3.6',
@@ -35,7 +35,7 @@ setuptools.setup(
     classifiers=[
         'Development Status :: 4 - Beta',
         'Topic :: Education',
-        'License :: OSI Approved :: Apache-2.0 License',
+        'License :: OSI Approved :: Apache Software License',
         'Natural Language :: English',
         'Intended Audience :: Education',
         'Topic :: Education',
