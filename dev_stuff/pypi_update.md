@@ -1,9 +1,9 @@
 # PYPI Package Update
 
-- Clean previous build
+- Clean any previous build
   - `python3 setup.py clean --all`
 
-- Create wheel build and 
+- Create source distribution and pure python wheels build
   - `python3 setup.py sdist bdist_wheel`
 
 - Upload to PYPI

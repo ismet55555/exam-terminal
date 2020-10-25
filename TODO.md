@@ -1,7 +1,7 @@
 # TODO 
 
 ## General
-- README.md <----------------------------
+- README.md
 - Python DocStrings
 - A few sample exams
   - DCA
@@ -28,6 +28,7 @@
   - Markdown?
   - Both Yaml and markdown?
 - Add a sample sample_exam.yml, that is called with option --sample
+- Add CLI option for exam taker's name
 
 ## Exam Formatting and Navigation
 - Go back and forth with questions
@@ -47,19 +48,14 @@
   - Exam Terminal <-----
   - Console / Terminal
   - Exam / Test(ing) / Assessment / Pilot?
-  - Cursed Console Test
+  - Cursed Exam
   - The Test Terminal
   - Terminal Test
 
 ## Packaging
-- pipx
-- Automatic twine PYPI publishing example: https://github.com/mingrammer/awesome-finder/blob/master/setup.py
 - At install, Print out a nice ASCII sign with scripts=['scripts/xmlproc_parse', 'scripts/xmlproc_val'] or in requirements():
 - Include sample exams with https://packaging.python.org/guides/using-manifest-in/
-  - package_data  or  data_files 
-  - MANIFEST.in 
-  - include, recursive-include, global-include
-  - blob style pattern
+  - package_data  or  data_files
 
 ## Random
 - Icon is the terminal symbol but with a check mark
