@@ -19,7 +19,19 @@ logger = logging.getLogger()
 
 
 class ExamTerminal:
+    """
+    This class defines the exam terminal and its function.
+    """
+
     def __init__(self, exam_filepath: str) -> None:
+        """
+        Object constructor method
+
+        Parameters:
+            exam_filepath (str): The path to the exam file
+        Returns: 
+            None
+        """
         # Loading exam contents
         self.exam_contents = self.__load_parse_examfile(exam_filepath)
         if not self.exam_contents:
@@ -62,6 +74,14 @@ class ExamTerminal:
     ###############################################################################################
 
     def __load_parse_examfile(self, filepath: str) -> Dict:
+        """
+        Loading and pasing a exam file form specified path
+
+        Parameters:
+            filepath (str): The path to the exam file
+        Returns: 
+            return (Dict): Loaded and parsed info of exam file contents
+        """
         # Load the examp file
         logger.debug(f"Loading specified exam file: '{filepath}' ...")
         try:
@@ -129,6 +149,15 @@ class ExamTerminal:
         return self.exam_contents
 
     def __basic_screen_setup(self, scr, halfdelay: bool) -> None:
+        """
+        Basic configurations of the current curses terminal screen
+
+        Parameters:
+            scr (obj)      : Handle for curses terminal screen handle
+            halfdely (bool): If True, refresh specified 1/10th of second, else refresh 25.5 seconds
+        Returns: 
+            None
+        """
         # Hiding the cursor
         curses.curs_set(0)
 
@@ -145,6 +174,14 @@ class ExamTerminal:
             curses.halfdelay(255)
 
     def __check_terminal_size(self, scr) -> None:
+        """
+        Checking if current terminal size is sufficient, if it is not, display warning.
+
+        Parameters:
+            scr (obj): Handle for curses terminal screen handle
+        Returns: 
+            None
+        """
         # Getting the screen height and width
         term_height, term_width = scr.getmaxyx()
         
@@ -184,13 +221,37 @@ class ExamTerminal:
             scr.refresh()
             k = scr.getch()
 
+    ###############################################################################################
 
     def __draw_screen_border(self, scr, color:list) -> None:
+        """
+        Draw a border around entire terminal screen with specified color
+
+        Parameters:
+            scr (obj)   : Handle for curses terminal screen handle
+            color (list): Foreground and background color (ie. [250, 0])
+        Returns: 
+            None
+        """
         scr.attron(color)
         scr.border(0)
         scr.attroff(color)
 
     def __draw_horizontal_seperator(self, scr, y:int, color:list) -> None:
+        """
+        Draw a horizontal line accross the terminal screen at specified height
+        and with specified color
+
+        Parameters:
+            scr (obj)   : Handle for curses terminal screen handle
+            y (int)     : The line/row number from top of the screen
+            color (list): Foreground and background color (ie. [250, 0])
+        Returns: 
+            None
+        """
+        scr.attron(color)
+        scr.border(0)
+        scr.attroff(color)
         # Getting the screen height and width
         term_height, term_width = scr.getmaxyx()
 
@@ -199,12 +260,33 @@ class ExamTerminal:
                 scr.addstr(y, x + 1, '-', color)
 
     def __draw_vertical_seperator(self, scr, x:int, color:list) -> None:
+        """
+        Draw a vertical line accross the terminal screen at specified character
+        column and with specified color
+
+        Parameters:
+            scr (obj)   : Handle for curses terminal screen handle
+            x (int)     : The column number from left of the screen
+            color (list): Foreground and background color (ie. [250, 0])
+        Returns: 
+            None
+        """
         # Getting the screen height and width
         term_height, term_width = scr.getmaxyx()
 
-        # TODO
+        # TODO: Currently unused but may come in handy
 
-    def __draw_selection_menu(self, scr, selections:list, start_y:int):
+    def __draw_selection_menu(self, scr, selections:list, start_y:int) -> None:
+        """
+        Draw a Selection menu at the bottom of the screen with a specified options
+
+        Parameters:
+            scr (obj)         : Handle for curses terminal screen handle
+            selections (list) : Menu selection for each list item
+            start_y (int)     : Line/row number at which selection menu starts
+        Returns: 
+            None
+        """
         # Getting the terminal size
         _, term_width = scr.getmaxyx()  
 
@@ -229,10 +311,19 @@ class ExamTerminal:
                 color = self.color['grey-light']
             scr.addstr(y + s + 1 + start_y, term_width // 2 - len(selection) // 2, selection, color)
 
-
     def __draw_message_box(self, scr, message_lines: list) -> None:
+        """
+        Draw a message box in the middle of the terminal screen
+
+        Parameters:
+            scr (obj)            : Handle for curses terminal screen handle
+            message_lines (list) : Lines of text in each list item
+        Returns: 
+            None
+        """
         term_height, term_width = scr.getmaxyx()
 
+        # Getting the message box size and position and creating the message box
         height, width, y, x = self.__get_message_box_size(term_height, term_width, message_lines)
         message_box = curses.newwin(height, width, y, x)
         message_box.box()
@@ -247,31 +338,19 @@ class ExamTerminal:
         # Refresh the messgae box
         message_box.refresh()
 
-
-    def __get_message_box_size(self, term_height:int, term_width:int, message_lines:list) -> Tuple[int, int, int, int]:
-        # Create a box (Height, Width, y, x) (Positions are top left)
-        box_height = len(message_lines) + 4
-        box_width = int(term_width / 1.5)  # Alternative: len(max(message_lines, key=len)) + 12
-        box_y = int(term_height / 2 - box_height / 2)
-        box_x = int(term_width / 2 - box_width / 2)
-        
-        return box_height, box_width, box_y, box_x
-
-    def __get_progress_bar(self, exam_progress, bar_char_width=60, bar_char_full='|', bar_char_empty='-') -> str:
-        progress_str = []
-        for i in range(bar_char_width):
-            # TODO: Different colors for different parts of the progress bar somehow
-            if i <= exam_progress * bar_char_width:
-                progress_str.append(bar_char_full)
-            else:
-                progress_str.append(bar_char_empty)
-
-        progress_str = "".join(progress_str)
-        return progress_str
-
     ###############################################################################################
 
     def draw_menu(self, scr) -> Tuple[str, bool]:
+        """
+        Draw a the main menu on the screen
+
+        Parameters:
+            scr (obj)         : Handle for curses terminal screen handle
+        Returns: 
+            menu option (str)  : Selection menu option user selected (ie. quit)
+            successfull (bool) : True if no error, else False
+        """
+
         # Setting up basic stuff for curses and load keys
         self.__basic_screen_setup(scr, halfdelay=False)
         KEYS = self.__load_keys()
@@ -408,12 +487,30 @@ class ExamTerminal:
             k = scr.getch()
 
     def show_menu(self) -> Tuple[str, bool]:
+        """
+        Curses wrapper function for drawing main menu on screen
+
+        Parameters:
+            None
+        Returns: 
+            menu option (str)  : Selection menu option user selected (ie. quit)
+            successfull (bool) : True if no error, else False
+        """
+
         return curses.wrapper(self.draw_menu)
 
     ###############################################################################################
 
     def __exam_timer_thread(self) -> None:
+        """
+        Exam timer that keeps track of elapsed exam time and exam paused time.
+        Interactions to the main thread are via object properties.
 
+        Parameters:
+            None
+        Returns: 
+            None
+        """
         logger.debug('Starting exam timer thread ...')
         while self.is_timer_timing:
             self.global_elapsed_time = time() - self.exam_begin_time 
@@ -428,7 +525,6 @@ class ExamTerminal:
             else:
                 # Time Spend paused
                 self.exam_paused_elapsed_time = self.global_elapsed_time - self.exam_elapsed_time
-
         logger.debug('Exam timer thread ended')
 
     def draw_question(self, scr, question:dict) -> Tuple[str, bool]:
@@ -1145,3 +1241,53 @@ class ExamTerminal:
             truncated_text = text[0:length - 3] + '...'
 
         return truncated_text
+
+    @staticmethod
+    def __get_message_box_size(term_height:int, term_width:int, message_lines:list) -> Tuple[int, int, int, int]:
+        """
+        Given a message box list with each item being a message box line/row,
+        this method find the right size and position of the message box for 
+        the given terminal size
+
+        Parameters:
+            term_height (int)    : Number of rows/lines in terminal
+            term_width (int)     : Number of columns in terminal
+            message_lines (list) : Lines of text in each list item
+        Returns: 
+            box_height (int) : Height of message box (rows/lines) 
+            box_width (int)  : Width of message box (columns)
+            box_y (int)      : Vertical position of box in terminal
+            box_x (int)      : Horizontal position of box in terminal
+        """
+        box_height = len(message_lines) + 4
+        box_width = int(term_width / 1.5)  # Alternative: len(max(message_lines, key=len)) + 12
+        box_y = term_height // 2 - box_height // 2
+        box_x = term_width // 2 - box_width // 2
+        
+        return box_height, box_width, box_y, box_x
+
+    @staticmethod
+    def __get_progress_bar(exam_progress: float, bar_char_width=60, bar_char_full='|', bar_char_empty='-') -> str:
+        """
+        Make a progress bar with specified parameters
+
+        Parameters:
+            exam_progress (float) : Exam progress from 0 to 1 (ie. 0.45 is 45%)
+            bar_char_width (int)  : Total width of progress bar, columns of text
+            bar_char_full (str)   : Symbol for filled
+            bar_char_empty (str)  : Symbol for empty
+        Returns: 
+            (str) : Progress bar as text
+        """
+        # TODO: Different colors for different parts of the progress bar somehow
+
+        progress_str = []
+        for i in range(bar_char_width):
+            
+            if i <= exam_progress * bar_char_width:
+                progress_str.append(bar_char_full)
+            else:
+                progress_str.append(bar_char_empty)
+
+        progress_str = "".join(progress_str)
+        return progress_str

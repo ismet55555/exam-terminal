@@ -8,12 +8,13 @@
   - AWS Practitioner
   - Ansible
 - Simple database? or just a file?
-- Enter exam taker name?
 - Animations on switch screen?  Side fille, bottom fill?
 - Run out of a Docker image (make the Dockerfile)
 - See example https://github.com/PyCQA/redbaron for flairs and tests
-- Upgrade to pipenv instead of requirements.txt
 
+## Code Structure
+- Break appart ExamTerminal.py to multiple files
+  - utility.py ?
 
 ## Main Menu
 - Add a About, Settings, Help Options (Horizontal? Two Lines?)
@@ -25,6 +26,7 @@
 
 
 ## Exam Loading
+- Enter exam taker name?
 - Add a sample sample_exam.yml, that is called with option --sample
 - Add CLI option for exam taker's name
 - Encrypt the exam file with a password so you can send it to someone?
@@ -52,7 +54,7 @@
   - .yml data
 
 
-## Packaging
+## Python Package Packaging
 - At install, Print out a nice ASCII sign with scripts=['scripts/xmlproc_parse', 'scripts/xmlproc_val'] or in requirements():
 - Include sample exams with https://packaging.python.org/guides/using-manifest-in/
   - package_data  or  data_files

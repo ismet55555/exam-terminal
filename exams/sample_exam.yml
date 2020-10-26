@@ -23,10 +23,12 @@ questions:
   - question: What is your favorite dinasour?
     question_time: 30
     selection:
-      - "Tyrannosaurus Rex": true
-      - "Triceratops": true
+      - "Tyrannosaurus Rex"
+      - "Triceratops"
       - "Velociraptor"
       - "Stegosaurus"
+      - "Commodore 64"
+      - "Brachiosaurus": true
 
   - question: "Why did the chicken cross the road?"
     question_time: 0
