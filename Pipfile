@@ -4,13 +4,14 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+wheel = "*"
 flake8 = '*'
 pylint = '*'
 pytest = "*"
 bump = "*"
-pipenv-setup = '*'
+twine = "*"
 exam-terminal = {editable = true, path = "."}
 
 [packages]
 exam-terminal = {editable = false, path = "."}
-# See setup.py for exam-terminal dependencies
+# See setup.py and requirements.txt for exam-terminal dependencies
