@@ -124,6 +124,8 @@ class ExamTerminal:
 
         logger.debug('Successfully parsed exam information from file')
 
+        pprint(self.exam_contents)
+
         return self.exam_contents
 
     def __basic_screen_setup(self, scr, halfdelay: bool) -> None:
@@ -356,7 +358,7 @@ class ExamTerminal:
                 scr.addstr(start_y , x, line, self.color['default'])
             start_y += 2
 
-            lines = ["Questions:", f"52"]
+            lines = ["Questions:", f"{self.exam_contents['exam']['exam_questions_count']}"]
             for x, line in zip(start_x, lines):
                 scr.addstr(start_y, x, line, self.color['default'])
             start_y += 2

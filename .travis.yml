@@ -37,3 +37,5 @@ script: ls -la &&
 # TODO:
 #   Figure out windows and osx tests jobs
 #   Code linting and formatting check (diff jobs?)
+#   Automatic update PYPI form master branch change
+#   Automatic update TestPYPI on development branch

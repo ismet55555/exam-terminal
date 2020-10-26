@@ -1,43 +1,53 @@
 ---
 exam:
-  exam_title: "This is a Sample Exam Just To Test Things, Certification"
-  exam_description: This is a sample exam and this is a description description descriptiondescriptiondescriptiondescription description description description description description description description description description description
+  exam_title: "Welcome. This is a Sample Exam Just To Show Things Off"
+  exam_description: This is a sample description for this sample "exam".
+                    Remember, this can be a practice exam, a exam protored by a teacher, a survey, or whatever you want.
+                    What it can not be is dragon, that would be hard to program, or feed, or keep, or install, just a mess ...
   exam_author: "Ismet Handzic"
-  exam_edit_date: "10/09/2020"
-  exam_allowed_time: 60
+  exam_edit_date: "10/26/2020"
+  exam_allowed_time: 120
   exam_allowed_time_units: "seconds"
   exam_passing_score: 70
 
 questions:
-  - question: What is your favorite food
+  - question: What is your favorite food?
     question_time: 10
     selection:
-      - "kebap"
-      - "salad"
-      - "nutella": true
-      - "chair"
+      - "Kebap"
+      - "Salad"
+      - "Nutella": true
+      - "Chair"
+      - "Now I feel hungry ..."
 
-  - question: What is your name
+  - question: What is your favorite dinasour?
     question_time: 30
     selection:
-      - "Ismet": true
-      - "Danger": true
-      - "Greckin"
-      - "Halid Beslic"
+      - "Tyrannosaurus Rex": true
+      - "Triceratops": true
+      - "Velociraptor"
+      - "Stegosaurus"
 
-  - question: "What is your sport what is your sport what is sldjfl sjflsd fsjldf lsdfh lsd fyour sport what is your sport what is your sport what is your sport what is your sport what is your sport what is your sport"
+  - question: "Why did the chicken cross the road?"
     question_time: 0
     selection:
-      - "soccer soccer soccer soccer soccer soccer soccer soccer soccer soccer soccer soccer soccer soccer soccer soccer soccer": true
-      - "tennis"
-      - "volleyball"
-      - "chess chess chess chess chess chess chess chess chess chess chess chess chess chess chess chess chess chess chess chess chess chess"
+      - "Because the road was too long to walk around it": true
+      - "To get away from the KFC"
+      - "To find itself in this crazy world"
+      - "To practice for the Most Extreme Elimination Challenge"
 
-  - question: "Why why why why why why why why why why why why why why why why why why why why why why why why why why why why why why why why why
-               why why why why why why why why why why why why why why why why"
+  - question: "A blue train filled with Amazon packages leaves Cairo at 3:00 am, averaging 30 mph.
+               Another red train headed in the same direction leaves Cairo at 6:00 am, averaging 60 mph.
+               How many hours after the second red train leaves will it pass the first train?"
     question_time: 0
     selection:
-      - "Because because because because because because because because because because because because because because because because because": true
-      - "Blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah"
-      - "Whatever whatever whatever whatever whatever whatever whatever whatever whatever whatever whatever whatever whatever whatever"
-      - "Naw"
+      - "5.5"
+      - "3.0": true
+      - "100.0"
+      - "-4.0"
+
+  - question: "Do you not just love exam-terminal?"
+    question_time: 0
+    selection:
+      - "Nope, kinda sucks ... booo"
+      - "Heck yes, good stuff! Whoo-Hooo!": true
