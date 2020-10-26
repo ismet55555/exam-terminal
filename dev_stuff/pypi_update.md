@@ -1,4 +1,4 @@
-# PYPI Package Update
+# Python Package Index (PYPI) Update
 
 - Clean any previous build
   - Build: `python3 setup.py clean --all`
@@ -8,8 +8,14 @@
   - `python3 setup.py sdist bdist_wheel`
 
 - Upload to PYPI
-  - TestPYPI: `python3 -m twine upload --repository testpypi dist/*` 
-  - PYPI: `twine upload dist/*`
+  - TestPYPI:
+    - This is preferred for development work 
+    - https://test.pypi.org/project/exam-terminal/
+    - `ptwine upload -r testpypi dist/*` 
+  - PYPI: 
+    - The real deal. This is what users will download from
+    - https://pypi.org/project/exam-terminal/
+    - `twine upload -r dist/*`
 
 
 
