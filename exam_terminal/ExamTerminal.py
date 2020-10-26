@@ -144,8 +144,6 @@ class ExamTerminal:
 
         logger.debug('Successfully parsed exam information from file')
 
-        pprint(self.exam_contents)
-
         return self.exam_contents
 
     def __basic_screen_setup(self, scr, halfdelay: bool) -> None:
