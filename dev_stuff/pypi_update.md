@@ -11,11 +11,11 @@
   - TestPYPI:
     - This is preferred for development work 
     - https://test.pypi.org/project/exam-terminal/
-    - `ptwine upload -r testpypi dist/*` 
+    - `twine upload -r testpypi dist/*` 
   - PYPI: 
     - The real deal. This is what users will download from
     - https://pypi.org/project/exam-terminal/
-    - `twine upload -r dist/*`
+    - `twine upload dist/*`
 
 
 
