@@ -221,59 +221,6 @@ class ExamTerminal:
 
     ###############################################################################################
 
-    def __draw_screen_border(self, scr, color:list) -> None:
-        """
-        Draw a border around entire terminal screen with specified color
-
-        Parameters:
-            scr (obj)   : Handle for curses terminal screen handle
-            color (list): Foreground and background color (ie. [250, 0])
-        Returns: 
-            None
-        """
-        scr.attron(color)
-        scr.border(0)
-        scr.attroff(color)
-
-    def __draw_horizontal_seperator(self, scr, y:int, color:list) -> None:
-        """
-        Draw a horizontal line accross the terminal screen at specified height
-        and with specified color
-
-        Parameters:
-            scr (obj)   : Handle for curses terminal screen handle
-            y (int)     : The line/row number from top of the screen
-            color (list): Foreground and background color (ie. [250, 0])
-        Returns: 
-            None
-        """
-        scr.attron(color)
-        scr.border(0)
-        scr.attroff(color)
-        # Getting the screen height and width
-        term_height, term_width = scr.getmaxyx()
-
-        if y < term_height - 2 and y > 1:
-            for x in range(term_width - 2):
-                scr.addstr(y, x + 1, '-', color)
-
-    def __draw_vertical_seperator(self, scr, x:int, color:list) -> None:
-        """
-        Draw a vertical line accross the terminal screen at specified character
-        column and with specified color
-
-        Parameters:
-            scr (obj)   : Handle for curses terminal screen handle
-            x (int)     : The column number from left of the screen
-            color (list): Foreground and background color (ie. [250, 0])
-        Returns: 
-            None
-        """
-        # Getting the screen height and width
-        term_height, term_width = scr.getmaxyx()
-
-        # TODO: Currently unused but may come in handy
-
     def __draw_selection_menu(self, scr, selections:list, start_y:int) -> None:
         """
         Draw a Selection menu at the bottom of the screen with a specified options
@@ -1289,3 +1236,59 @@ class ExamTerminal:
 
         progress_str = "".join(progress_str)
         return progress_str
+
+    @staticmethod
+    def __draw_screen_border(scr, color:list) -> None:
+        """
+        Draw a border around entire terminal screen with specified color
+
+        Parameters:
+            scr (obj)   : Handle for curses terminal screen handle
+            color (list): Foreground and background color (ie. [250, 0])
+        Returns: 
+            None
+        """
+        scr.attron(color)
+        scr.border(0)
+        scr.attroff(color)
+
+    @staticmethod
+    def __draw_horizontal_seperator(scr, y:int, color:list) -> None:
+        """
+        Draw a horizontal line accross the terminal screen at specified height
+        and with specified color
+
+        Parameters:
+            scr (obj)   : Handle for curses terminal screen handle
+            y (int)     : The line/row number from top of the screen
+            color (list): Foreground and background color (ie. [250, 0])
+        Returns: 
+            None
+        """
+        scr.attron(color)
+        scr.border(0)
+        scr.attroff(color)
+        # Getting the screen height and width
+        term_height, term_width = scr.getmaxyx()
+
+        if y < term_height - 2 and y > 1:
+            for x in range(term_width - 2):
+                scr.addstr(y, x + 1, '-', color)
+
+    @staticmethod
+    def __draw_vertical_seperator(scr, x:int, color:list) -> None:
+        """
+        Draw a vertical line accross the terminal screen at specified character
+        column and with specified color
+
+        Parameters:
+            scr (obj)   : Handle for curses terminal screen handle
+            x (int)     : The column number from left of the screen
+            color (list): Foreground and background color (ie. [250, 0])
+        Returns: 
+            None
+        """
+        # Getting the screen height and width
+        term_height, term_width = scr.getmaxyx()
+
+        # TODO: Currently unused but may come in handy
