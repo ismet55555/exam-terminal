@@ -1,11 +1,6 @@
 
 
-<!-- <p align="center"><img src="misc/logo.png" width="150"/></p> -->
-<p align="center"><img src="[](https://github.com/ismet55555/exam-terminal/raw/master/misc/logo.png)" width="150"/></p>
-<!-- https://raw.githubusercontent.com/ismet55555/exam-terminal/blob/master/misc/logo.png -->
-
-
-<!-- https://github.com/kirankotari/shconfparser/raw/master/asserts/img/sh_run.png -->
+<p align="center"><img src="[logo](https://raw.githubusercontent.com/ismet55555/exam-terminal/master/misc/logo.png)" width="150"/></p>
 
 <h1 align="center">exam-terminal</h1>
 
