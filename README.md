@@ -4,6 +4,29 @@
 
 <h1 align="center">exam-terminal</h1>
 
+<!-- Licence Shield from https://shields.io/-->
+<p align="center">
+
+<img alt="portfolio_view" src="https://img.shields.io/github/pipenv/locked/dependency-version/ismet55555/exam-terminal/exam-terminal">
+
+<img alt="portfolio_view" src="https://img.shields.io/pypi/format/exam-terminal">
+
+<img alt="portfolio_view" src="https://img.shields.io/pypi/status/exam-terminal">
+
+<img alt="portfolio_view" src="https://img.shields.io/github/license/ismet55555/exam-terminal">
+
+<img alt="portfolio_view" src="https://img.shields.io/travis/com/ismet55555/exam-terminal/master">
+
+
+</p>
+
+
+
+
+
+
+
+
 The exam-terminal is a terminal-based examination tool, which you can potentially do any of the following:
 
 - Construct and take practice exams

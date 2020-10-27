@@ -17,7 +17,7 @@ def requirements():
 
 setuptools.setup(
     name="exam-terminal",
-    version="0.0.13",
+    version="0.0.14",
     author="Ismet Handzic",
     author_email="ismet.handzic@gmail.com",
     maintainer="Ismet Handzic",
