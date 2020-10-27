@@ -64,6 +64,7 @@
 - Travis CI: Figure out windows and osx tests jobs
 - Travis CI: Code linting and formatting check
 - Travis CI: Omit travis testing when changes to .md files were made
+- Add pep8, black, isort, tests
 
 
 ## Random

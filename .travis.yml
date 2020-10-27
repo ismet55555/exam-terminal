@@ -31,8 +31,10 @@ install:
   - pip install pipenv --upgrade-strategy=only-if-needed
   - pipenv install --dev --ignore-pipfile
 
-script: ls -la &&
-        exam-terminal --help
+script: 
+    - pwd &&
+      ls -la 
+    - exam-terminal --help
 
 deploy:
   - provider: pypi
