@@ -34,7 +34,7 @@ script: ls -la &&
 
 deploy:
   provider: pypi
-  server: https://test.pypi.org/legacy/  # Comment out to deploy to PYPI
+  # server: https://test.pypi.org/legacy/  # Comment out to deploy to PYPI
   username: $PYPI_USERNAME
   password: $PYPI_PASSWORD
   edge: true  # Opt in to travis CI dpl v2

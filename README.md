@@ -16,8 +16,6 @@
 <img alt="portfolio_view" src="https://img.shields.io/github/license/ismet55555/exam-terminal">
 
 <img alt="portfolio_view" src="https://img.shields.io/travis/com/ismet55555/exam-terminal/master">
-
-
 </p>
 
 
@@ -43,9 +41,9 @@ Some mentionable features:
 
 ## Quick Start
 - `exam-terminal --help`
-- `exam-terminal exams/sample_exam.yml`
+- `exam-terminal --sample`
 
-## Development
+## Development Notes
 
 - Clone this repo
 - Go into cloned repo directory directory
