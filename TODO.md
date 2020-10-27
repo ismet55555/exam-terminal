@@ -59,6 +59,12 @@
 - Include sample exams with https://packaging.python.org/guides/using-manifest-in/
   - package_data  or  data_files
 
+## Testing and Continues Integration
+- Get bumpversion to work to automatically increase version for every push
+- Travis CI: Figure out windows and osx tests jobs
+- Travis CI: Code linting and formatting check
+- Travis CI: Omit travis testing when changes to .md files were made
+
 
 ## Random
 - ...
