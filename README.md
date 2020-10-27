@@ -9,6 +9,8 @@
 
 <img alt="portfolio_view" src="https://img.shields.io/github/pipenv/locked/dependency-version/ismet55555/exam-terminal/exam-terminal">
 
+<img alt="portfolio_view" src="https://img.shields.io/pypi/pyversions/exam-terminal">
+
 <img alt="portfolio_view" src="https://img.shields.io/pypi/format/exam-terminal">
 
 <img alt="portfolio_view" src="https://img.shields.io/pypi/status/exam-terminal">
