@@ -17,7 +17,7 @@ def requirements():
 
 setuptools.setup(
     name="exam-terminal",
-    version="0.0.10",
+    version="0.0.12",
     author="Ismet Handzic",
     author_email="ismet.handzic@gmail.com",
     maintainer="Ismet Handzic",
@@ -49,6 +49,7 @@ setuptools.setup(
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3 :: Only'
     ]
 )
