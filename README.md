@@ -7,15 +7,25 @@
 <!-- Licence Shield from https://shields.io/-->
 <p align="center">
 
-<img alt="PYPI Version" src="https://img.shields.io/github/pipenv/locked/dependency-version/ismet55555/exam-terminal/exam-terminal">
+<a href="https://pypi.org/project/exam-terminal/">
+  <img alt="PYPI Version" src="https://img.shields.io/github/pipenv/locked/dependency-version/ismet55555/exam-terminal/exam-terminal">
+</a>
 
-<img alt="Python Versions" src="https://img.shields.io/pypi/pyversions/exam-terminal">
+<a href="https://pypi.org/project/exam-terminal/">
+  <img alt="Python Versions" src="https://img.shields.io/pypi/pyversions/exam-terminal">
+</a>
 
-<img alt="Packaging Format" src="https://img.shields.io/pypi/format/exam-terminal">
+<a href="https://pypi.org/project/exam-terminal/">
+  <img alt="Packaging Format" src="https://img.shields.io/pypi/format/exam-terminal">
+</a>
 
-<img alt="PYPI Status" src="https://img.shields.io/pypi/status/exam-terminal">
+<a href="https://pypi.org/project/exam-terminal/">
+  <img alt="PYPI Status" src="https://img.shields.io/pypi/status/exam-terminal">
+</a>
 
-<img alt="Licence" src="https://img.shields.io/github/license/ismet55555/exam-terminal">
+<a href="https://github.com/ismet55555/exam-terminal/blob/master/LICENSE">
+  <img alt="Licence" src="https://img.shields.io/github/license/ismet55555/exam-terminal">
+</a>
 
 <a href="https://travis-ci.com/github/ismet55555/exam-terminal">
   <img alt="Build Status" src="https://img.shields.io/travis/com/ismet55555/exam-terminal/master">
