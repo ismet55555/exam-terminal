@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import curses
+from exam_terminal import utlity
 import logging
 import os
 import sys
@@ -14,6 +15,8 @@ from typing import Tuple, Dict
 
 import yaml
 from fpdf import FPDF
+
+from . import utlity
 
 logger = logging.getLogger()
 
@@ -160,7 +163,7 @@ class ExamTerminal:
         curses.curs_set(0)
 
         # Load curses colors
-        self.color, self.decor = self.__load_curses_colors_decor()
+        self.color, self.decor = utlity.load_curses_colors_decor()
 
         # Turn off echo
         curses.noecho()
@@ -191,7 +194,7 @@ class ExamTerminal:
             scr.addstr(1, 1, f"[Terminal Size: W:{term_width}, H:{term_height}]", self.color['grey-light'])
 
         k = 0
-        KEYS = self.__load_keys()
+        KEYS = utlity.load_keys()
         while not self.terminal_size_good:
             if k in KEYS['QUIT']:
                 self.exam_exit = True
@@ -212,7 +215,7 @@ class ExamTerminal:
                 ''
                 'To quit program press "Q" or "ESC"'
                 ]
-            # self.__draw_message_box(scr, message_lines)
+            # utlity.draw_message_box(scr, message_lines)
             for y, line in enumerate(message_lines):
                 scr.addstr(1 + y, 1, line, self.decor['bold'])
 
@@ -269,7 +272,7 @@ class ExamTerminal:
         term_height, term_width = scr.getmaxyx()
 
         # Getting the message box size and position and creating the message box
-        height, width, y, x = self.__get_message_box_size(term_height, term_width, message_lines)
+        height, width, y, x = utlity.get_message_box_size(term_height, term_width, message_lines)
         message_box = curses.newwin(height, width, y, x)
         message_box.box()
         message_box.border()
@@ -298,7 +301,7 @@ class ExamTerminal:
 
         # Setting up basic stuff for curses and load keys
         self.__basic_screen_setup(scr, halfdelay=False)
-        KEYS = self.__load_keys()
+        KEYS = utlity.load_keys()
 
         # User key input (ASCII)
         k = 0
@@ -343,10 +346,10 @@ class ExamTerminal:
             self.__check_terminal_size(scr)
 
             # Drawing the screen border
-            self.__draw_screen_border(scr, self.color['grey-dark'])
+            utlity.draw_screen_border(scr, self.color['grey-dark'])
 
             # Show software name/title
-            scr.addstr(term_height - 2, 2, self.__load_software_ascii_name(), self.color['grey-dark'])
+            scr.addstr(term_height - 2, 2, utlity.load_software_ascii_name(), self.color['grey-dark'])
 
             ########################################################################################
 
@@ -356,15 +359,15 @@ class ExamTerminal:
             start_x = [5, 22]
 
             line = f"{self.exam_contents['exam']['exam_title']}"
-            scr.addstr(start_y, self.__center_x(term_width, line), line, self.decor['bold'])
+            scr.addstr(start_y, utlity.center_x(term_width, line), line, self.decor['bold'])
             start_y += 1
 
             line = f"{self.exam_contents['exam']['exam_author']}"
-            scr.addstr(start_y, self.__center_x(term_width, line), line, self.color['grey-light'])
+            scr.addstr(start_y, utlity.center_x(term_width, line), line, self.color['grey-light'])
             start_y += 1
 
             line = f"{self.exam_contents['exam']['exam_edit_date']}"
-            scr.addstr(start_y, self.__center_x(term_width, line), line, self.color['grey-light'])
+            scr.addstr(start_y, utlity.center_x(term_width, line), line, self.color['grey-light'])
             start_y += 3
 
 
@@ -400,7 +403,7 @@ class ExamTerminal:
             ########################################################################################
 
             selections = ["Begin Exam", "Quit"]
-            self.__draw_horizontal_seperator(scr, term_height - len(selections) - 4, self.color['grey-dark'])
+            utlity.draw_horizontal_seperator(scr, term_height - len(selections) - 4, self.color['grey-dark'])
             start_y = term_height - len(selections) - 7
             self.__draw_selection_menu(scr, selections, start_y)
 
@@ -475,7 +478,7 @@ class ExamTerminal:
     def draw_question(self, scr, question:dict) -> Tuple[str, bool]:
         # Setting up basic stuff for curses and load keys
         self.__basic_screen_setup(scr, halfdelay=True)
-        KEYS = self.__load_keys()
+        KEYS = utlity.load_keys()
 
         start_y = 3
         question_x = 4
@@ -530,7 +533,7 @@ class ExamTerminal:
             self.__check_terminal_size(scr)
 
             # Drawing the screen border
-            self.__draw_screen_border(scr, self.color['grey-dark'])
+            utlity.draw_screen_border(scr, self.color['grey-dark'])
             
             ########################################################################################
 
@@ -550,7 +553,7 @@ class ExamTerminal:
             for l, line in enumerate(question_wrap):
                 scr.addstr(start_y + l - 1, question_x, line, self.color['default'] | self.decor['bold'])
 
-            self.__draw_horizontal_seperator(scr, len(question_wrap) + 3, self.color['grey-dark'])
+            utlity.draw_horizontal_seperator(scr, len(question_wrap) + 3, self.color['grey-dark'])
 
             # Set the offset to the next line
             selection_offset = len(question_wrap) + 3
@@ -585,7 +588,7 @@ class ExamTerminal:
             term_height, term_width = scr.getmaxyx()
 
             # Progress bar and status - call method
-            progress_bar = self.__get_progress_bar(exam_progress=self.questions_progress, bar_char_width=term_width - 23)
+            progress_bar = utlity.get_progress_bar(exam_progress=self.questions_progress, bar_char_width=term_width - 23)
             scr.addstr(term_height - 3, 3, f"[ {self.questions_complete:3.0f}  / {self.questions_total:3.0f}  ][{progress_bar}]", self.color['default'])
 
             # Elapsed Time
@@ -595,7 +598,7 @@ class ExamTerminal:
                 color = self.color['orange']
             if examp_elapsed_dec > 0.92:
                 color = self.color['red'] | self.decor['bold']
-            progress_bar = self.__get_progress_bar(exam_progress=examp_elapsed_dec, bar_char_width=term_width - 23)
+            progress_bar = utlity.get_progress_bar(exam_progress=examp_elapsed_dec, bar_char_width=term_width - 23)
             scr.addstr(term_height - 2, 3, f"[ {self.exam_elapsed_time:3.0f}s / {self.exam_allowed_time:3.0f}s ][{progress_bar}]", color)
 
             ########################################################################################
@@ -812,7 +815,7 @@ class ExamTerminal:
     def draw_result(self, scr) -> Tuple[str, bool]:
         # Setting up basic stuff for curses and load keys
         self.__basic_screen_setup(scr, halfdelay=False)
-        KEYS = self.__load_keys()
+        KEYS = utlity.load_keys()
 
         self.selection_index = 0
 
@@ -862,10 +865,10 @@ class ExamTerminal:
             self.__check_terminal_size(scr)
 
             # Drawing the screen border
-            self.__draw_screen_border(scr, self.color['grey-dark'])
+            utlity.draw_screen_border(scr, self.color['grey-dark'])
 
             # Show software name/title
-            scr.addstr(term_height - 2, 2, self.__load_software_ascii_name(), self.color['grey-dark'])
+            scr.addstr(term_height - 2, 2, utlity.load_software_ascii_name(), self.color['grey-dark'])
 
             ########################################################################################
 
@@ -873,10 +876,10 @@ class ExamTerminal:
 
             # Heading
             line = f"Exam Result Summary"
-            scr.addstr(start_y, self.__center_x(term_width, line), line, self.decor['bold'])
+            scr.addstr(start_y, utlity.center_x(term_width, line), line, self.decor['bold'])
             start_y += 2
 
-            self.__draw_horizontal_seperator(scr, start_y, self.color['grey-dark'])
+            utlity.draw_horizontal_seperator(scr, start_y, self.color['grey-dark'])
             start_y += 2
 
             # Draw items
@@ -884,13 +887,13 @@ class ExamTerminal:
             results = self.__assemble_exam_results()
             for index, item in results.items():
                 scr.addstr(start_y , start_x[0], item['label'], self.color['default'])
-                scr.addstr(start_y , start_x[1], self.__truncate_text(item['text'], term_width - 32), self.color[item['color']] | self.decor[item['decor']])
+                scr.addstr(start_y , start_x[1], utlity.truncate_text(item['text'], term_width - 32), self.color[item['color']] | self.decor[item['decor']])
                 start_y += item['skip_lines']
 
             ########################################################################################
 
             selections = ["Save Result PDF and Quit", "Main Menu", "Quit"]  # TODO: "Review Question"
-            self.__draw_horizontal_seperator(scr, term_height - len(selections) - 4, self.color['grey-dark'])
+            utlity.draw_horizontal_seperator(scr, term_height - len(selections) - 4, self.color['grey-dark'])
             start_y = term_height - len(selections) - 7
             self.__draw_selection_menu(scr, selections, start_y)
 
@@ -986,7 +989,7 @@ class ExamTerminal:
             else:
                 pdf.set_font('Helvetica', '', 11)
             pdf.set_xy(x=start_x[1], y=start_y)
-            pdf.cell(w=60, h=line_height, txt=self.__truncate_text(item['text'], self.width_limit - 25), border=0, align='L')
+            pdf.cell(w=60, h=line_height, txt=utlity.truncate_text(item['text'], self.width_limit - 25), border=0, align='L')
             
             start_y += item['skip_lines'] * 8
 
@@ -1000,7 +1003,7 @@ class ExamTerminal:
         pdf.set_text_color(*[100, 100, 100])
         pdf.set_font('Helvetica', 'I', 8) 
         pdf.set_xy(x=page_left_margin + 3, y=page_height - page_bottom_margin - 8)
-        pdf.cell(w=0, h=5, txt=f"Created with {self.__load_software_ascii_name()}", border=0, align='L')
+        pdf.cell(w=0, h=5, txt=f"Created with {utlity.load_software_ascii_name()}", border=0, align='L')
 
         # Export the pdf to file
         datetime_text = datetime.fromtimestamp(self.exam_contents['exam']['exam_end_timestamp']).strftime("[%m-%d][%H-%M]")
@@ -1084,211 +1087,3 @@ class ExamTerminal:
 
         # Evaluate the exam
         self.__evaluate_exam()
-
-    ###############################################################################################
-
-    @staticmethod
-    def __load_curses_colors_decor() -> Tuple[dict, dict]:
-        # In code usage example:
-        #       scr.addstr(y, x, "hello", self.color['blue'])
-        #       scr.addstr(y, x, "hello", self.color['blue'] | self.decor['bold'])
-
-        # Start colors in curses
-        curses.start_color()
-
-        # Defining colors [foreground/font, background]
-        color_definition = {
-            'default':      [curses.COLOR_WHITE, 0],    # FIXME: Rename to "normal" to match decor
-            'red':          [curses.COLOR_RED, 0],
-            'green':        [curses.COLOR_GREEN, 0],
-            'blue':         [curses.COLOR_BLUE, 0],
-            'yellow':       [curses.COLOR_YELLOW, 0],
-            'orange':       [209, 0],
-            'cyan':         [curses.COLOR_CYAN, 0],
-            'magenta':      [curses.COLOR_MAGENTA, 0],
-            'grey-dark':    [240, 0],
-            'grey-light':   [248, 0],
-            'black-white':  [curses.COLOR_BLACK, curses.COLOR_WHITE],
-            'white-red':    [curses.COLOR_WHITE, curses.COLOR_RED]
-        }
-
-        # If terminal does not support colors, reset everything to white
-        if not curses.has_colors() or not curses.can_change_color():
-            for color in color_definition:
-                color_definition[color] = [curses.COLOR_WHITE, 0]
-
-        # Initiating curses color and saving for quick reference
-        color = {}
-        for index, (key, value) in enumerate(color_definition.items()):
-            try:
-                curses.init_pair(index + 1, value[0], value[1])
-            except:
-                curses.init_pair(index + 1, 0, 0)
-            color[key] = curses.color_pair(index + 1)
-
-        # Defining font decorations
-        decoration_definition ={
-            'normal' : curses.A_NORMAL,         # Normal display (no highlight)
-            'standout': curses.A_STANDOUT,      # Best highlighting mode of the terminal
-            'underline': curses.A_UNDERLINE,    # Underlining
-            'reverse': curses.A_REVERSE,        # Reverse video
-            'blink': curses.A_BLINK,            # Blinking
-            'dim': curses.A_DIM,                # Half bright
-            'bold': curses.A_BOLD,              # Extra bright or bold
-            'protect': curses.A_PROTECT,        # Protected mode
-            'invisible': curses.A_INVIS,        # Invisible or blank mode
-            'alt-char': curses.A_ALTCHARSET,    # Alternate character set
-            'char': curses.A_CHARTEXT           # Bit-mask to extract a character
-        }
-
-        # Initiating curses color and saving for quick reference
-        decor = {}
-        for key, value in decoration_definition.items():
-            decor[key] = value
-
-        return color, decor
-
-    @staticmethod
-    def __load_keys() -> dict:
-        KEYS = {
-            "ENTER":  (curses.KEY_ENTER, ord('\n'), ord('\r')),
-            "SPACE":  (32, ord(' ')),
-            "UP":     (curses.KEY_UP, ord('k')),
-            "DOWN":   (curses.KEY_DOWN, ord('j')),
-            "RIGHT":  (curses.KEY_RIGHT, ord('l')),
-            "LEFT":   (curses.KEY_LEFT, ord('h')),
-            "PAUSE":  (ord('p'), ord('P')),
-            "RESUME": (ord('r'), ord('R')),
-            "QUIT":   (27 , ord('q'), ord('Q'))
-        }
-        return KEYS
-
-    @staticmethod
-    def __load_software_ascii_name() -> str:
-        # TODO: Smarter, automatic loading of version
-        
-        software_name = "Exam Terminal"
-        software_version = "0.0.4"  # TODO: Pull from setup.py somehow
-        return software_name + ' v' + software_version
-
-    @staticmethod
-    def __center_x(display_width:int, line:str) -> int:
-        return display_width // 2 - len(line) // 2
-
-    @staticmethod
-    def __center_y(display_height:int) -> int:
-        return display_height // 2
-
-    @staticmethod
-    def __truncate_text(text:str, length:int) -> str:
-        truncated_text = text
-        if len(text) >= length - 3:
-            truncated_text = text[0:length - 3] + '...'
-
-        return truncated_text
-
-    @staticmethod
-    def __get_message_box_size(term_height:int, term_width:int, message_lines:list) -> Tuple[int, int, int, int]:
-        """
-        Given a message box list with each item being a message box line/row,
-        this method find the right size and position of the message box for 
-        the given terminal size
-
-        Parameters:
-            term_height (int)    : Number of rows/lines in terminal
-            term_width (int)     : Number of columns in terminal
-            message_lines (list) : Lines of text in each list item
-        Returns: 
-            box_height (int) : Height of message box (rows/lines) 
-            box_width (int)  : Width of message box (columns)
-            box_y (int)      : Vertical position of box in terminal
-            box_x (int)      : Horizontal position of box in terminal
-        """
-        box_height = len(message_lines) + 4
-        box_width = int(term_width / 1.5)  # Alternative: len(max(message_lines, key=len)) + 12
-        box_y = term_height // 2 - box_height // 2
-        box_x = term_width // 2 - box_width // 2
-        
-        return box_height, box_width, box_y, box_x
-
-    @staticmethod
-    def __get_progress_bar(exam_progress: float, bar_char_width=60, bar_char_full='|', bar_char_empty='-') -> str:
-        """
-        Make a progress bar with specified parameters
-
-        Parameters:
-            exam_progress (float) : Exam progress from 0 to 1 (ie. 0.45 is 45%)
-            bar_char_width (int)  : Total width of progress bar, columns of text
-            bar_char_full (str)   : Symbol for filled
-            bar_char_empty (str)  : Symbol for empty
-        Returns: 
-            (str) : Progress bar as text
-        """
-        # TODO: Different colors for different parts of the progress bar somehow
-
-        progress_str = []
-        for i in range(bar_char_width):
-            
-            if i <= exam_progress * bar_char_width:
-                progress_str.append(bar_char_full)
-            else:
-                progress_str.append(bar_char_empty)
-
-        progress_str = "".join(progress_str)
-        return progress_str
-
-    @staticmethod
-    def __draw_screen_border(scr, color:list) -> None:
-        """
-        Draw a border around entire terminal screen with specified color
-
-        Parameters:
-            scr (obj)   : Handle for curses terminal screen handle
-            color (list): Foreground and background color (ie. [250, 0])
-        Returns: 
-            None
-        """
-        scr.attron(color)
-        scr.border(0)
-        scr.attroff(color)
-
-    @staticmethod
-    def __draw_horizontal_seperator(scr, y:int, color:list) -> None:
-        """
-        Draw a horizontal line accross the terminal screen at specified height
-        and with specified color
-
-        Parameters:
-            scr (obj)   : Handle for curses terminal screen handle
-            y (int)     : The line/row number from top of the screen
-            color (list): Foreground and background color (ie. [250, 0])
-        Returns: 
-            None
-        """
-        scr.attron(color)
-        scr.border(0)
-        scr.attroff(color)
-        # Getting the screen height and width
-        term_height, term_width = scr.getmaxyx()
-
-        if y < term_height - 2 and y > 1:
-            for x in range(term_width - 2):
-                scr.addstr(y, x + 1, '-', color)
-
-    @staticmethod
-    def __draw_vertical_seperator(scr, x:int, color:list) -> None:
-        """
-        Draw a vertical line accross the terminal screen at specified character
-        column and with specified color
-
-        Parameters:
-            scr (obj)   : Handle for curses terminal screen handle
-            x (int)     : The column number from left of the screen
-            color (list): Foreground and background color (ie. [250, 0])
-        Returns: 
-            None
-        """
-        # Getting the screen height and width
-        term_height, term_width = scr.getmaxyx()
-
-        # TODO: Currently unused but may come in handy

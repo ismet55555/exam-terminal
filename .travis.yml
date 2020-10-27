@@ -11,13 +11,11 @@ python:
   - "3.6"
   - "3.7"
   - "3.8"
-  - "2.7"
-  - "nightly"
+  - "3.9"
 
 matrix:
   allow_failures:
-    - python: "2.7"
-    - python: "nightly"
+    - python: "3.9"
 
 branches:
   only:

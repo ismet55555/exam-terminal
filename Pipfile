@@ -6,8 +6,8 @@ verify_ssl = true
 [dev-packages]
 wheel = "*"
 flake8 = '*'
+autopep8 = "*"
 pylint = '*'
-pytest = "*"
 bump = "*"
 twine = "*"
 exam-terminal = {editable = true, path = "."}
