@@ -17,7 +17,7 @@
 
 <img alt="portfolio_view" src="https://img.shields.io/github/license/ismet55555/exam-terminal">
 
-<img alt="portfolio_view" src="https://img.shields.io/travis/com/ismet55555/exam-terminal/master">
+<a href="https://travis-ci.com/github/ismet55555/exam-terminal"><img alt="portfolio_view" src="https://img.shields.io/travis/com/ismet55555/exam-terminal/master"></a>
 </p>
 
 
