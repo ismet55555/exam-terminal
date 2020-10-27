@@ -32,6 +32,13 @@ install:
 script: ls -la &&
         exam-terminal --help
 
+deploy:
+  provider: pypi
+  server: https://test.pypi.org/legacy/
+  username: $PYPI_USERNAME
+  password: $PYPI_PASSWORD
+  edge: true # opt in to dpl v2
+
 # TODO:
 #   Figure out windows and osx tests jobs
 #   Code linting and formatting check (diff jobs?)
