@@ -61,9 +61,11 @@
 
 ## Testing and Continues Integration
 - Get bumpversion to work to automatically increase version for every push
-- Travis CI: Figure out windows and osx tests jobs
-- Travis CI: Code linting and formatting check
-- Travis CI: Omit travis testing when changes to .md files were made
+- Travis CI
+  - OSX and Windows testing
+  - Figure out windows and osx tests jobs
+  - Code linting and formatting check
+  - Omit travis testing when changes to .md files were made
 - Add pep8, black, isort, tests
 
 

@@ -32,8 +32,9 @@ install:
   - pipenv install --dev --ignore-pipfile
 
 script: 
-    - pwd &&
-      ls -la 
+    - pwd
+    - ls -la 
+    - pip list
     - exam-terminal --help
 
 deploy:
