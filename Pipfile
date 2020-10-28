@@ -8,7 +8,6 @@ wheel = "*"
 # flake8 = '*'
 # autopep8 = "*"
 # pylint = '*'
-bump = "*"
 bump2version = "*"
 twine = "*"
 exam-terminal = {editable = true, path = "."}
