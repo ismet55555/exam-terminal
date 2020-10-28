@@ -1,7 +1,8 @@
 os:
   - linux
+  - windows
 
-dist: bionic
+# dist: bionic
 
 language: python
 
@@ -32,8 +33,7 @@ install:
   - pipenv install --dev --ignore-pipfile
 
 script: 
-    - pwd
-    - ls -la 
+    - pwd 
     - pip list
     - exam-terminal --help
 
