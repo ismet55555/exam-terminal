@@ -83,11 +83,9 @@ def load_keys() -> dict:
     return KEYS
 
 
-def load_software_ascii_name() -> str:
-    # TODO: Smarter, automatic loading of version
-    
-    software_name = "Exam Terminal"
-    software_version = "0.0.4"  # TODO: Pull from setup.py somehow
+def load_software_name_version() -> str:
+    software_name = "exam-terminal"
+    software_version = "0.0.17"  # Updated with bumpversion
     return software_name + ' v' + software_version
 
 
