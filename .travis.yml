@@ -1,8 +1,7 @@
 os:
   - linux
-  - osx
 
-# dist: bionic
+dist: bionic
 
 language: python
 

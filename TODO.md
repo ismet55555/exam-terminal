@@ -70,6 +70,8 @@
 - Get bumpversion to work to automatically increase version for every push
 - Travis CI
   - OSX and Windows testing
+    - Example: https://github.com/IntelRealSense/librealsense/blob/master/.travis.yml
+    - Possibly need custom python setup
   - Figure out windows and osx tests jobs
   - Code linting and formatting check
   - Omit travis testing when changes to .md files were made
