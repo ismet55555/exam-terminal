@@ -2,6 +2,7 @@
 
 import logging
 import os
+import site
 import sys
 
 import click
@@ -52,7 +53,8 @@ def main(sample, examfile) -> None:
     # Sample examfile
     exam_filepath = ''
     if sample and not examfile:
-        exam_filepath = os.path.abspath(click.format_filename("exams/sample_exam.yml"))
+        print(site.getsitepackages())  # FIXME: Need to find where the loaded exams are
+        exam_filepath = os.path.abspath(click.format_filename("exam_terminal/exams/sample_exam.yml"))
         logger.debug(f'Using sample exam file: {exam_filepath}')
 
     # Specified examfile

@@ -1,2 +1,2 @@
-recursive-include exams *.yml
-recursive-include exams *.yaml
+recursive-include exam_terminal/exams *.yml
+recursive-include exam_terminal/exams *.yaml
