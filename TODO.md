@@ -13,8 +13,7 @@
 - See example https://github.com/PyCQA/redbaron for flairs and tests
 
 ## Code Structure
-- Break appart ExamTerminal.py to multiple files
-  - utility.py ?
+- ...
 
 ## Main Menu
 - Add a About, Settings, Help Options (Horizontal? Two Lines?)
@@ -28,6 +27,7 @@
 ## Exam Loading
 - Enter exam taker name?
 - Add a sample sample_exam.yml, that is called with option --sample
+  - `exams/sample_exam.yml` must be available at package install
 - Add CLI option for exam taker's name
 - Encrypt the exam file with a password so you can send it to someone?
 - Better way to format and load exam
@@ -49,19 +49,22 @@
 
 ## Results
 - Ability to send exam results via email
+- Give user option to save exam format
   - PDF
   - .json data
   - .yml data
+  - Standard out as json data
 
 
 ## Python Package Packaging
-- At install, Print out a nice ASCII sign with scripts=['scripts/xmlproc_parse', 'scripts/xmlproc_val'] or in requirements():
 - Include sample exams with https://packaging.python.org/guides/using-manifest-in/
   - package_data  or  data_files
+- `bumpversion` with automatic bump at push
 
 
 ## Random
-- ...
+- Update version number within exam
+  - Read from setup.py ?
 
 
 # Bugs
