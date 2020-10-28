@@ -1,6 +1,6 @@
 os:
   - linux
-  - windows
+  - osx
 
 # dist: bionic
 
