@@ -2,7 +2,8 @@
 
 - Bump the package version number
   - Version format: `MAJOR.MINOR.PATCH`
-  - `bumpversion patch` or `bumpverison minor`
+  - `bumpversion major`, `bumpverison minor`, or `bumpversion patch`
+  - Run inside directory containing file `.bumpversion.cfg`
 
 - Clean any previous build
   - Build: `python3 setup.py clean --all`

@@ -2,7 +2,7 @@
 
 import logging
 import os
-import site
+import sysconfig
 import sys
 
 import click
@@ -53,8 +53,13 @@ def main(sample, examfile) -> None:
     # Sample examfile
     exam_filepath = ''
     if sample and not examfile:
-        print(site.getsitepackages())  # FIXME: Need to find where the loaded exams are
-        exam_filepath = os.path.abspath(click.format_filename("exam_terminal/exams/sample_exam.yml"))
+        # If local does not exist, try site-package
+        exam_filepath = os.path.abspath(os.path.join("exams", "sample_exam.yml"))
+        print(exam_filepath)
+        if not os.path.exists(exam_filepath):
+            logger.debug(f'Failed to find {exam_filepath}, trying python site-package directory ...')
+            site_package_dir = sysconfig.get_paths()["purelib"]
+            exam_filepath = os.path.abspath(os.path.join(site_package_dir, "exam-terminal", "exams", "sample_exam.yml"))
         logger.debug(f'Using sample exam file: {exam_filepath}')
 
     # Specified examfile
