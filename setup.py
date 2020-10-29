@@ -4,7 +4,7 @@ import os
 import setuptools
 
 # Package version number
-__version__ = "0.0.17"
+__version__ = "0.0.19"
 
 # Utility function to read the README file. Used for the long_description
 def read(fname):
