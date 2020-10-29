@@ -1,5 +1,6 @@
 import curses
 
+
 def draw_menu(stdscr):
     # Predefine and pre-allocate variables
     k = 0
@@ -20,9 +21,6 @@ def draw_menu(stdscr):
 
     # Turn off echo
     curses.noecho()
-
-
-
 
     # Loop where k is the last character pressed
     while (k != ord('q')):
@@ -60,28 +58,27 @@ def draw_menu(stdscr):
 
         # Check for cursor not off the screen in vertical direction
         cursor_y = max(0, cursor_y)
-        cursor_y = min(term_height-2, cursor_y)  # Excluding status bar at bottom
+        # Excluding status bar at bottom
+        cursor_y = min(term_height-2, cursor_y)
 
         ###########################################################################################
 
         # Declaration of strings (ensuring that strings are not larger than screen term_width)
-        title = "Question: AWS Certified Architect Practice Exam"[:term_width-1]
+        title = "Question: AWS Certified Architect Practice Exam"[
+            :term_width-1]
         x = 10
         y = 10
         stdscr.addstr(y, x, title)
-
 
         x = 10
         y = 11
         selection = "Written by Ismet Handzic"[:term_width-1]
         stdscr.addstr(y, x, selection)
 
-
         x = 10
         y = 13
         keystr = "Last key pressed: {}".format(k)[:term_width-1]
         stdscr.addstr(y, x, keystr)
-
 
         ###########################################################################################
 
@@ -95,13 +92,14 @@ def draw_menu(stdscr):
 
         # Wait for next user input
         k = stdscr.getch()
-        
+
 
 def main():
     # Calling the curses 'draw_menu' function
     curses.wrapper(draw_menu)
 
     # ... can add more wrappers here here ...
+
 
 if __name__ == "__main__":
     # Entry point of code

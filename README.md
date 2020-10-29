@@ -1,5 +1,3 @@
-
-
 <p align="center"><img width="150" alt="portfolio_view" src="https://raw.githubusercontent.com/ismet55555/exam-terminal/master/misc/logo.png"></p>
 
 <h1 align="center">exam-terminal</h1>
@@ -36,13 +34,6 @@
 </a>
 </p>
 
-
-
-
-
-
-
-
 The exam-terminal is a terminal-based examination tool, which you can potentially do any of the following:
 
 - Construct and take practice exams
@@ -58,6 +49,7 @@ Some mentionable features:
 - `pip install exam-terminal`
 
 ## Quick Start
+
 - `exam-terminal --help`
 - `exam-terminal --sample`
 

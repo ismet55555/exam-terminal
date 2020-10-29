@@ -3,20 +3,23 @@
 import os
 import setuptools
 
-# Package version number
+# Package version number (Updated via bumpversion)
 __version__ = "0.0.20"
 
-# Utility function to read the README file. Used for the long_description
+
 def read(fname):
+    """Utility function to read the README file. Used for the long_description"""
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
-# Load packages in requirements.txt
+
 def requirements():
+    """Load packages in requirements.txt"""
     with open(os.path.join(os.path.dirname(__file__), "requirements.txt")) as handle:
         packages = handle.readlines()
     packages = [package.strip() for package in packages]
 
     return packages
+
 
 setuptools.setup(
     name="exam-terminal",
@@ -35,7 +38,8 @@ setuptools.setup(
     python_requires='>=3.6',
     setup_requires=['wheel'],
     py_modules=["exam_terminal"],
-    entry_points={"console_scripts": ["exam-terminal = exam_terminal.__main__:main"]},
+    entry_points={"console_scripts": [
+        "exam-terminal = exam_terminal.__main__:main"]},
     classifiers=[
         'Development Status :: 4 - Beta',
         'Topic :: Education',
