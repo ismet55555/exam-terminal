@@ -349,7 +349,7 @@ class ExamTerminal:
             utlity.draw_screen_border(scr, self.color['grey-dark'])
 
             # Show software name/title
-            scr.addstr(term_height - 2, 2, utlity.load_software_ascii_name(), self.color['grey-dark'])
+            scr.addstr(term_height - 2, 2, utlity.load_software_name_version(), self.color['grey-dark'])
 
             ########################################################################################
 
@@ -868,7 +868,7 @@ class ExamTerminal:
             utlity.draw_screen_border(scr, self.color['grey-dark'])
 
             # Show software name/title
-            scr.addstr(term_height - 2, 2, utlity.load_software_ascii_name(), self.color['grey-dark'])
+            scr.addstr(term_height - 2, 2, utlity.load_software_name_version(), self.color['grey-dark'])
 
             ########################################################################################
 
@@ -1003,7 +1003,7 @@ class ExamTerminal:
         pdf.set_text_color(*[100, 100, 100])
         pdf.set_font('Helvetica', 'I', 8) 
         pdf.set_xy(x=page_left_margin + 3, y=page_height - page_bottom_margin - 8)
-        pdf.cell(w=0, h=5, txt=f"Created with {utlity.load_software_ascii_name()}", border=0, align='L')
+        pdf.cell(w=0, h=5, txt=f"Created with {utlity.load_software_name_version()}", border=0, align='L')
 
         # Export the pdf to file
         datetime_text = datetime.fromtimestamp(self.exam_contents['exam']['exam_end_timestamp']).strftime("[%m-%d][%H-%M]")

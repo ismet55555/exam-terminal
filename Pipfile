@@ -5,13 +5,16 @@ verify_ssl = true
 
 [dev-packages]
 wheel = "*"
-flake8 = '*'
-autopep8 = "*"
-pylint = '*'
-bump = "*"
+# flake8 = '*'
+# autopep8 = "*"
+# pylint = '*'
+bump2version = "*"
 twine = "*"
 exam-terminal = {editable = true, path = "."}
 
 [packages]
 exam-terminal = {editable = false, path = "."}
 # See setup.py and requirements.txt for exam-terminal dependencies
+
+[pipenv]
+allow_prereleases = false

@@ -3,10 +3,6 @@
 ## General
 - README.md
 - Python DocStrings
-- A few sample exams
-  - DCA
-  - AWS Practitioner
-  - Ansible
 - Simple database? or just a file?
 - Animations on switch screen?  Side fille, bottom fill?
 - Run out of a Docker image (make the Dockerfile)
@@ -30,6 +26,13 @@
   - `exams/sample_exam.yml` must be available at package install
 - Add CLI option for exam taker's name
 - Encrypt the exam file with a password so you can send it to someone?
+- SQLite database somewhere in AWS? Github?
+- Add few sample exams
+  - Docker Certified Accosiate (DCA)
+  - AWS Practitioner
+  - Ansible RedHat Cert
+  - Algebra / Calculus Math exams
+  - Python Programming Fundementals
 - Better way to format and load exam
   - Markdown?
   - Both Yaml and markdown?
@@ -40,6 +43,8 @@
 - Have a answered/unanswered questions indicator 
 - Set up where multiple choice selection yields something backce
 
+## Exam
+- Multiple choice, Multiple answer
 
 ## Pause/Resume Exam
 - Quitting exam with option to continue later -> create a temp .exam file
@@ -61,11 +66,20 @@
   - package_data  or  data_files
 - `bumpversion` with automatic bump at push
 
+## Testing and Continues Integration
+- Get bumpversion to work to automatically increase version for every push
+- Travis CI
+  - OSX and Windows testing
+    - Example: https://github.com/IntelRealSense/librealsense/blob/master/.travis.yml
+    - Possibly need custom python setup
+  - Figure out windows and osx tests jobs
+  - Code linting and formatting check
+  - Omit travis testing when changes to .md files were made
+- Add pep8, black, isort, tests
+
 
 ## Random
-- Update version number within exam
-  - Read from setup.py ?
-
+- ...
 
 # Bugs
 - I'm sure there are some lurking in the dark ...

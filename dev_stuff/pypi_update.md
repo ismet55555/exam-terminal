@@ -1,5 +1,9 @@
 # Python Package Index (PYPI) Update
 
+- Bump the package version number
+  - Version format: `MAJOR.MINOR.PATCH`
+  - `bumpversion patch` or `bumpverison minor`
+
 - Clean any previous build
   - Build: `python3 setup.py clean --all`
   - Dist: `rm -rf dist`  (Windows: `rm -force dist`)

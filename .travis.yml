@@ -20,8 +20,10 @@ matrix:
 branches:
   only:
     - master
+    - dev
     - stable
 
+# FIXME: Omit travis build on changes in .md files
 # before_install:
 #   - bash scripts/preflight.sh $TRAVIS_COMMIT $TRAVIS_BRANCH || travis_terminate 1;
 
@@ -29,21 +31,28 @@ install:
   - pip install pipenv --upgrade-strategy=only-if-needed
   - pipenv install --dev --ignore-pipfile
 
-script: ls -la &&
-        exam-terminal --help
+script: 
+    - pwd 
+    - pip list
+    - exam-terminal --help
 
 deploy:
-  provider: pypi
-  # server: https://test.pypi.org/legacy/  # Comment out to deploy to PYPI
-  username: $PYPI_USERNAME
-  password: $PYPI_PASSWORD
-  edge: true  # Opt in to travis CI dpl v2
-  distributions: "sdist bdist_wheel"
-  skip_existing: true  # Prevent competing deploy builds
+  - provider: pypi
+    username: $PYPI_USERNAME
+    password: $PYPI_PASSWORD
+    edge: true  # Opt in to travis CI dpl v2
+    distributions: "sdist bdist_wheel"
+    skip_existing: true  # Prevent competing deploy builds
+    on:
+      branch: master
 
+  - provider: pypi
+    server: https://test.pypi.org/legacy/  # Comment out to deploy to PYPI
+    username: $TEST_PYPI_USERNAME
+    password: $TEST_PYPI_PASSWORD
+    edge: true  # Opt in to travis CI dpl v2
+    distributions: "sdist bdist_wheel"
+    skip_existing: true  # Prevent competing deploy builds
+    on:
+      branch: dev
 
-# TODO:
-#   Figure out windows and osx tests jobs
-#   Code linting and formatting check (diff jobs?)
-#   Automatic update PYPI form master branch change
-#   Automatic update TestPYPI on development branch

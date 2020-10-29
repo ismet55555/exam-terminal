@@ -3,6 +3,9 @@
 import os
 import setuptools
 
+# Package version number
+__version__ = "0.0.17"
+
 # Utility function to read the README file. Used for the long_description
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
@@ -17,7 +20,7 @@ def requirements():
 
 setuptools.setup(
     name="exam-terminal",
-    version="0.0.15",
+    version=__version__,
     author="Ismet Handzic",
     author_email="ismet.handzic@gmail.com",
     maintainer="Ismet Handzic",
