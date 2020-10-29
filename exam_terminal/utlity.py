@@ -1,7 +1,6 @@
 import curses
 import logging
-from pprint import pprint
-from typing import Dict, Tuple
+from typing import Tuple
 
 
 logger = logging.getLogger()
@@ -85,7 +84,7 @@ def load_keys() -> dict:
 
 def load_software_name_version() -> str:
     software_name = "exam-terminal"
-    software_version = "0.0.19"  # Updated with bumpversion
+    software_version = "0.0.20"  # Updated with bumpversion
     return software_name + ' v' + software_version
 
 
@@ -108,7 +107,7 @@ def truncate_text(text:str, length:int) -> str:
 def get_message_box_size(term_height:int, term_width:int, message_lines:list) -> Tuple[int, int, int, int]:
     """
     Given a message box list with each item being a message box line/row,
-    this method find the right size and position of the message box for 
+    this method find the right size and position of the message box for
     the given terminal size
 
     Parameters:
@@ -116,7 +115,7 @@ def get_message_box_size(term_height:int, term_width:int, message_lines:list) ->
         term_width (int)     : Number of columns in terminal
         message_lines (list) : Lines of text in each list item
     Returns: 
-        box_height (int) : Height of message box (rows/lines) 
+        box_height (int) : Height of message box (rows/lines)
         box_width (int)  : Width of message box (columns)
         box_y (int)      : Vertical position of box in terminal
         box_x (int)      : Horizontal position of box in terminal
@@ -125,7 +124,7 @@ def get_message_box_size(term_height:int, term_width:int, message_lines:list) ->
     box_width = int(term_width / 1.5)  # Alternative: len(max(message_lines, key=len)) + 12
     box_y = term_height // 2 - box_height // 2
     box_x = term_width // 2 - box_width // 2
-    
+
     return box_height, box_width, box_y, box_x
 
 
@@ -205,7 +204,5 @@ def draw_vertical_seperator(scr, x:int, color:list) -> None:
     Returns: 
         None
     """
-    # Getting the screen height and width
-    term_height, term_width = scr.getmaxyx()
-
     # TODO: Currently unused but may come in handy
+    pass
