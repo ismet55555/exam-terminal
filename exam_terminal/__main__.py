@@ -59,7 +59,7 @@ def main(sample, examfile) -> None:
         if not os.path.exists(exam_filepath):
             logger.debug(f'Failed to find {exam_filepath}, trying python site-package directory ...')
             site_package_dir = sysconfig.get_paths()["purelib"]
-            exam_filepath = os.path.abspath(os.path.join(site_package_dir, "exam-terminal", "exams", "sample_exam.yml"))
+            exam_filepath = os.path.abspath(os.path.join(site_package_dir, "exam_terminal", "exams", "sample_exam.yml"))
         logger.debug(f'Using sample exam file: {exam_filepath}')
 
     # Specified examfile
