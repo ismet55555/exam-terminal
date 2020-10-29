@@ -1,5 +1,3 @@
-
-
 <p align="center"><img width="150" alt="portfolio_view" src="https://raw.githubusercontent.com/ismet55555/exam-terminal/master/misc/logo.png"></p>
 
 <h1 align="center">exam-terminal</h1>
@@ -36,34 +34,59 @@
 </a>
 </p>
 
+The exam-terminal is a terminal-based assessment tool. It can potentially be used for making and taking practice exams, deliver quizes, or collect a survey.
+
+The results include your general exam score, some basic statistics, and the ability to export your results to a PDF documment.
 
 
+## Quick Start
+
+```bash
+# Install it
+pip install exam-terminal
+
+# Quick checkout of the help
+exam-terminal --help
+
+# Try out a sample exam
+exam-terminal --sample
+
+# Make your own exams using YAML format (See below)
+```
 
 
+## Compatibility
+As of now the following Python 3 versions are supported for Linux, OSX, and Windows:
+  - Python 3.6
+  - Python 3.7
+  - Python 3.8
+  - Python 3.9
 
+To check which python version you have, open a terminal and type `python --version`
 
-
-The exam-terminal is a terminal-based examination tool, which you can potentially do any of the following:
-
-- Construct and take practice exams
-- Give quick quizzes
-
-Some mentionable features:
-
-- Exam statistics
-- Evaluation PDF
 
 ## Installation
 
-- `pip install exam-terminal`
+### Get It From PYPI
+```bash
+pip install exam-terminal
+```
+### _(If Needed)_ Install pip, setuptools, and wheel
 
-## Quick Start
-- `exam-terminal --help`
-- `exam-terminal --sample`
+```bash
+python -m pip install --upgrade pip setuptools wheel
+```
+
+## Exam Creation
+_TODO_
+
 
 ## Development Notes
+If you are eying this repo and thinking "Hey this is kind of neat, I'd love to add a few things", well this is your chance :-)
 
-- Clone this repo
-- Go into cloned repo directory directory
-- `pipenv install --three --dev -e .`
-- `pipenv shell`
+There is definetly work to be done. If you don't have a genius great idea of the next big change. There is a `TODO.md` file which outlines some changes that would be nice to have.
+
+For some guides on how to help out, checkout the `dev_stuff` directory.
+
+
+

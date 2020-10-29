@@ -1,30 +1,26 @@
 #!/usr/bin/env python3
 
 import curses
-from exam_terminal import utlity
 import logging
 import os
 import sys
 import textwrap
 import threading
 from datetime import datetime
-from pprint import pprint
 from statistics import mean, median, stdev
-from time import gmtime, sleep, strftime, time
-from typing import Tuple, Dict
+from time import gmtime, strftime, time
+from typing import Dict, Tuple
 
 import yaml
 from fpdf import FPDF
 
-from . import utlity
+from exam_terminal import utlity
 
 logger = logging.getLogger()
 
 
 class ExamTerminal:
-    """
-    This class defines the exam terminal and its function.
-    """
+    """This class defines the exam terminal and its function."""
 
     def __init__(self, exam_filepath: str) -> None:
         """
@@ -32,7 +28,7 @@ class ExamTerminal:
 
         Parameters:
             exam_filepath (str): The path to the exam file
-        Returns: 
+        Returns:
             None
         """
         # Loading exam contents
@@ -89,8 +85,8 @@ class ExamTerminal:
         logger.debug(f"Loading specified exam file: '{filepath}' ...")
         try:
             with open(filepath) as file:
-                self.exam_contents = yaml.load(file, Loader=yaml.FullLoader)
-            logger.debug(f"Successfully loaded exam file")
+                self.exam_contents = yaml.safe_load(file)
+            logger.debug("Successfully loaded exam file")
         except Exception as e:
             logger.error(f"Failed to load specified exam file: '{filepath}'. Exception: {e}")
             return {}
@@ -380,7 +376,7 @@ class ExamTerminal:
             start_y += len(menu_item_wrap)
 
             
-            lines = ["Exam Type:", f"Multiple Choice, Single Answer"]
+            lines = ["Exam Type:", "Multiple Choice, Single Answer"]
             for x, line in zip(start_x, lines):
                 scr.addstr(start_y , x, line, self.color['default'])
             start_y += 2
@@ -885,7 +881,7 @@ class ExamTerminal:
             # Draw items
             start_x = [4, 30]
             results = self.__assemble_exam_results()
-            for index, item in results.items():
+            for _, item in results.items():
                 scr.addstr(start_y , start_x[0], item['label'], self.color['default'])
                 scr.addstr(start_y , start_x[1], utlity.truncate_text(item['text'], term_width - 32), self.color[item['color']] | self.decor[item['decor']])
                 start_y += item['skip_lines']
@@ -938,7 +934,7 @@ class ExamTerminal:
         page_bottom_margin = 20
 
         page_x_area = page_width - page_left_margin - page_right_margin
-        page_y_area = page_height - page_top_margin - page_bottom_margin
+        # page_y_area = page_height - page_top_margin - page_bottom_margin
 
         # Setup Page
         pdf = FPDF(orientation='P', unit='mm', format='A4')
@@ -965,11 +961,11 @@ class ExamTerminal:
             pdf.set_fill_color(r=255, g=220, b=220)
 
         # Add Title
-        pdf.set_text_color(*[0, 0, 0]) 
+        pdf.set_text_color(*[0, 0, 0])
         pdf.cell(w=page_x_area, h=20, txt='Exam Results', border=1, align='C', fill=1)
 
         # Add Footer
-        pdf.set_font('Helvetica', '', 24) 
+        pdf.set_font('Helvetica', '', 24)
         pdf.set_xy(x=page_width - page_right_margin - 70, y=page_height - page_bottom_margin - 40)
         pdf.cell(w=60, h=30, txt=self.exam_contents['exam']['evaluation_label'], border=1, align='C', fill=1)
 
@@ -1001,7 +997,7 @@ class ExamTerminal:
 
         # Add the software watermark thingy
         pdf.set_text_color(*[100, 100, 100])
-        pdf.set_font('Helvetica', 'I', 8) 
+        pdf.set_font('Helvetica', 'I', 8)
         pdf.set_xy(x=page_left_margin + 3, y=page_height - page_bottom_margin - 8)
         pdf.cell(w=0, h=5, txt=f"Created with {utlity.load_software_name_version()}", border=0, align='L')
 

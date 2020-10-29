@@ -20,8 +20,9 @@ logger.setLevel(logging.INFO)
 @click.option('-e', '--examfile', required=False, default='', type=str, help='Relative or absolute path to the exam file to be loaded')
 def main(sample, examfile) -> None:
     """
+
         \b
-                                       _                      _             _ 
+                                       _                      _             _
                                       | |                    (_)           | |
          _____  ____ _ _ __ ___ ______| |_ ___ _ __ _ __ ___  _ _ __   __ _| |
         / _ \ \/ / _` | '_ ` _ \______| __/ _ \ '__| '_ ` _ \| | '_ \ / _` | |
@@ -54,7 +55,7 @@ def main(sample, examfile) -> None:
     exam_filepath = ''
     if sample and not examfile:
         # If local does not exist, try site-package
-        exam_filepath = os.path.abspath(os.path.join("exams", "sample_exam.yml"))
+        exam_filepath = os.path.abspath(os.path.join("exam_terminal", "exams", "sample_exam.yml"))
         print(exam_filepath)
         if not os.path.exists(exam_filepath):
             logger.debug(f'Failed to find {exam_filepath}, trying python site-package directory ...')
@@ -86,7 +87,7 @@ def main(sample, examfile) -> None:
 if __name__ == "__main__":
     """
     Main entry point to the entire program.
-    This file and this function will be called when running the program
+    This file and this function will be called when running the program.
 
     Parameters: None
     Returns: None

@@ -2,6 +2,7 @@
 
 import curses
 
+
 def draw_menu(stdscr):
     # Predefine and pre-allocate variables
     k = 0
@@ -22,9 +23,6 @@ def draw_menu(stdscr):
 
     # Turn off echo
     curses.noecho()
-
-
-
 
     # Loop where k is the last character pressed
     while (k != ord('q')):
@@ -62,15 +60,18 @@ def draw_menu(stdscr):
 
         # Check for cursor not off the screen in vertical direction
         cursor_y = max(0, cursor_y)
-        cursor_y = min(term_height-2, cursor_y)  # Excluding status bar at bottom
+        # Excluding status bar at bottom
+        cursor_y = min(term_height-2, cursor_y)
 
         ###########################################################################################
 
         # Render status bar at the bottom
-        statusbarstr = "[STATUS BAR] Press 'q' to exit | Cursor Position: {}, {}".format(cursor_x, cursor_y)
+        statusbarstr = "[STATUS BAR] Press 'q' to exit | Cursor Position: {}, {}".format(
+            cursor_x, cursor_y)
         # stdscr.attron(curses.color_pair(3))
         stdscr.addstr(term_height-1, 0, statusbarstr)
-        stdscr.addstr(term_height-1, len(statusbarstr), " " * (term_width - len(statusbarstr) - 1), curses.color_pair(3))
+        stdscr.addstr(term_height-1, len(statusbarstr), " " *
+                      (term_width - len(statusbarstr) - 1), curses.color_pair(3))
         # stdscr.attroff(curses.color_pair(3))
 
         ###########################################################################################
@@ -81,9 +82,12 @@ def draw_menu(stdscr):
         keystr = "Last key pressed: {}".format(k)[:term_width-1]
 
         # Centering label calculations and what position in terminal to start
-        start_x_title = int((term_width // 2) - (len(title) // 2) - len(title) % 2)
-        start_x_subtitle = int((term_width // 2) - (len(subtitle) // 2) - len(subtitle) % 2)
-        start_x_keystr = int((term_width // 2) - (len(keystr) // 2) - len(keystr) % 2)
+        start_x_title = int((term_width // 2) -
+                            (len(title) // 2) - len(title) % 2)
+        start_x_subtitle = int((term_width // 2) -
+                               (len(subtitle) // 2) - len(subtitle) % 2)
+        start_x_keystr = int((term_width // 2) -
+                             (len(keystr) // 2) - len(keystr) % 2)
 
         # Defining the vertical position to start text
         start_y = int((term_height // 2) - 4)
@@ -114,7 +118,7 @@ def draw_menu(stdscr):
 
         # Wait for next user input
         k = stdscr.getch()
-        
+
         # stdscr.getkey()
 
         ###########################################################################################
@@ -125,6 +129,7 @@ def main():
     curses.wrapper(draw_menu)
 
     # ... can add more wrappers here here ...
+
 
 if __name__ == "__main__":
     # Entry point of code

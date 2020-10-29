@@ -1,21 +1,19 @@
-
-
 # class PDF(FPDF):
-    # def header(self):
-    #     # Select Arial bold 15
-    #     self.set_font('Arial', 'I', 8)
-    #     # Move to the right
-    #     self.cell(80)
-    #     # Framed title
-    #     self.cell(30, 5, 'Test Terminal', 0, 0, 'C')
-    #     # Line break
-    #     self.ln(20)
+# def header(self):
+#     # Select Arial bold 15
+#     self.set_font('Arial', 'I', 8)
+#     # Move to the right
+#     self.cell(80)
+#     # Framed title
+#     self.cell(30, 5, 'Test Terminal', 0, 0, 'C')
+#     # Line break
+#     self.ln(20)
 
-    # def footer(self):
-    #     self.set_y(-15)
-    #     self.set_font('Arial', 'I', 8)
-    #     pdf.set_text_color(*[0]*3) 
-    #     self.cell(0, 10, 'Page ' + str(self.page_no()) + '/{nb}', 0, 0, 'C')
+# def footer(self):
+#     self.set_y(-15)
+#     self.set_font('Arial', 'I', 8)
+#     pdf.set_text_color(*[0]*3)
+#     self.cell(0, 10, 'Page ' + str(self.page_no()) + '/{nb}', 0, 0, 'C')
 
 from fpdf import FPDF
 
@@ -36,7 +34,7 @@ pdf.set_author("Author Test Terminal")
 pdf.set_creator("Creator Test Terminal")
 pdf.set_subject("Exam Results")
 
-pdf.add_page(orientation = 'P', format = 'A4', same = False)
+pdf.add_page(orientation='P', format='A4', same=False)
 pdf.set_left_margin(margin=10)
 pdf.set_right_margin(margin=10)
 
@@ -51,7 +49,7 @@ pdf.line(200, 10, 200, 277)
 # Title
 pdf.set_font('Arial', 'B', 12)  # Italics I, underline U
 color = [0, 0, 0]
-pdf.set_text_color(*color) 
+pdf.set_text_color(*color)
 pdf.cell(w=page_x_area, h=20, txt='Exam Results', border=1, align='C')
 
 # Stats
@@ -63,10 +61,6 @@ pdf.output(name='tuto1.pdf', dest='F')
 
 # Close
 pdf.close()
-
-
-
-
 
 
 # pdf.add_font(family: str, style = '', fname = '', uni = False)

@@ -12,9 +12,9 @@ class Clock(threading.Thread):
         """ Create the clock """
         super(Clock, self).__init__()
         if show_seconds:
-            self._target=self.update_seconds
+            self._target = self.update_seconds
         else:
-            self._target=self.blink_colon
+            self._target = self.blink_colon
         self.daemon = True
         self.stdscr = stdscr
         self.start()
@@ -39,7 +39,7 @@ class Clock(threading.Thread):
 
 def run(stdscr):
 
-    stdscr.addstr( 1, 0, "This is sample text\n\n")
+    stdscr.addstr(1, 0, "This is sample text\n\n")
     stdscr.addstr(18, 0, "This is more sample text\n\n")
     clock1 = Clock(stdscr)
     # clock2 = Clock(stdscr, seconds=False)
@@ -51,6 +51,6 @@ def run(stdscr):
         break
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     stdscr = curses.initscr()
     curses.wrapper(run)

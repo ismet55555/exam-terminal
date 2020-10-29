@@ -3,14 +3,17 @@
 Don't need pip, virtualenv, venv, or requirements.txt anymore!
 
 Installation:
-  - `pip install pipenv` (or `sudo apt install pipenv`)
+
+- `pip install pipenv` (or `sudo apt install pipenv`)
 
 ## Basics
 
 - Change directory into project directory
 
 - Create pipenv and install packages from Pipfile
+
   - `pipenv install [OPTIONS] [PROJECT DIRECTORY]`
+
   - Options:
     - Don't try to lock: `--ignore-pipfile`
     - Actively editable env: `-e`
@@ -25,28 +28,32 @@ Installation:
 
 - Installing additional packages
   - `pipenv install <PACKAGE NAME>`
-  
 - Activate the created pipenv virtual environment
+
   - `pipenv shell`
 
 - Locking the current pipenv dependencies and package versions
+
   - `pipeenv lock`
   - **NOTE**: If `Pipfile` changes, this will happen automatically
 
 - Upgrade packages
+
   - `pipenv update <PACKAGE NAME>`
 
 - Uninstall the development packages
+
   - Specific package: `pipenv uninstall <PACKAGE NAME>`
   - All development packages: `pipenv uninstall --all-dev`
 
 - Deactivating a active pipenv (reverse `pipenv shell`)
+
   - Linux: `exit` or `CTRL+D`
   - Windows: `exit`
 
 - Removing the pyenv virtual environment
-  - `pipenv --rm`
 
+  - `pipenv --rm`
 
 - Other useful things:
   - Run single command in the created pipenv
