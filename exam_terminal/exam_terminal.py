@@ -27,7 +27,7 @@ def exam_terminal(exam_filepath) -> int:
         # Create the exam object and loading the exam file
         exam = ExamTerminal.ExamTerminal(exam_filepath=exam_filepath)
 
-        # Show the intro 
+        # Show the intro
         main_menu_selection = exam.show_menu()
 
         if main_menu_selection[0] == 'begin':

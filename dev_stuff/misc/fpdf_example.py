@@ -1,5 +1,3 @@
-
-
 # class PDF(FPDF):
     # def header(self):
     #     # Select Arial bold 15
@@ -14,7 +12,7 @@
     # def footer(self):
     #     self.set_y(-15)
     #     self.set_font('Arial', 'I', 8)
-    #     pdf.set_text_color(*[0]*3) 
+    #     pdf.set_text_color(*[0]*3)
     #     self.cell(0, 10, 'Page ' + str(self.page_no()) + '/{nb}', 0, 0, 'C')
 
 from fpdf import FPDF
@@ -51,7 +49,7 @@ pdf.line(200, 10, 200, 277)
 # Title
 pdf.set_font('Arial', 'B', 12)  # Italics I, underline U
 color = [0, 0, 0]
-pdf.set_text_color(*color) 
+pdf.set_text_color(*color)
 pdf.cell(w=page_x_area, h=20, txt='Exam Results', border=1, align='C')
 
 # Stats
