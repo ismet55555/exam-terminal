@@ -30,6 +30,10 @@
 <a href="https://travis-ci.com/github/ismet55555/exam-terminal">
   <img alt="Build Status" src="https://img.shields.io/travis/com/ismet55555/exam-terminal/master">
 </a>
+
+<a href="https://www.codacy.com/gh/ismet55555/exam-terminal/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ismet55555/exam-terminal&amp;utm_campaign=Badge_Grade">
+  <img src="https://app.codacy.com/project/badge/Grade/dc108e18f27b4b86a9f6304745e6869c"/>
+</a>
 </p>
 
 
