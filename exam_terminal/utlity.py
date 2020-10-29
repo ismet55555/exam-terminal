@@ -84,7 +84,7 @@ def load_keys() -> dict:
 
 def load_software_name_version() -> str:
     software_name = "exam-terminal"
-    software_version = "0.0.20"  # Updated with bumpversion
+    software_version = "0.1.0"  # Updated with bumpversion
     return software_name + ' v' + software_version
 
 
