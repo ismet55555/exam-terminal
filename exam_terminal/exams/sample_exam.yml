@@ -15,9 +15,9 @@ questions:
     question_time: 10
     selection:
       - "Kebap"
-      - "Salad"
+      - "Salad": true
       - "Nutella": true
-      - "Chair"
+      - "Chair": true
       - "Now I feel hungry ..."
 
   - question: What is your favorite dinasour?
@@ -35,7 +35,7 @@ questions:
     selection:
       - "Because the road was too long to walk around it": true
       - "To get away from the KFC"
-      - "To find itself in this crazy world"
+      - "To find itself in this crazy world": true
       - "To practice for the Most Extreme Elimination Challenge"
 
   - question: "A blue train filled with Amazon packages leaves Cairo at 3:00 am, averaging 30 mph.

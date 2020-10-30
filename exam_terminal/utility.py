@@ -205,4 +205,3 @@ def draw_vertical_seperator(scr, x:int, color:list) -> None:
         None
     """
     # TODO: Currently unused but may come in handy
-    pass
