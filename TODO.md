@@ -3,11 +3,9 @@
 ## General
 
   - README.md
-  - Python DocStrings
+    - Record terminalizer demo video
   - Simple database? or just a file?
-  - Animations on switch screen? Side fille, bottom fill?
   - Run out of a Docker image (make the Dockerfile)
-  - See example https://github.com/PyCQA/redbaron for flairs and tests
 
 ## Code Structure
 
@@ -15,7 +13,7 @@
 
 ## Main Menu
 
-  - Add a About, Settings, Help Options (Horizontal? Two Lines?)
+  - Add a About, Settings, Help, Options
   - Options menu
     - Immediate result feedback
     - Show Time
@@ -48,7 +46,8 @@
 
 ## Exam
 
-  - Open response input
+  - Immediate question-by-question based feedback
+  - Time constraint for each question
 
 ## Pause/Resume Exam
 
@@ -67,8 +66,6 @@
 
 ## Python Package Packaging
 
-  - Include sample exams with https://packaging.python.org/guides/using-manifest-in/
-    - package_data or data_files
   - `bumpversion` with automatic bump at push
 
 ## Testing and Continues Integration
@@ -81,7 +78,7 @@
     - Figure out windows and osx tests jobs
     - Code linting and formatting check
     - Omit travis testing when changes to .md files were made
-  - Add pep8, black, isort, tests
+  - Add tests
 
 ## Random
 
@@ -89,4 +86,4 @@
 
 # Bugs
 
-  'm sure there are some lurking in the dark ...
+  - I'm sure there are some lurking in the dark ...

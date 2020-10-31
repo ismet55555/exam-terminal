@@ -292,7 +292,6 @@ class ExamTerminal:
             menu option (str)  : Selection menu option user selected (ie. quit)
             successfull (bool) : True if no error, else False
         """
-
         # Setting up basic stuff for curses and load keys
         self.__basic_screen_setup(scr, halfdelay=False)
         KEYS = utility.load_keys()
@@ -438,7 +437,6 @@ class ExamTerminal:
             menu option (str)  : Selection menu option user selected (ie. quit)
             successfull (bool) : True if no error, else False
         """
-
         return curses.wrapper(self.draw_menu)
 
     ###############################################################################################
@@ -470,6 +468,15 @@ class ExamTerminal:
         logger.debug('Exam timer thread ended')
 
     def draw_question(self, scr, question:dict) -> Tuple[str, bool]:
+        """
+        Draw a the current quesition on the screen
+
+        Parameters:
+            question (dict) : The current question information being presented
+        Returns: 
+            menu option (str)  : Selection menu option user selected (ie. quit)
+            successfull (bool) : True if no error, else False
+        """
         # Setting up basic stuff for curses and load keys
         self.__basic_screen_setup(scr, halfdelay=True)
         KEYS = utility.load_keys()
@@ -665,11 +672,28 @@ class ExamTerminal:
             k = scr.getch()
 
     def show_question(self, question:dict) -> Tuple[str, bool]:
+        """
+        Curses wrapper function for drawing single question on screen
+
+        Parameters:
+            question (dict) : The current question information being presented
+        Returns: 
+            menu option (str)  : Selection menu option user selected (ie. quit)
+            successfull (bool) : True if no error, else False
+        """
         return curses.wrapper(self.draw_question, question)
 
     ###############################################################################################
 
     def __evaluate_exam(self) -> None:
+        """
+        Evaluate the exam results
+
+        Parameters:
+            None
+        Returns: 
+            None
+        """
         logger.debug('Evaluating exam results ...')
         questions_count = len(self.exam_contents['questions'])
 
@@ -685,6 +709,14 @@ class ExamTerminal:
             self.exam_contents['exam']['evaluation_bool'] = False
 
     def __assemble_exam_results(self) -> dict:
+        """
+        Evaluate the exam results for presentation
+
+        Parameters:
+            None
+        Returns: 
+            results (dict) : Combined and formatted exam results for presentation
+        """
         results = {}
         index = 0
 
@@ -838,6 +870,15 @@ class ExamTerminal:
         return results
 
     def draw_result(self, scr) -> Tuple[str, bool]:
+        """
+        Draw a results on the screen
+
+        Parameters:
+            None
+        Returns: 
+            menu option (str)  : Selection menu option user selected (ie. quit)
+            successfull (bool) : True if no error, else False
+        """
         # Setting up basic stuff for curses and load keys
         self.__basic_screen_setup(scr, halfdelay=False)
         KEYS = utility.load_keys()
@@ -951,9 +992,26 @@ class ExamTerminal:
             k = scr.getch()
 
     def show_result(self) -> Tuple[str, bool]:
+        """
+        Curses wrapper function for drawing the results on screen
+
+        Parameters:
+            None
+        Returns: 
+            menu option (str)  : Selection menu option user selected (ie. quit)
+            successfull (bool) : True if no error, else False
+        """
         return curses.wrapper(self.draw_result)
 
     def export_results_to_pdf(self) -> bool:
+        """
+        Export all results to a PDF document.
+
+        Parameters:
+            None
+        Returns: 
+            success (bool) : True if successfull, else False 
+        """
         page_width = 210
         page_height = 297
 
@@ -1048,6 +1106,14 @@ class ExamTerminal:
     ###############################################################################################
 
     def begin_exam(self) -> None:
+        """
+        Beginning of an exam. Looping through all specified questions
+
+        Parameters:
+            None
+        Returns: 
+            None
+        """
         logger.debug('Beginning Exam ...')
         self.exam_begin_time = time()
 

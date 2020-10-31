@@ -7,10 +7,20 @@ logger = logging.getLogger()
 
 
 def load_curses_colors_decor() -> Tuple[dict, dict]:
-    # In code usage example:
-    #       scr.addstr(y, x, "hello", self.color['blue'])
-    #       scr.addstr(y, x, "hello", self.color['blue'] | self.decor['bold'])
+    """
+    Load curses colors and decorations and load them in a usable
+    dictionary for reference.
 
+    Usage: self.colors("green")
+           self.decor("blink")
+           scr.addstr(y, x, "hello", self.color['blue'] | self.decor['bold'])
+
+    Parameters:
+        None
+    Returns: 
+        color (dict): Curses color references
+        decor (dict): Curses decoration/style references
+    """
     # Start colors in curses
     curses.start_color()
 
@@ -68,6 +78,16 @@ def load_curses_colors_decor() -> Tuple[dict, dict]:
 
 
 def load_keys() -> dict:
+    """
+    Load all keyboard keys available to user in program
+
+    Usage: KEYS['DOWN']
+
+    Parameters:
+        None
+    Returns: 
+        KEYS (dict): Dictionary of references to curses keys
+    """
     KEYS = {
         "ENTER":  (curses.KEY_ENTER, ord('\n'), ord('\r')),
         "SPACE":  (32, ord(' ')),
@@ -83,23 +103,59 @@ def load_keys() -> dict:
 
 
 def load_software_name_version() -> str:
+    """
+    Load the software name and version.
+    The version number is updated by bumpversion
+
+    Parameters:
+        None
+    Returns: 
+        (str): Software name and version
+    """
     software_name = "exam-terminal"
     software_version = "0.1.1"  # Updated with bumpversion
     return software_name + ' v' + software_version
 
 
 def center_x(display_width:int, line:str) -> int:
+    """
+    Find the horizontal center position of the given text line
+
+    Parameters:
+        display_width (int) : The character width of the screen/space/display
+        line (int)          : Line of text
+    Returns: 
+        (int): Horizontal character number
+    """
     return display_width // 2 - len(line) // 2
 
 
 def center_y(display_height:int) -> int:
+    """
+    Find the vertical center position of given screen/space/display
+
+    Parameters:
+        display_width (int) : The character height of the screen/space/display
+    Returns: 
+        (int): Vertical character number
+    """
     return display_height // 2
 
 
-def truncate_text(text:str, length:int) -> str:
+def truncate_text(text:str, length_limit:int) -> str:
+    """
+    Truncating/shortening of text given a length limit.
+    Will add "..." to truncated text.
+
+    Parameters:
+        text (str)         : The character height of the screen/space/display
+        length_limit (int) : Length limit of the text
+    Returns: 
+        truncated_text (str): The truncated line of text
+    """
     truncated_text = text
-    if len(text) >= length - 3:
-        truncated_text = text[0:length - 3] + '...'
+    if len(text) >= length_limit - 3:
+        truncated_text = text[0:length_limit - 3] + '...'
 
     return truncated_text
 
