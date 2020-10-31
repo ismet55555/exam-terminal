@@ -12,8 +12,9 @@ from exam_terminal import exam_terminal
 # Creating a message logger, all dependent scripts will inhearent this logger
 logging.basicConfig(format='[%(asctime)s][%(levelname)-8s] [%(filename)-30s:%(lineno)4s] %(message)s', datefmt='%m/%d-%H:%M:%S')
 logger = logging.getLogger()
-logger.addHandler(logging.FileHandler(__file__ + ".log"))
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)  # <--- Manually change debug level here
+if logger.level == logging.DEBUG:
+    logger.addHandler(logging.FileHandler("exam-terminal.log"))
 
 
 @click.command(context_settings={"ignore_unknown_options": True})

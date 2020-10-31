@@ -95,8 +95,6 @@ class ExamTerminal:
         self.exam_allowed_time = self.exam_contents['exam']['exam_allowed_time']
         self.exam_allowed_time_units = self.exam_contents['exam']['exam_allowed_time_units']
 
-        # TODO: Calculate exam time in seconds? minutes?
-
         logger.debug(f"Parsing the loaded exam file. Loading {len(self.exam_contents['questions'])} questions ...")
         # Loop through all the questions
         for index, question in enumerate(self.exam_contents['questions']):
@@ -476,11 +474,14 @@ class ExamTerminal:
         self.__basic_screen_setup(scr, halfdelay=True)
         KEYS = utility.load_keys()
 
+        # Layout variables
         start_y = 3
         question_x = 4
         selection_x = 6
+
+        # Selection / Answer Variables
         self.selection_index = 0
-        selection_indexes = []
+        question['answered_indexes'] = []
         question['answered_correct_bool'] = [False] * len(question['question_answer_bool'])
 
         # User key input (ASCII)
@@ -507,26 +508,25 @@ class ExamTerminal:
                     return 'quit', False
 
                 elif not self.exam_paused:
-
-                    # FIXME: The indexing is off form the bool lists
-
-                    # Check if the number of answers selected matches multiselect answers
-                    if len(selection_indexes) < question['question_min_selection_count']:
-                        # Select
+                    if self.selection_index not in question['answered_indexes']:
                         # Store the selection index
-                        selection_indexes.append(self.selection_index)
-                        question['answered_indexes'] = selection_indexes
-                        for index, s in enumerate(selection_indexes):
-                            question['answered_correct_bool'][index] = question['question_answer_bool'][s]
-                        
+                        question['answered_indexes'].append(self.selection_index)
+
                         # Determine correct or not correct
-                        correct = question['question_answer_bool'] == question['answered_correct_bool']
+                        question['answered_correct_bool'][self.selection_index] = question['question_answer_bool'][self.selection_index] != question['answered_correct_bool'][self.selection_index]
+                        correct_all = question['question_answer_bool'] == question['answered_correct_bool']
+
                         answer = question['selection'][self.selection_index]
-                        logger.debug(f"Selected indexes: {selection_indexes}")
+
+                        logger.debug(f"Selected indexes: {question['answered_indexes']}")
+                        logger.debug(f"Selection answer bools: {question['answered_correct_bool']}")
+
+                        if len(question['answered_indexes']) >= question['question_min_selection_count']:
+                            # Return the entered selections
+                            logging.debug('---- SELECTION ENTERED -----')
+                            return answer, correct_all
                     else:
-                        logging.debug('---- SELECTION ENTERED -----')
-                        # Return the entered answer
-                        return answer, correct
+                        logger.debug(f"Selection index {self.selection_index} already selected")
 
             elif k in KEYS['PAUSE']:
                 self.exam_paused = True
@@ -594,6 +594,11 @@ class ExamTerminal:
                         scr.addstr(start_y + selection_offset + l - 1, selection_x - 2, self.selection_indicator, self.color['default'] | self.decor['bold'])
                     else:
                         color = self.color['grey-light']
+
+                    # Style already selected indexes (for multi-select)
+                    if question['question_multiselect']:
+                        if s in question['answered_indexes']:
+                            color = self.color['black-white']
 
                     scr.addstr(start_y + selection_offset + l - 1, selection_x + 2, line, color)
 
