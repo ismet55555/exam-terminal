@@ -508,25 +508,26 @@ class ExamTerminal:
                     return 'quit', False
 
                 elif not self.exam_paused:
+                    correct_all = False
+                    answer = ''
+                    # Store or remove selection index
                     if self.selection_index not in question['answered_indexes']:
-                        # Store the selection index
                         question['answered_indexes'].append(self.selection_index)
-
-                        # Determine correct or not correct
-                        question['answered_correct_bool'][self.selection_index] = question['question_answer_bool'][self.selection_index] != question['answered_correct_bool'][self.selection_index]
-                        correct_all = question['question_answer_bool'] == question['answered_correct_bool']
-
-                        answer = question['selection'][self.selection_index]
-
-                        logger.debug(f"Selected indexes: {question['answered_indexes']}")
-                        logger.debug(f"Selection answer bools: {question['answered_correct_bool']}")
-
-                        if len(question['answered_indexes']) >= question['question_min_selection_count']:
-                            # Return the entered selections
-                            logging.debug('---- SELECTION ENTERED -----')
-                            return answer, correct_all
                     else:
-                        logger.debug(f"Selection index {self.selection_index} already selected")
+                        index_to_remove = question['answered_indexes'].index(self.selection_index)
+                        question['answered_indexes'].pop(index_to_remove)
+                    logger.debug(f"Selected selection indexes: {question['answered_indexes']}")
+
+                    # Determine correct or not correct
+                    question['answered_correct_bool'][self.selection_index] = question['question_answer_bool'][self.selection_index] != question['answered_correct_bool'][self.selection_index]
+                    correct_all = question['question_answer_bool'] == question['answered_correct_bool']
+
+                    answer = question['selection'][self.selection_index]
+
+                    # Return the entered selections if all selections have been made
+                    if len(question['answered_indexes']) >= question['question_min_selection_count']:
+                        logging.debug('- Selection entered -')
+                        return answer, correct_all
 
             elif k in KEYS['PAUSE']:
                 self.exam_paused = True
@@ -613,7 +614,7 @@ class ExamTerminal:
 
             # Progress bar and status - call method
             progress_bar = utility.get_progress_bar(exam_progress=self.questions_progress, bar_char_width=term_width - 23)
-            scr.addstr(term_height - 3, 3, f"[ {self.questions_complete:3.0f}  / {self.questions_total:3.0f}  ][{progress_bar}]", self.color['default'])
+            scr.addstr(term_height - 3, 3, f"[ {self.questions_complete + 1:3.0f}  / {self.questions_total:3.0f}  ][{progress_bar}]", self.color['default'])
 
             # Elapsed Time
             examp_elapsed_dec = self.exam_elapsed_time / self.exam_contents['exam']['exam_allowed_time']
@@ -1058,6 +1059,8 @@ class ExamTerminal:
 
         # Looping over all listed questions
         for q, question in enumerate(self.exam_contents['questions']):
+            logging.debug(f'Showing question number {q + 1}')
+
             # Start timer for current question
             question_elapsed_time = time()
             self.exam_contents['questions'][q]['question_presented_timestamp'] = question_elapsed_time
@@ -1109,8 +1112,9 @@ class ExamTerminal:
         self.is_timer_timing = False
         exam_timer_thread.join()
 
-        from pprint import pprint
-        pprint(self.exam_contents)
-
         # Evaluate the exam
         self.__evaluate_exam()
+
+        if logger.level == logging.DEBUG:
+            from pprint import pprint
+            pprint(self.exam_contents)

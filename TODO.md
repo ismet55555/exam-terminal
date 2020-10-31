@@ -48,7 +48,7 @@
 
 ## Exam
 
-  - Multiple choice, Multiple answer
+  - Open response input
 
 ## Pause/Resume Exam
 
