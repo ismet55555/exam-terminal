@@ -12,7 +12,9 @@ from exam_terminal import exam_terminal
 # Creating a message logger, all dependent scripts will inhearent this logger
 logging.basicConfig(format='[%(asctime)s][%(levelname)-8s] [%(filename)-30s:%(lineno)4s] %(message)s', datefmt='%m/%d-%H:%M:%S')
 logger = logging.getLogger()
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.INFO)  # <--- Manually change debug level here
+if logger.level == logging.DEBUG:
+    logger.addHandler(logging.FileHandler("exam-terminal.log"))
 
 
 @click.command(context_settings={"ignore_unknown_options": True})
@@ -56,7 +58,6 @@ def main(sample, examfile) -> None:
     if sample and not examfile:
         # If local does not exist, try site-package
         exam_filepath = os.path.abspath(os.path.join("exam_terminal", "exams", "sample_exam.yml"))
-        print(exam_filepath)
         if not os.path.exists(exam_filepath):
             logger.debug(f'Failed to find {exam_filepath}, trying python site-package directory ...')
             site_package_dir = sysconfig.get_paths()["purelib"]

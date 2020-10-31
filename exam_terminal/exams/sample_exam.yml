@@ -2,7 +2,7 @@
 exam:
   exam_title: "Welcome. This is a Sample Exam Just To Show Things Off"
   exam_description: This is a sample description for this sample "exam".
-                    Remember, this can be a practice exam, a exam protored by a teacher, a survey, or whatever you want.
+                    Remember, this can be a practice exam, a exam proctored by a teacher, a survey, or whatever you want.
                     What it can not be is dragon, that would be hard to program, or feed, or keep, or install, just a mess ...
   exam_author: "Ismet Handzic"
   exam_edit_date: "10/26/2020"
@@ -15,12 +15,12 @@ questions:
     question_time: 10
     selection:
       - "Kebap"
-      - "Salad"
+      - "Salad": true
       - "Nutella": true
-      - "Chair"
+      - "Chair": true
       - "Now I feel hungry ..."
 
-  - question: What is your favorite dinasour?
+  - question: What is your favorite dinosaur?
     question_time: 30
     selection:
       - "Tyrannosaurus Rex"
@@ -35,7 +35,7 @@ questions:
     selection:
       - "Because the road was too long to walk around it": true
       - "To get away from the KFC"
-      - "To find itself in this crazy world"
+      - "To find itself in this crazy world": true
       - "To practice for the Most Extreme Elimination Challenge"
 
   - question: "A blue train filled with Amazon packages leaves Cairo at 3:00 am, averaging 30 mph.

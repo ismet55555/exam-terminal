@@ -14,7 +14,7 @@ from typing import Dict, Tuple
 import yaml
 from fpdf import FPDF
 
-from exam_terminal import utlity
+from exam_terminal import utility
 
 logger = logging.getLogger()
 
@@ -95,8 +95,6 @@ class ExamTerminal:
         self.exam_allowed_time = self.exam_contents['exam']['exam_allowed_time']
         self.exam_allowed_time_units = self.exam_contents['exam']['exam_allowed_time_units']
 
-        # TODO: Calculate exam time in seconds? minutes?
-
         logger.debug(f"Parsing the loaded exam file. Loading {len(self.exam_contents['questions'])} questions ...")
         # Loop through all the questions
         for index, question in enumerate(self.exam_contents['questions']):
@@ -159,7 +157,7 @@ class ExamTerminal:
         curses.curs_set(0)
 
         # Load curses colors
-        self.color, self.decor = utlity.load_curses_colors_decor()
+        self.color, self.decor = utility.load_curses_colors_decor()
 
         # Turn off echo
         curses.noecho()
@@ -190,7 +188,7 @@ class ExamTerminal:
             scr.addstr(1, 1, f"[Terminal Size: W:{term_width}, H:{term_height}]", self.color['grey-light'])
 
         k = 0
-        KEYS = utlity.load_keys()
+        KEYS = utility.load_keys()
         while not self.terminal_size_good:
             if k in KEYS['QUIT']:
                 self.exam_exit = True
@@ -211,7 +209,7 @@ class ExamTerminal:
                 ''
                 'To quit program press "Q" or "ESC"'
                 ]
-            # utlity.draw_message_box(scr, message_lines)
+            # utility.draw_message_box(scr, message_lines)
             for y, line in enumerate(message_lines):
                 scr.addstr(1 + y, 1, line, self.decor['bold'])
 
@@ -268,7 +266,7 @@ class ExamTerminal:
         term_height, term_width = scr.getmaxyx()
 
         # Getting the message box size and position and creating the message box
-        height, width, y, x = utlity.get_message_box_size(term_height, term_width, message_lines)
+        height, width, y, x = utility.get_message_box_size(term_height, term_width, message_lines)
         message_box = curses.newwin(height, width, y, x)
         message_box.box()
         message_box.border()
@@ -294,10 +292,9 @@ class ExamTerminal:
             menu option (str)  : Selection menu option user selected (ie. quit)
             successfull (bool) : True if no error, else False
         """
-
         # Setting up basic stuff for curses and load keys
         self.__basic_screen_setup(scr, halfdelay=False)
-        KEYS = utlity.load_keys()
+        KEYS = utility.load_keys()
 
         # User key input (ASCII)
         k = 0
@@ -342,10 +339,10 @@ class ExamTerminal:
             self.__check_terminal_size(scr)
 
             # Drawing the screen border
-            utlity.draw_screen_border(scr, self.color['grey-dark'])
+            utility.draw_screen_border(scr, self.color['grey-dark'])
 
             # Show software name/title
-            scr.addstr(term_height - 2, 2, utlity.load_software_name_version(), self.color['grey-dark'])
+            scr.addstr(term_height - 2, 2, utility.load_software_name_version(), self.color['grey-dark'])
 
             ########################################################################################
 
@@ -355,15 +352,15 @@ class ExamTerminal:
             start_x = [5, 22]
 
             line = f"{self.exam_contents['exam']['exam_title']}"
-            scr.addstr(start_y, utlity.center_x(term_width, line), line, self.decor['bold'])
+            scr.addstr(start_y, utility.center_x(term_width, line), line, self.decor['bold'])
             start_y += 1
 
             line = f"{self.exam_contents['exam']['exam_author']}"
-            scr.addstr(start_y, utlity.center_x(term_width, line), line, self.color['grey-light'])
+            scr.addstr(start_y, utility.center_x(term_width, line), line, self.color['grey-light'])
             start_y += 1
 
             line = f"{self.exam_contents['exam']['exam_edit_date']}"
-            scr.addstr(start_y, utlity.center_x(term_width, line), line, self.color['grey-light'])
+            scr.addstr(start_y, utility.center_x(term_width, line), line, self.color['grey-light'])
             start_y += 3
 
 
@@ -399,7 +396,7 @@ class ExamTerminal:
             ########################################################################################
 
             selections = ["Begin Exam", "Quit"]
-            utlity.draw_horizontal_seperator(scr, term_height - len(selections) - 4, self.color['grey-dark'])
+            utility.draw_horizontal_seperator(scr, term_height - len(selections) - 4, self.color['grey-dark'])
             start_y = term_height - len(selections) - 7
             self.__draw_selection_menu(scr, selections, start_y)
 
@@ -440,7 +437,6 @@ class ExamTerminal:
             menu option (str)  : Selection menu option user selected (ie. quit)
             successfull (bool) : True if no error, else False
         """
-
         return curses.wrapper(self.draw_menu)
 
     ###############################################################################################
@@ -472,14 +468,28 @@ class ExamTerminal:
         logger.debug('Exam timer thread ended')
 
     def draw_question(self, scr, question:dict) -> Tuple[str, bool]:
+        """
+        Draw a the current quesition on the screen
+
+        Parameters:
+            question (dict) : The current question information being presented
+        Returns: 
+            menu option (str)  : Selection menu option user selected (ie. quit)
+            successfull (bool) : True if no error, else False
+        """
         # Setting up basic stuff for curses and load keys
         self.__basic_screen_setup(scr, halfdelay=True)
-        KEYS = utlity.load_keys()
+        KEYS = utility.load_keys()
 
+        # Layout variables
         start_y = 3
         question_x = 4
         selection_x = 6
+
+        # Selection / Answer Variables
         self.selection_index = 0
+        question['answered_indexes'] = []
+        question['answered_correct_bool'] = [False] * len(question['question_answer_bool'])
 
         # User key input (ASCII)
         k = 0
@@ -500,16 +510,31 @@ class ExamTerminal:
                 if not self.exam_paused and not self.is_exam_time_out:
                     self.selection_index -= 1
 
-            elif k in KEYS['ENTER']:
+            elif k in KEYS['ENTER']:                
                 if self.is_exam_time_out:
                     return 'quit', False
 
                 elif not self.exam_paused:
-                    correct = question['question_answer_bool'][self.selection_index]
+                    correct_all = False
+                    answer = ''
+                    # Store or remove selection index
+                    if self.selection_index not in question['answered_indexes']:
+                        question['answered_indexes'].append(self.selection_index)
+                    else:
+                        index_to_remove = question['answered_indexes'].index(self.selection_index)
+                        question['answered_indexes'].pop(index_to_remove)
+                    logger.debug(f"Selected selection indexes: {question['answered_indexes']}")
+
+                    # Determine correct or not correct
+                    question['answered_correct_bool'][self.selection_index] = question['question_answer_bool'][self.selection_index] != question['answered_correct_bool'][self.selection_index]
+                    correct_all = question['question_answer_bool'] == question['answered_correct_bool']
+
                     answer = question['selection'][self.selection_index]
 
-                    # Return the entered answer
-                    return answer, correct
+                    # Return the entered selections if all selections have been made
+                    if len(question['answered_indexes']) >= question['question_min_selection_count']:
+                        logging.debug('- Selection entered -')
+                        return answer, correct_all
 
             elif k in KEYS['PAUSE']:
                 self.exam_paused = True
@@ -529,7 +554,7 @@ class ExamTerminal:
             self.__check_terminal_size(scr)
 
             # Drawing the screen border
-            utlity.draw_screen_border(scr, self.color['grey-dark'])
+            utility.draw_screen_border(scr, self.color['grey-dark'])
             
             ########################################################################################
 
@@ -549,10 +574,21 @@ class ExamTerminal:
             for l, line in enumerate(question_wrap):
                 scr.addstr(start_y + l - 1, question_x, line, self.color['default'] | self.decor['bold'])
 
-            utlity.draw_horizontal_seperator(scr, len(question_wrap) + 3, self.color['grey-dark'])
+            # Message of number of selections to pick
+            if question['question_multiselect']:
+                multiselect_msg = f"(Multiple Answers, Pick {question['question_min_selection_count']})"
+                color = self.color['grey-light']
+                multiselect_offset = 1
+                scr.addstr(start_y + l, question_x, multiselect_msg, color)
+            else:
+                multiselect_msg = f"(Pick {question['question_min_selection_count']})"
+                color = self.color['grey-dark']
+                multiselect_offset = 0
+
+            utility.draw_horizontal_seperator(scr, len(question_wrap) + 3 + multiselect_offset, self.color['grey-dark'])
 
             # Set the offset to the next line
-            selection_offset = len(question_wrap) + 3
+            selection_offset = len(question_wrap) + 3 + multiselect_offset
 
             # Wrap and show selection
             for s, selection in enumerate(question['selection']):
@@ -562,15 +598,15 @@ class ExamTerminal:
                     # Style selection and draw selector
                     if s == self.selection_index:
                         color = self.color['default'] | self.decor['bold']
-
-                        # Get the x position of selection indicator
-                        # longest_selection_text = len(max(question['selection'], key = len))
-
-                        # Draw the indicators
+                        # Draw the selection indicator
                         scr.addstr(start_y + selection_offset + l - 1, selection_x - 2, self.selection_indicator, self.color['default'] | self.decor['bold'])
-                        # scr.addstr(start_y + selection_offset + l - 1, selection_x + longest_selection_text + 4, self.selection_indicator, color)
                     else:
                         color = self.color['grey-light']
+
+                    # Style already selected indexes (for multi-select)
+                    if question['question_multiselect']:
+                        if s in question['answered_indexes']:
+                            color = self.color['black-white']
 
                     scr.addstr(start_y + selection_offset + l - 1, selection_x + 2, line, color)
 
@@ -584,8 +620,8 @@ class ExamTerminal:
             term_height, term_width = scr.getmaxyx()
 
             # Progress bar and status - call method
-            progress_bar = utlity.get_progress_bar(exam_progress=self.questions_progress, bar_char_width=term_width - 23)
-            scr.addstr(term_height - 3, 3, f"[ {self.questions_complete:3.0f}  / {self.questions_total:3.0f}  ][{progress_bar}]", self.color['default'])
+            progress_bar = utility.get_progress_bar(exam_progress=self.questions_progress, bar_char_width=term_width - 23)
+            scr.addstr(term_height - 3, 3, f"[ {self.questions_complete + 1:3.0f}  / {self.questions_total:3.0f}  ][{progress_bar}]", self.color['default'])
 
             # Elapsed Time
             examp_elapsed_dec = self.exam_elapsed_time / self.exam_contents['exam']['exam_allowed_time']
@@ -594,7 +630,7 @@ class ExamTerminal:
                 color = self.color['orange']
             if examp_elapsed_dec > 0.92:
                 color = self.color['red'] | self.decor['bold']
-            progress_bar = utlity.get_progress_bar(exam_progress=examp_elapsed_dec, bar_char_width=term_width - 23)
+            progress_bar = utility.get_progress_bar(exam_progress=examp_elapsed_dec, bar_char_width=term_width - 23)
             scr.addstr(term_height - 2, 3, f"[ {self.exam_elapsed_time:3.0f}s / {self.exam_allowed_time:3.0f}s ][{progress_bar}]", color)
 
             ########################################################################################
@@ -636,11 +672,28 @@ class ExamTerminal:
             k = scr.getch()
 
     def show_question(self, question:dict) -> Tuple[str, bool]:
+        """
+        Curses wrapper function for drawing single question on screen
+
+        Parameters:
+            question (dict) : The current question information being presented
+        Returns: 
+            menu option (str)  : Selection menu option user selected (ie. quit)
+            successfull (bool) : True if no error, else False
+        """
         return curses.wrapper(self.draw_question, question)
 
     ###############################################################################################
 
     def __evaluate_exam(self) -> None:
+        """
+        Evaluate the exam results
+
+        Parameters:
+            None
+        Returns: 
+            None
+        """
         logger.debug('Evaluating exam results ...')
         questions_count = len(self.exam_contents['questions'])
 
@@ -656,6 +709,14 @@ class ExamTerminal:
             self.exam_contents['exam']['evaluation_bool'] = False
 
     def __assemble_exam_results(self) -> dict:
+        """
+        Evaluate the exam results for presentation
+
+        Parameters:
+            None
+        Returns: 
+            results (dict) : Combined and formatted exam results for presentation
+        """
         results = {}
         index = 0
 
@@ -809,9 +870,18 @@ class ExamTerminal:
         return results
 
     def draw_result(self, scr) -> Tuple[str, bool]:
+        """
+        Draw a results on the screen
+
+        Parameters:
+            None
+        Returns: 
+            menu option (str)  : Selection menu option user selected (ie. quit)
+            successfull (bool) : True if no error, else False
+        """
         # Setting up basic stuff for curses and load keys
         self.__basic_screen_setup(scr, halfdelay=False)
-        KEYS = utlity.load_keys()
+        KEYS = utility.load_keys()
 
         self.selection_index = 0
 
@@ -861,10 +931,10 @@ class ExamTerminal:
             self.__check_terminal_size(scr)
 
             # Drawing the screen border
-            utlity.draw_screen_border(scr, self.color['grey-dark'])
+            utility.draw_screen_border(scr, self.color['grey-dark'])
 
             # Show software name/title
-            scr.addstr(term_height - 2, 2, utlity.load_software_name_version(), self.color['grey-dark'])
+            scr.addstr(term_height - 2, 2, utility.load_software_name_version(), self.color['grey-dark'])
 
             ########################################################################################
 
@@ -872,10 +942,10 @@ class ExamTerminal:
 
             # Heading
             line = f"Exam Result Summary"
-            scr.addstr(start_y, utlity.center_x(term_width, line), line, self.decor['bold'])
+            scr.addstr(start_y, utility.center_x(term_width, line), line, self.decor['bold'])
             start_y += 2
 
-            utlity.draw_horizontal_seperator(scr, start_y, self.color['grey-dark'])
+            utility.draw_horizontal_seperator(scr, start_y, self.color['grey-dark'])
             start_y += 2
 
             # Draw items
@@ -883,13 +953,13 @@ class ExamTerminal:
             results = self.__assemble_exam_results()
             for _, item in results.items():
                 scr.addstr(start_y , start_x[0], item['label'], self.color['default'])
-                scr.addstr(start_y , start_x[1], utlity.truncate_text(item['text'], term_width - 32), self.color[item['color']] | self.decor[item['decor']])
+                scr.addstr(start_y , start_x[1], utility.truncate_text(item['text'], term_width - 32), self.color[item['color']] | self.decor[item['decor']])
                 start_y += item['skip_lines']
 
             ########################################################################################
 
             selections = ["Save Result PDF and Quit", "Main Menu", "Quit"]  # TODO: "Review Question"
-            utlity.draw_horizontal_seperator(scr, term_height - len(selections) - 4, self.color['grey-dark'])
+            utility.draw_horizontal_seperator(scr, term_height - len(selections) - 4, self.color['grey-dark'])
             start_y = term_height - len(selections) - 7
             self.__draw_selection_menu(scr, selections, start_y)
 
@@ -922,9 +992,26 @@ class ExamTerminal:
             k = scr.getch()
 
     def show_result(self) -> Tuple[str, bool]:
+        """
+        Curses wrapper function for drawing the results on screen
+
+        Parameters:
+            None
+        Returns: 
+            menu option (str)  : Selection menu option user selected (ie. quit)
+            successfull (bool) : True if no error, else False
+        """
         return curses.wrapper(self.draw_result)
 
     def export_results_to_pdf(self) -> bool:
+        """
+        Export all results to a PDF document.
+
+        Parameters:
+            None
+        Returns: 
+            success (bool) : True if successfull, else False 
+        """
         page_width = 210
         page_height = 297
 
@@ -985,7 +1072,7 @@ class ExamTerminal:
             else:
                 pdf.set_font('Helvetica', '', 11)
             pdf.set_xy(x=start_x[1], y=start_y)
-            pdf.cell(w=60, h=line_height, txt=utlity.truncate_text(item['text'], self.width_limit - 25), border=0, align='L')
+            pdf.cell(w=60, h=line_height, txt=utility.truncate_text(item['text'], self.width_limit - 25), border=0, align='L')
             
             start_y += item['skip_lines'] * 8
 
@@ -999,7 +1086,7 @@ class ExamTerminal:
         pdf.set_text_color(*[100, 100, 100])
         pdf.set_font('Helvetica', 'I', 8)
         pdf.set_xy(x=page_left_margin + 3, y=page_height - page_bottom_margin - 8)
-        pdf.cell(w=0, h=5, txt=f"Created with {utlity.load_software_name_version()}", border=0, align='L')
+        pdf.cell(w=0, h=5, txt=f"Created with {utility.load_software_name_version()}", border=0, align='L')
 
         # Export the pdf to file
         datetime_text = datetime.fromtimestamp(self.exam_contents['exam']['exam_end_timestamp']).strftime("[%m-%d][%H-%M]")
@@ -1019,6 +1106,14 @@ class ExamTerminal:
     ###############################################################################################
 
     def begin_exam(self) -> None:
+        """
+        Beginning of an exam. Looping through all specified questions
+
+        Parameters:
+            None
+        Returns: 
+            None
+        """
         logger.debug('Beginning Exam ...')
         self.exam_begin_time = time()
 
@@ -1030,6 +1125,8 @@ class ExamTerminal:
 
         # Looping over all listed questions
         for q, question in enumerate(self.exam_contents['questions']):
+            logging.debug(f'Showing question number {q + 1}')
+
             # Start timer for current question
             question_elapsed_time = time()
             self.exam_contents['questions'][q]['question_presented_timestamp'] = question_elapsed_time
@@ -1083,3 +1180,7 @@ class ExamTerminal:
 
         # Evaluate the exam
         self.__evaluate_exam()
+
+        if logger.level == logging.DEBUG:
+            from pprint import pprint
+            pprint(self.exam_contents)
