@@ -31,6 +31,12 @@ class ExamTerminal:
         Returns:
             None
         """
+        # Defining all possible exam type descriptions
+        self.exam_types = {
+            0: "Multiple Choice, Single Answer",
+            1: "Multiple Choice, Multiple Answers"
+        }
+
         # Loading exam contents
         self.exam_contents = self.__load_parse_examfile(exam_filepath)
         if not self.exam_contents:
@@ -95,6 +101,10 @@ class ExamTerminal:
         self.exam_allowed_time = self.exam_contents['exam']['exam_allowed_time']
         self.exam_allowed_time_units = self.exam_contents['exam']['exam_allowed_time_units']
 
+        # Default exam type. If any questions are multiple answers, change type
+        self.exam_types
+        self.exam_contents['exam']['exam_type'] = self.exam_types[0]
+
         logger.debug(f"Parsing the loaded exam file. Loading {len(self.exam_contents['questions'])} questions ...")
         # Loop through all the questions
         for index, question in enumerate(self.exam_contents['questions']):
@@ -107,8 +117,7 @@ class ExamTerminal:
 
             # Looping over selection for each question
             for i, s in enumerate(question['selection']):
-                
-                # Check if a answer was passed with slection
+                # Check if a answer was passed with selection
                 if isinstance(s, dict):
                     # Get the first key
                     first_key = next(iter(s))
@@ -132,6 +141,10 @@ class ExamTerminal:
             # Determine if it is a multi-selection question
             question['question_multiselect'] = sum(question['question_answer_bool']) > 1
             question['question_min_selection_count'] = sum(question['question_answer_bool'])
+
+            # Change exam type
+            if question['question_multiselect']:
+                self.exam_contents['exam']['exam_type'] = self.exam_types[1]
 
             # Set answered status
             question['answered'] = False
@@ -373,7 +386,7 @@ class ExamTerminal:
             start_y += len(menu_item_wrap)
 
             
-            lines = ["Exam Type:", "Multiple Choice, Single Answer"]
+            lines = ["Exam Type:", self.exam_contents['exam']['exam_type']]
             for x, line in zip(start_x, lines):
                 scr.addstr(start_y , x, line, self.color['default'])
             start_y += 2
@@ -491,6 +504,20 @@ class ExamTerminal:
         question['answered_indexes'] = []
         question['answered_correct_bool'] = [False] * len(question['question_answer_bool'])
 
+        # Loading question specific allowed time
+        question_timer = True
+        if 'question_allowed_time' in question.keys():
+            if not isinstance(question['question_allowed_time'], int) or question['question_allowed_time'] < 1:
+                logger.debug('Question allowed time not specified as integer or less than one second')
+                question_timer = False
+        else:
+            logger.debug('Question allowed time not listed')
+            question_timer = False
+
+        # Start the question timer
+        question_start_time = time()
+        question_elapsed_time = 0
+
         # User key input (ASCII)
         k = 0
 
@@ -574,21 +601,27 @@ class ExamTerminal:
             for l, line in enumerate(question_wrap):
                 scr.addstr(start_y + l - 1, question_x, line, self.color['default'] | self.decor['bold'])
 
-            # Message of number of selections to pick
+            # Message of number of selections needed for current question
+            message = []
             if question['question_multiselect']:
-                multiselect_msg = f"(Multiple Answers, Pick {question['question_min_selection_count']})"
-                color = self.color['grey-light']
-                multiselect_offset = 1
-                scr.addstr(start_y + l, question_x, multiselect_msg, color)
-            else:
-                multiselect_msg = f"(Pick {question['question_min_selection_count']})"
-                color = self.color['grey-dark']
-                multiselect_offset = 0
+                message.append(f"Multiple Answers, Pick {question['question_min_selection_count']}")
 
-            utility.draw_horizontal_seperator(scr, len(question_wrap) + 3 + multiselect_offset, self.color['grey-dark'])
+            # Message of allowed time for current question
+            if question_timer:
+                message.append(f"Allowed Time: {question['question_allowed_time']:3.1f} seconds")
+                
+            # Construct the question message
+            if question['question_multiselect'] or question_timer:
+                color = self.color['grey-light']
+                scr.addstr(start_y + l, question_x, "(" + ", ".join(message) + ")", color)
+                line_offset = 1
+            else:
+                line_offset = 0
+
+            utility.draw_horizontal_seperator(scr, len(question_wrap) + 3 + line_offset, self.color['grey-dark'])
 
             # Set the offset to the next line
-            selection_offset = len(question_wrap) + 3 + multiselect_offset
+            selection_offset = len(question_wrap) + 3 + line_offset
 
             # Wrap and show selection
             for s, selection in enumerate(question['selection']):
@@ -610,7 +643,6 @@ class ExamTerminal:
 
                     scr.addstr(start_y + selection_offset + l - 1, selection_x + 2, line, color)
 
-
                 # Set the offset to the next line
                 selection_offset += len(selection_wrap) + 1
 
@@ -619,18 +651,42 @@ class ExamTerminal:
             # Getting the screen height and width
             term_height, term_width = scr.getmaxyx()
 
-            # Progress bar and status - call method
+            if question_timer:
+                # Calculate current question time, and determine if timeout
+                question_elapsed_time = time() - question_start_time
+                if question_elapsed_time > question['question_allowed_time']:
+                    logging.debug('Question timout')
+
+                    # Determine correct or not correct at timeout
+                    question['answered_correct_bool'][self.selection_index] = question['question_answer_bool'][self.selection_index] != question['answered_correct_bool'][self.selection_index]
+                    correct_all = question['question_answer_bool'] == question['answered_correct_bool']
+
+                    question['answered_timeout'] = True
+                    return 'timout', correct_all
+
+                # Progress - Question Time
+                elapsed_dec = question_elapsed_time / question['question_allowed_time']
+                color = self.color['yellow']
+                if elapsed_dec > 0.85 and elapsed_dec <= 0.92:
+                    color = self.color['orange']
+                if elapsed_dec > 0.92:
+                    color = self.color['red'] | self.decor['bold']
+                progress_bar = utility.get_progress_bar(exam_progress=elapsed_dec, bar_char_width=term_width - 24, bar_char_full="*")
+                scr.addstr(term_height - 4, 3, f"[ {question_elapsed_time:3.1f}s / {question['question_allowed_time']:3.1f}s ][{progress_bar}]", color)
+
+
+            # Progress - Questions answered
             progress_bar = utility.get_progress_bar(exam_progress=self.questions_progress, bar_char_width=term_width - 23)
             scr.addstr(term_height - 3, 3, f"[ {self.questions_complete + 1:3.0f}  / {self.questions_total:3.0f}  ][{progress_bar}]", self.color['default'])
 
-            # Elapsed Time
-            examp_elapsed_dec = self.exam_elapsed_time / self.exam_contents['exam']['exam_allowed_time']
+            # Progress - Elapsed Exam Time
+            elapsed_dec = self.exam_elapsed_time / self.exam_contents['exam']['exam_allowed_time']
             color = self.color['default']
-            if examp_elapsed_dec > 0.85 and examp_elapsed_dec <= 0.95:
+            if elapsed_dec > 0.85 and elapsed_dec <= 0.92:
                 color = self.color['orange']
-            if examp_elapsed_dec > 0.92:
+            if elapsed_dec > 0.92:
                 color = self.color['red'] | self.decor['bold']
-            progress_bar = utility.get_progress_bar(exam_progress=examp_elapsed_dec, bar_char_width=term_width - 23)
+            progress_bar = utility.get_progress_bar(exam_progress=elapsed_dec, bar_char_width=term_width - 23)
             scr.addstr(term_height - 2, 3, f"[ {self.exam_elapsed_time:3.0f}s / {self.exam_allowed_time:3.0f}s ][{progress_bar}]", color)
 
             ########################################################################################
@@ -1017,7 +1073,7 @@ class ExamTerminal:
 
         page_left_margin = 10
         page_right_margin = 10
-        page_top_margin = 10
+        # page_top_margin = 10
         page_bottom_margin = 20
 
         page_x_area = page_width - page_left_margin - page_right_margin
@@ -1051,7 +1107,7 @@ class ExamTerminal:
         pdf.set_text_color(*[0, 0, 0])
         pdf.cell(w=page_x_area, h=20, txt='Exam Results', border=1, align='C', fill=1)
 
-        # Add Footer
+        # Add result label
         pdf.set_font('Helvetica', '', 24)
         pdf.set_xy(x=page_width - page_right_margin - 70, y=page_height - page_bottom_margin - 40)
         pdf.cell(w=60, h=30, txt=self.exam_contents['exam']['evaluation_label'], border=1, align='C', fill=1)
@@ -1062,7 +1118,7 @@ class ExamTerminal:
         start_x = [20, 77]
         start_y = 40
         line_height = 8
-        for index, item in results.items():
+        for _, item in results.items():
             pdf.set_font('Helvetica', 'B', 11)
             pdf.set_xy(x=start_x[0], y=start_y)
             pdf.cell(w=60, h=line_height, txt=item['label'], border=0, align='L')
@@ -1079,8 +1135,6 @@ class ExamTerminal:
         # Add divider lines
         # pdf.line(page_width // 4, 60, 3*page_width // 4, 60)
         # pdf.line(page_width // 4, 100, 3*page_width // 4, 100)
-
-        # TODO: Section titles
 
         # Add the software watermark thingy
         pdf.set_text_color(*[100, 100, 100])
