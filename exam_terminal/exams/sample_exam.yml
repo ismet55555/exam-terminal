@@ -1,4 +1,3 @@
----
 exam:
   exam_title: "Welcome. This is a Sample Exam Just To Show Things Off"
   exam_description: This is a sample description for this sample "exam".
@@ -12,36 +11,34 @@ exam:
 
 questions:
   - question: What is your favorite food?
-    question_time: 10
+    question_allowed_time: 45
     selection:
       - "Kebap"
-      - "Salad": true
-      - "Nutella": true
-      - "Chair": true
-      - "Now I feel hungry ..."
+      - "Salad"
+      - "Nutella"
+      - "Chair"
+      - "Now I feel hungry ...": true
 
   - question: What is your favorite dinosaur?
-    question_time: 30
     selection:
-      - "Tyrannosaurus Rex"
+      - "Tyrannosaurus Rex": true
       - "Triceratops"
       - "Velociraptor"
       - "Stegosaurus"
-      - "Commodore 64"
+      - "Commodore 64": true
       - "Brachiosaurus": true
 
-  - question: "Why did the chicken cross the road?"
-    question_time: 0
+  - question: "Quick! Why did the chicken cross the road?"
+    question_allowed_time: 10
     selection:
-      - "Because the road was too long to walk around it": true
+      - "Because the road was too long to walk around it"
       - "To get away from the KFC"
-      - "To find itself in this crazy world": true
-      - "To practice for the Most Extreme Elimination Challenge"
+      - "To find itself in this crazy world"
+      - "To practice for the Most Extreme Elimination Challenge": true
 
   - question: "A blue train filled with Amazon packages leaves Cairo at 3:00 am, averaging 30 mph.
                Another red train headed in the same direction leaves Cairo at 6:00 am, averaging 60 mph.
                How many hours after the second red train leaves will it pass the first train?"
-    question_time: 0
     selection:
       - "5.5"
       - "3.0": true
@@ -49,7 +46,6 @@ questions:
       - "-4.0"
 
   - question: "Do you not just love exam-terminal?"
-    question_time: 0
     selection:
       - "Nope, kinda sucks ... booo"
       - "Heck yes, good stuff! Whoo-Hooo!": true
