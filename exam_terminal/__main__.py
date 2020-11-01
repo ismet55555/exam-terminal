@@ -12,7 +12,7 @@ from exam_terminal import exam_terminal
 # Creating a message logger, all dependent scripts will inhearent this logger
 logging.basicConfig(format='[%(asctime)s][%(levelname)-8s] [%(filename)-30s:%(lineno)4s] %(message)s', datefmt='%m/%d-%H:%M:%S')
 logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)  # <--- Manually change debug level here (DEBUG, INFO, ERROR, etc)
+logger.setLevel(logging.INFO)  # <--- Manually change debug level here (DEBUG, INFO, ERROR, etc)
 if logger.level == logging.DEBUG:
     logger.addHandler(logging.FileHandler("exam-terminal.log"))
 
