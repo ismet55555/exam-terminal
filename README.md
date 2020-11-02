@@ -6,7 +6,7 @@
 <p align="center">
 
 <a href="https://pypi.org/project/exam-terminal/">
-  <img alt="PYPI Version" src="https://img.shields.io/github/pipenv/locked/dependency-version/ismet55555/exam-terminal/exam-terminal">
+  <img alt="PYPI Version" src="https://img.shields.io/pypi/v/exam-terminal?color=blue">
 </a>
 
 <a href="https://pypi.org/project/exam-terminal/">
