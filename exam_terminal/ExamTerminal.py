@@ -11,7 +11,6 @@ from statistics import mean, median, stdev
 from time import gmtime, strftime, time
 from typing import Dict, Tuple
 
-import yaml
 from fpdf import FPDF
 
 from exam_terminal import utility
@@ -22,12 +21,12 @@ logger = logging.getLogger()
 class ExamTerminal:
     """This class defines the exam terminal and its function."""
 
-    def __init__(self, exam_filepath: str) -> None:
+    def __init__(self, exam_file_contents:dict) -> None:
         """
         Object constructor method
 
         Parameters:
-            exam_filepath (str): The path to the exam file
+            exam_file_contents (dict): Pre-loaded exam contents
         Returns:
             None
         """
@@ -37,11 +36,8 @@ class ExamTerminal:
             1: "Multiple Choice, Multiple Answers"
         }
 
-        # Loading exam contents
-        self.exam_contents = self.__load_parse_examfile(exam_filepath)
-        if not self.exam_contents:
-            logger.error('Exiting ...')
-            sys.exit(1)
+        # Parse exam contents
+        self.exam_contents = self.__parse_examfile_contents(exam_file_contents)
 
         self.color = {}
         self.decor = {}
@@ -78,36 +74,25 @@ class ExamTerminal:
 
     ###############################################################################################
 
-    def __load_parse_examfile(self, filepath: str) -> Dict:
+    def __parse_examfile_contents(self, exam_file_contents:dict) -> Dict:
         """
-        Loading and pasing a exam file form specified path
+        Parsing and supplementing a exam file contents
 
         Parameters:
-            filepath (str): The path to the exam file
+            exam_file_contents (dict): Pre-loaded exam contents
         Returns: 
             return (Dict): Loaded and parsed info of exam file contents
         """
-        # Load the examp file
-        logger.debug(f"Loading specified exam file: '{filepath}' ...")
-        try:
-            with open(filepath) as file:
-                self.exam_contents = yaml.safe_load(file)
-            logger.debug("Successfully loaded exam file")
-        except Exception as e:
-            logger.error(f"Failed to load specified exam file: '{filepath}'. Exception: {e}")
-            return {}
-
         # Get the total exam time
-        self.exam_allowed_time = self.exam_contents['exam']['exam_allowed_time']
-        self.exam_allowed_time_units = self.exam_contents['exam']['exam_allowed_time_units']
+        self.exam_allowed_time = exam_file_contents['exam']['exam_allowed_time']
+        self.exam_allowed_time_units = exam_file_contents['exam']['exam_allowed_time_units']
 
         # Default exam type. If any questions are multiple answers, change type
-        self.exam_types
-        self.exam_contents['exam']['exam_type'] = self.exam_types[0]
+        exam_file_contents['exam']['exam_type'] = self.exam_types[0]
 
-        logger.debug(f"Parsing the loaded exam file. Loading {len(self.exam_contents['questions'])} questions ...")
+        logger.debug(f"Parsing the loaded exam file. Loading {len(exam_file_contents['questions'])} questions ...")
         # Loop through all the questions
-        for index, question in enumerate(self.exam_contents['questions']):
+        for index, question in enumerate(exam_file_contents['questions']):
             # Store the question number
             question['question_number'] = index
 
@@ -144,17 +129,17 @@ class ExamTerminal:
 
             # Change exam type
             if question['question_multiselect']:
-                self.exam_contents['exam']['exam_type'] = self.exam_types[1]
+                exam_file_contents['exam']['exam_type'] = self.exam_types[1]
 
             # Set answered status
             question['answered'] = False
 
         # Get the total number of questions
-        self.exam_contents['exam']['exam_questions_count'] = len(self.exam_contents['questions'])
+        exam_file_contents['exam']['exam_questions_count'] = len(exam_file_contents['questions'])
 
         logger.debug('Successfully parsed exam information from file')
 
-        return self.exam_contents
+        return exam_file_contents
 
     def __basic_screen_setup(self, scr, halfdelay: bool) -> None:
         """
@@ -597,7 +582,8 @@ class ExamTerminal:
             wrapper_selection = textwrap.TextWrapper(width=term_width - 10)
 
             # Wrap and show the question
-            question_wrap = wrapper_question.wrap(text=question['question']) 
+            question_wrap = wrapper_question.wrap(text=question['question'])
+            l = 0
             for l, line in enumerate(question_wrap):
                 scr.addstr(start_y + l - 1, question_x, line, self.color['default'] | self.decor['bold'])
 
