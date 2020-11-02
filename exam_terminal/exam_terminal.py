@@ -13,7 +13,7 @@ def exam_terminal(exam_file_contents:dict) -> int:
     Beginning of program. Called from __main__.py
 
     Parameters:
-        exam_terminal (path or str): Relative or absolute file path to exam file
+        exam_file_contents (dict): Pre-loaded exam contents
     Returns:
         exit code (int): Program exit code
 

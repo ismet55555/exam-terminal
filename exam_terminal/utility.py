@@ -117,7 +117,7 @@ def load_software_name_version() -> str:
         (str): Software name and version
     """
     software_name = "exam-terminal"
-    software_version = "0.1.2"  # Updated with bumpversion
+    software_version = "0.2.0"  # Updated with bumpversion
     return software_name + ' v' + software_version
 
 
@@ -271,11 +271,15 @@ def load_examfile_contents_from_local_file(local_file_path:str) -> Dict:
     """
     Loading a local file exam contents
 
-    TODO
+    Parameters:
+        local_file_path (str) : Path to a local file to be loaded
+    Returns: 
+        file_contents (Dict) : The contents of the file
     """
+    # TODO: Check if right file type (.yml or .yaml)
     logger.debug(f"Loading specified local exam file: '{local_file_path}' ...")
     try:
-        with open(local_file_path) as file:
+        with open(local_file_path, 'r') as file:
             file_contents = yaml.safe_load(file)
         logger.debug("Successfully loaded local exam file")
     except Exception as e:
@@ -288,7 +292,11 @@ def load_examfile_contents_from_url(remote_file_url:url, allow_redirects:bool=Tr
     """
     Loading a remote exam file contents over HTTP
 
-    TODO
+    Parameters:
+        remote_file_url (url)  : Remote URL location of file to be loaded
+        allow_redirects (bool) : If True allow redirects to another URL (defulat True)
+    Returns: 
+        file_contents (Dict) : The contents of the file
     """
     # Getting name of file from URL
     remote_filename = Path(remote_file_url).name

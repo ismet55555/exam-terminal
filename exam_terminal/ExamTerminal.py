@@ -11,7 +11,6 @@ from statistics import mean, median, stdev
 from time import gmtime, strftime, time
 from typing import Dict, Tuple
 
-import yaml
 from fpdf import FPDF
 
 from exam_terminal import utility
@@ -22,12 +21,12 @@ logger = logging.getLogger()
 class ExamTerminal:
     """This class defines the exam terminal and its function."""
 
-    def __init__(self, exam_file_contents:dir) -> None:
+    def __init__(self, exam_file_contents:dict) -> None:
         """
         Object constructor method
 
         Parameters:
-            exam_filepath (str): The path to the exam file
+            exam_file_contents (dict): Pre-loaded exam contents
         Returns:
             None
         """
@@ -77,10 +76,10 @@ class ExamTerminal:
 
     def __parse_examfile_contents(self, exam_file_contents:dict) -> Dict:
         """
-        Loading and pasing a exam file form specified path
+        Parsing and supplementing a exam file contents
 
         Parameters:
-            filepath (str): The path to the exam file
+            exam_file_contents (dict): Pre-loaded exam contents
         Returns: 
             return (Dict): Loaded and parsed info of exam file contents
         """
@@ -583,7 +582,8 @@ class ExamTerminal:
             wrapper_selection = textwrap.TextWrapper(width=term_width - 10)
 
             # Wrap and show the question
-            question_wrap = wrapper_question.wrap(text=question['question']) 
+            question_wrap = wrapper_question.wrap(text=question['question'])
+            l = 0
             for l, line in enumerate(question_wrap):
                 scr.addstr(start_y + l - 1, question_x, line, self.color['default'] | self.decor['bold'])
 

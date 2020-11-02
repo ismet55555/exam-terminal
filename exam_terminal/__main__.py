@@ -19,8 +19,8 @@ if logger.level == logging.DEBUG:
 
 
 @click.command(context_settings={"ignore_unknown_options": True})
-@click.option('-s', '--sample', is_flag=True, default=False, type=bool, help='Set this flag to a sample exam, just to check things out')
-@click.option('-e', '--examfile', required=False, default='', type=str, help='Relative or absolute path to the exam file to be loaded')
+@click.option('-s', '--sample', is_flag=True, default=False, type=bool, help='Set this flag to run a sample exam, just to check things out')
+@click.option('-e', '--examfile', required=False, default='', type=str, help='Local path or remote URL to the exam YAML file to be loaded')
 def main(sample, examfile) -> None:
     """
 
@@ -41,6 +41,7 @@ def main(sample, examfile) -> None:
             exam-terminal -e MyExam.yml
             exam-terminal -examfile ~/Documents/Exams/SomeExam.yaml
             exam-terminal -e "/home/you/review.yml"
+            exam-terminal -e https://raw.githubusercontent.com/ismet55555/exam-terminal/master/exam_terminal/exams/sample_exam.yml
 
         For even more help visit:
         https://github.com/ismet55555/exam-terminal
@@ -56,6 +57,7 @@ def main(sample, examfile) -> None:
 
     # Sample examfile
     exam_file_location = ''
+    exam_file_contents = {}
     if sample and not examfile:
         # If local does not exist, try site-package
         exam_file_location = os.path.abspath(os.path.join("exam_terminal", "exams", "sample_exam.yml"))
@@ -65,8 +67,10 @@ def main(sample, examfile) -> None:
             exam_file_location = os.path.abspath(os.path.join(site_package_dir, "exam_terminal", "exams", "sample_exam.yml"))
         logger.debug(f'Using sample exam file: {exam_file_location}')
 
+        # Load the file
+        exam_file_contents = utility.load_examfile_contents_from_local_file(exam_file_location)
+
     # Specified exam file location
-    exam_file_contents = {}
     if examfile:
         # Check if examfile is passed as local path or remote URL to be downloaded
         if bool(urlparse(examfile).scheme):
@@ -88,6 +92,7 @@ def main(sample, examfile) -> None:
             exam_file_contents = utility.load_examfile_contents_from_local_file(exam_file_location)
 
     # Run exam-terminal
+    exitcode = 0
     if exam_file_contents:
         exitcode = exam_terminal.exam_terminal(exam_file_contents)
     else:
