@@ -4,10 +4,11 @@ import logging
 import os
 import sysconfig
 import sys
+from urllib.parse import urlparse
 
 import click
 
-from exam_terminal import exam_terminal
+from exam_terminal import exam_terminal, utility
 
 # Creating a message logger, all dependent scripts will inhearent this logger
 logging.basicConfig(format='[%(asctime)s][%(levelname)-8s] [%(filename)-30s:%(lineno)4s] %(message)s', datefmt='%m/%d-%H:%M:%S')
@@ -54,30 +55,44 @@ def main(sample, examfile) -> None:
         ctx.fail(click.style("User Input Error: No exam-terminal options were specified. Please specify any option.", fg='bright_red', bold=True))
 
     # Sample examfile
-    exam_filepath = ''
+    exam_file_location = ''
     if sample and not examfile:
         # If local does not exist, try site-package
-        exam_filepath = os.path.abspath(os.path.join("exam_terminal", "exams", "sample_exam.yml"))
-        if not os.path.exists(exam_filepath):
-            logger.debug(f'Failed to find {exam_filepath}, trying python site-package directory ...')
+        exam_file_location = os.path.abspath(os.path.join("exam_terminal", "exams", "sample_exam.yml"))
+        if not os.path.exists(exam_file_location):
+            logger.debug(f'Failed to find {exam_file_location}, trying python site-package directory ...')
             site_package_dir = sysconfig.get_paths()["purelib"]
-            exam_filepath = os.path.abspath(os.path.join(site_package_dir, "exam_terminal", "exams", "sample_exam.yml"))
-        logger.debug(f'Using sample exam file: {exam_filepath}')
+            exam_file_location = os.path.abspath(os.path.join(site_package_dir, "exam_terminal", "exams", "sample_exam.yml"))
+        logger.debug(f'Using sample exam file: {exam_file_location}')
 
-    # Specified examfile
+    # Specified exam file location
+    exam_file_contents = {}
     if examfile:
-        logger.debug(f'Passed exam file: {click.format_filename(examfile)}')
-        exam_filepath = os.path.abspath(click.format_filename(examfile))
-        logger.debug(f'Interpreted exam file path: {exam_filepath}')
+        # Check if examfile is passed as local path or remote URL to be downloaded
+        if bool(urlparse(examfile).scheme):
+            # Loading file from remote URL
+            exam_file_contents = utility.load_examfile_contents_from_url(examfile)
+        else:
+            # Loading local file
+            logger.debug(f'Passed local exam file: {click.format_filename(examfile)}')
+            exam_file_location = os.path.abspath(click.format_filename(examfile))
+            logger.debug(f'Interpreted local exam file path: {exam_file_location}')
 
-    # Check if examfile exists
-    if not os.path.exists(exam_filepath):
-        ctx = click.get_current_context()
-        click.echo(click.style("Uh-Oh! Something's wrong here ...", fg='bright_red', bold=True))
-        ctx.fail(click.style(f"User Input Error: The exam file which you specified does not exist: {exam_filepath}", fg='bright_red', bold=True))
+            # Check if examfile exists locally
+            if not os.path.exists(exam_file_location):
+                ctx = click.get_current_context()
+                click.echo(click.style("Uh-Oh! Something's wrong here ...", fg='bright_red', bold=True))
+                ctx.fail(click.style(f"User Input Error: The exam file which you specified does not exist: {exam_file_location}", fg='bright_red', bold=True))
+
+            # Load the file
+            exam_file_contents = utility.load_examfile_contents_from_local_file(exam_file_location)
 
     # Run exam-terminal
-    exitcode = exam_terminal.exam_terminal(exam_filepath=exam_filepath)
+    if exam_file_contents:
+        exitcode = exam_terminal.exam_terminal(exam_file_contents)
+    else:
+        ctx = click.get_current_context()
+        ctx.fail(click.style(f"Failed to load the specified file '{examfile}'. Check file location or format.", fg='bright_red', bold=True))
 
     if not exitcode:
         click.echo(click.style("Done", fg='bright_green', bold=True))

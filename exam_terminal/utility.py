@@ -1,10 +1,10 @@
 import curses
 import logging
-import os
 from pathlib import Path
-from typing import Tuple
+from typing import Dict, Tuple
 
 import requests
+import yaml
 
 url = str
 logger = logging.getLogger()
@@ -267,23 +267,39 @@ def draw_vertical_seperator(scr, x:int, color:list) -> None:
     # TODO: Currently unused but may come in handy
 
 
-def download_file_from_url(remote_file_url:url, local_dir:str='.', allow_redirects:bool=True) -> str:
+def load_examfile_contents_from_local_file(local_file_path:str) -> Dict:
     """
-    Downloading a remote file over HTTP and saving it to the specified
-    local directory
+    Loading a local file exam contents
 
-    Usage: download_file_from_url()
+    TODO
+    """
+    logger.debug(f"Loading specified local exam file: '{local_file_path}' ...")
+    try:
+        with open(local_file_path) as file:
+            file_contents = yaml.safe_load(file)
+        logger.debug("Successfully loaded local exam file")
+    except Exception as e:
+        logger.error(f"Failed to load specified local exam file: '{local_file_path}'. Exception: {e}")
+        return {}
+    return file_contents
+
+
+def load_examfile_contents_from_url(remote_file_url:url, allow_redirects:bool=True) -> Dict:
+    """
+    Loading a remote exam file contents over HTTP
+
+    TODO
     """
     # Getting name of file from URL
     remote_filename = Path(remote_file_url).name
-    logger.debug(f'Remote filename parsed: {remote_filename}')
+    logger.debug(f'Requested remote filename parsed: {remote_filename}')
 
     # Check requested file extension
     remote_file_ext = Path(remote_file_url).suffix
     file_ext_accepted = ['.yml', '.yaml']
     if not remote_file_ext in file_ext_accepted:
         logger.debug(f'Remote file requested "{remote_filename}"" is not one of the accepted file types: {file_ext_accepted}')
-        return ''
+        return {}
 
     # Get request headers
     logger.debug(f'Getting remote file HTTP request headers for "{remote_file_url}" ...')
@@ -291,7 +307,7 @@ def download_file_from_url(remote_file_url:url, local_dir:str='.', allow_redirec
         h = requests.head(remote_file_url)
     except Exception as e:
         logger.debug(f'Failed to request headers. Exception: {e}')
-        return ''
+        return {}
     header = h.headers
 
     # Check if file is below size limit
@@ -299,34 +315,35 @@ def download_file_from_url(remote_file_url:url, local_dir:str='.', allow_redirec
     logger.debug(f'Requested file content length: {content_length:.5f} MB)')
     if content_length > 1.0:
         logger.debug(f'The requested remote file "{remote_filename}" is {content_length:.2f} MB and larger than 1.0 MB limit, will not download')
-        return ''
+        return {}
 
     # Check if content is text or yaml based
     content_types_accepted = ['text/plain', 'text/x-yaml', 'application/x-yaml', 'text/yaml', 'text/vnd.yaml']
     content_type = header.get('content-type')
     logger.debug(f'Request content type: {content_type}')
     if not content_type:
-        return ''
+        return {}
     elif not any(ext in content_type for ext in content_types_accepted):
         logger.debug(f'The content type "{content_type}" of the requested file "{remote_filename}" is not one of the following: {content_types_accepted}')
-        return ''
+        return {}
 
     # Downloading the file content
     logger.debug(f"Requesting remote file: '{remote_file_url}' ...")
-    remote_request = requests.get(remote_file_url, allow_redirects=True)
+    remote_request = requests.get(remote_file_url, allow_redirects=allow_redirects)
 
     # Check if no error from downloading
     if remote_request.status_code == requests.codes.ok:
-        # Saving the file content
-        local_filepath = os.path.join(local_dir, remote_filename)
-        logger.debug(f"Saving downloaded file to '{local_filepath}' ...")
+        # Loading the yaml file content
+        logger.debug("Loading contents of remote file ...")
         try:
-            open(local_filepath, 'wb').write(remote_request.content)
-        except IOError as e:
-            logger.debug(f'Failed save requested file to "{local_filepath}". Exception: {e}')
-            return ''
+            # open(os.path.join(local_dir, remote_filename), 'wb').write(remote_request.content)
+            file_contents = yaml.safe_load(remote_request.content)
+        except Exception as e:
+            logger.debug(f'Failed loading requested file. Exception: {e}')
+            return {}
     else:
-        logger.debug(f"Failed to request remote file '{remote_file_url}'. HTTP request error code {remote_request.status_code}")
-        return ''
+        logger.debug(f"Failed to get remote file '{remote_file_url}'. HTTP request error code {remote_request.status_code}")
+        return {}
 
-    return local_filepath
+    return file_contents
+

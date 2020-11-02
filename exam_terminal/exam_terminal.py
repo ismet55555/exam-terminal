@@ -8,7 +8,7 @@ from . import ExamTerminal
 
 logger = logging.getLogger()
 
-def exam_terminal(exam_filepath) -> int:
+def exam_terminal(exam_file_contents:dict) -> int:
     """
     Beginning of program. Called from __main__.py
 
@@ -25,7 +25,7 @@ def exam_terminal(exam_filepath) -> int:
 
     while True:
         # Create the exam object and loading the exam file
-        exam = ExamTerminal.ExamTerminal(exam_filepath=exam_filepath)
+        exam = ExamTerminal.ExamTerminal(exam_file_contents)
 
         # Show the intro
         main_menu_selection = exam.show_menu()
