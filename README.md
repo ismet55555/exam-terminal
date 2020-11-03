@@ -38,8 +38,18 @@ The exam-terminal is a terminal-based assessment tool. It can potentially be use
 
 The results include your general exam score, some basic statistics, and the ability to export your results to a PDF documment.
 
+## :eyeglasses: Overview
 
-## Quick Start
+* [Quick Start](#fast_forward-quick-start)
+* [Compatibility](#thumbsup-compatibility)
+* [Installation](#rocket-installation)
+* [Exam Creation](#pencil-exam-creation)
+* [Contributors](#bust_in_silhouette-contributors)
+* [Development Notes](#computer-Development-Notes)
+* [Licence](#licence)
+
+
+## :fast_forward: Quick Start
 
 ```bash
 # Install it
@@ -55,17 +65,17 @@ exam-terminal --sample
 ```
 
 
-## Compatibility
-As of now the following Python 3 versions are supported for Linux, OSX, and Windows:
-  - Python 3.6
-  - Python 3.7
-  - Python 3.8
-  - Python 3.9
+## :thumbsup: Compatibility
+As of now the following Python 3 versions are tested and supported:
+  - Python 3.6, 3.7, 3.8, 3.9
+
+For the following platforms:
+  - OSX, Windows, Linux (Debian based)
 
 To check which python version you have, open a terminal and type `python --version`
 
 
-## Installation
+## :rocket: Installation
 
 ### Get It From PYPI
 ```bash
@@ -77,16 +87,28 @@ pip install exam-terminal
 python -m pip install --upgrade pip setuptools wheel
 ```
 
-## Exam Creation
-_TODO_
+## :pencil: Exam Creation
+
+Exams are made using the YAML file format.
+
+See example here:  [`sample_exam.yml`](exam_terminal/exams/sample_exam.yml)
+
+_TODO: Section work in progress_
 
 
-## Development Notes
+
+
+
+---
+## :bust_in_silhouette: Contributors
+**Ismet Handžić** - GitHub: [@ismet55555](https://github.com/ismet55555)
+
+## :computer: Development Notes
 If you are eying this repo and thinking "Hey this is kind of neat, I'd love to add a few things", well this is your chance :-)
 
-There is definetly work to be done. If you don't have a genius great idea of the next big change. There is a `TODO.md` file which outlines some changes that would be nice to have.
+There is definetly work to be done. If you don't have a genius great idea for the next big change, there is a [`TODO.md`](TODO.md) file which outlines some changes, features, and fixes that would be nice to have.
 
 For some guides on how to help out, checkout the `dev_stuff` directory.
 
-
-
+## Licence
+This project is licensed under the Apache 2.0 License - Please see the [LICENSE](LICENSE) file for details.
