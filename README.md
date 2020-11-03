@@ -40,6 +40,13 @@ The results include your general exam score, some basic statistics, and the abil
 
 ## :eyeglasses: Overview
 
+* [Quick Start](#fast_forward-quick-start)
+* [Compatibility](#thumbsup-compatibility)
+* [Installation](#rocket-installation)
+* [Exam Creation](#pencil-exam-creation)
+* [Contributors](#bust_in_silhouette-contributors)
+* [Development Notes](#computer-Development-Notes)
+* [Licence](#licence)
 
 
 ## :fast_forward: Quick Start
@@ -81,7 +88,12 @@ python -m pip install --upgrade pip setuptools wheel
 ```
 
 ## :pencil: Exam Creation
-_TODO_
+
+Exams are made using the YAML file format.
+
+See example here:  [`sample_exam.yml`](exam_terminal/exams/sample_exam.yml)
+
+_TODO: Section work in progress_
 
 
 
