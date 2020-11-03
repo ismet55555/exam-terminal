@@ -80,9 +80,8 @@
 
 ## Random
 
-  - Fix Docstrings for new loading feature
+  - ...
 
 # Bugs
 
-  - Package PYPI version shield in README.md not updating
-    - https://github.com/lemurheavy/coveralls-public/issues/971
+  - ...
