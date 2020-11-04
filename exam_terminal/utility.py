@@ -117,7 +117,7 @@ def load_software_name_version() -> str:
         (str): Software name and version
     """
     software_name = "exam-terminal"
-    software_version = "0.2.1"  # Updated with bumpversion
+    software_version = "0.2.2"  # Updated with bumpversion
     return software_name + ' v' + software_version
 
 
