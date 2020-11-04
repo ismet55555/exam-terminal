@@ -4,30 +4,29 @@ Please include a summary of the change and which issue is fixed.
 Please also include relevant motivation and context. 
 List any dependencies that are required for this change.
 
-Fixes # (issue)
+- ...
 
-## Type of change
 
-Please delete options that are not relevant.
+## List and Type of Changes
 
-- [ ] Bug fix (non-breaking change which fixes an issue)
-- [ ] New feature (non-breaking change which adds functionality)
-- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
-- [ ] This change requires a documentation update
+**Type Categories:** Bug Fix, New Feature, Code Refactoring, Docummentation and Formatting
+  
+- TYPE - CHANGE DESCRIPTION
+- ...
 
-# How Has This Been Tested?
+
+## How Has This Been Tested?
 
 Please describe the tests that you ran to verify your changes. 
 Provide instructions so we can reproduce. 
 Please also list any relevant details for your test configuration
 
-- [ ] Test A Description Here ...
-- [ ] Test B Description Here ...
 - ...
 
 **Test Configuration**:
-* Python Version(s):
-* Hardware:
+* Python Version(s): ...
+* Hardware: ...
+
 
 # Checklist:
 
