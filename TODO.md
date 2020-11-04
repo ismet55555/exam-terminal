@@ -4,7 +4,6 @@
 
   - README.md
     - Record terminalizer demo video
-    - How to put together a exam file
 
 ## Code Structure
 
@@ -22,11 +21,10 @@
 ## Exam Loading
 
   - Allowed time units
+  - Survey mode option?
   - Enter exam taker name?
     - Add CLI option for exam taker's name
-  - Simple database? or just a file?
   - Encrypt the exam file with a password so you can send it to someone?
-  - SQLite database somewhere in AWS? Github?
   - Add few sample exams
     - Docker Certified Accosiate (DCA)
     - AWS Practitioner
@@ -39,12 +37,13 @@
 
 ## Exam Formatting and Navigation
 
-  - Go back and forth with questions
+  - Navigate back and forth with questions (skip questions)
   - Have a answered/unanswered questions indicator
 
 ## Exam
 
   - Immediate question-by-question based feedback
+    - Show the right answer immediatelly when selected
 
 ## Pause/Resume Exam
 
@@ -80,9 +79,8 @@
 
 ## Random
 
-  - Fix Docstrings for new loading feature
+  - ...
 
 # Bugs
 
-  - Package PYPI version shield in README.md not updating
-    - https://github.com/lemurheavy/coveralls-public/issues/971
+  - ...
