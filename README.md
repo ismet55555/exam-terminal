@@ -125,7 +125,9 @@ Exams are described within examfiles.
 
 ## Examfile Format
 
-Exam description files are made using the YAML file format, human-readable structured data format. If you are not familiar with YAML, there are lots of sources explaining it, [here is one](https://blog.stackpath.com/yaml/#:~:text=Definition,used%20to%20write%20configuration%20files.). An example of a examfile description in YAML format [can be viewed here](exam_terminal/exams/sample_exam.yml).
+Exam description files are made using the YAML file format (`.yml` or `.yaml`), human-readable structured data format. If you are not familiar with YAML, there are lots of sources explaining it, [here is one](https://blog.stackpath.com/yaml/#:~:text=Definition,used%20to%20write%20configuration%20files.). An example of a examfile description in YAML format [can be viewed here](exam_terminal/exams/sample_exam.yml).
+
+The exam file should be named with the `.yml` or `.yaml` file extension.
 
 ## Exam File Structure
 
@@ -149,6 +151,7 @@ questions:
     selection:
       - ...
       - ...
+  - ...
 ```
 
 ## Exam File Section: `exam`
