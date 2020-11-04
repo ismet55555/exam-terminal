@@ -50,20 +50,20 @@ The exam results include your general exam score, some basic statistics, and the
 
 # :eyeglasses: Overview
 
-- [:eyeglasses: Overview](#eyeglasses-overview)
-- [:fast_forward: Quick Start](#fast_forward-quick-start)
-- [:thumbsup: Compatibility](#thumbsup-compatibility)
-- [:rocket: Installation](#rocket-installation)
+- [Overview](#eyeglasses-overview)
+- [Quick Start](#fast_forward-quick-start)
+- [Compatibility](#thumbsup-compatibility)
+- [Installation](#rocket-installation)
   - [Install It From PYPI (pre-build)](#install-it-from-pypi-pre-build)
   - [Manually Build and Install it Yourself](#manually-build-and-install-it-yourself)
-- [:boom: Usage](#boom-usage)
-- [:pencil: Exam Creation](#pencil-exam-creation)
+- [Usage](#boom-usage)
+- [Exam Creation](#pencil-exam-creation)
   - [Examfile Format](#examfile-format)
   - [Exam File Structure](#exam-file-structure)
   - [Exam File Section: `exam`](#exam-file-section-exam)
   - [Exam File Section: `questions`](#exam-file-section-questions)
-- [:bust_in_silhouette: Contributors](#bust_in_silhouette-contributors)
-- [:computer: Development Notes](#computer-development-notes)
+- [Contributors](#bust_in_silhouette-contributors)
+- [Development Notes](#computer-development-notes)
 - [Licence](#licence)
 
 
