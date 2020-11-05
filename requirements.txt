@@ -2,4 +2,5 @@ wheel
 Click
 PyYAML
 fpdf2
+requests
 windows-curses; platform_system=="Windows"
