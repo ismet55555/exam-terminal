@@ -21,7 +21,7 @@ logger = logging.getLogger()
 class ExamTerminal:
     """This class defines the exam terminal and its function."""
 
-    def __init__(self, exam_file_contents:dict) -> None:
+    def __init__(self, exam_file_contents:dict, exam_attempt:int = 0) -> None:
         """
         Object constructor method
 
@@ -37,7 +37,8 @@ class ExamTerminal:
         }
 
         # Parse exam contents
-        self.exam_contents = self.__parse_examfile_contents(exam_file_contents)
+        self.exam_contents = {}
+        self.exam_contents = self.__parse_examfile_contents(exam_file_contents, exam_attempt)
 
         self.color = {}
         self.decor = {}
@@ -74,7 +75,7 @@ class ExamTerminal:
 
     ###############################################################################################
 
-    def __parse_examfile_contents(self, exam_file_contents:dict) -> Dict:
+    def __parse_examfile_contents(self, exam_file_contents:dict, exam_attempt:int) -> Dict:
         """
         Parsing and supplementing a exam file contents
 
@@ -83,14 +84,23 @@ class ExamTerminal:
         Returns: 
             return (Dict): Loaded and parsed info of exam file contents
         """
-        # Get the total exam time
-        self.exam_allowed_time = exam_file_contents['exam']['exam_allowed_time']
-        self.exam_allowed_time_units = exam_file_contents['exam']['exam_allowed_time_units']
+        logger.debug(f"Parsing the loaded exam file ...")
+
+        # Get the exam allowed time in seconds
+        if exam_attempt < 1:
+            # FIXME: Should not have to use "exam_attempt" to make this work.
+            logger.debug(f"Calculating exam_allwed_time ...")
+            exam_file_contents['exam']['exam_allowed_time'] = utility.to_seconds(
+                                                exam_file_contents['exam']['exam_allowed_time'],
+                                                exam_file_contents['exam']['exam_allowed_time_units']
+                                                )
+        # Save the current exam attempt
+        exam_file_contents['exam']['exam_attempt'] = exam_attempt
 
         # Default exam type. If any questions are multiple answers, change type
         exam_file_contents['exam']['exam_type'] = self.exam_types[0]
 
-        logger.debug(f"Parsing the loaded exam file. Loading {len(exam_file_contents['questions'])} questions ...")
+        logger.debug(f"Loading {len(exam_file_contents['questions'])} questions ...")
         # Loop through all the questions
         for index, question in enumerate(exam_file_contents['questions']):
             # Store the question number
@@ -663,7 +673,7 @@ class ExamTerminal:
 
             # Progress - Questions answered
             progress_bar = utility.get_progress_bar(exam_progress=self.questions_progress, bar_char_width=term_width - 23)
-            scr.addstr(term_height - 3, 3, f"[ {self.questions_complete + 1:3.0f}  / {self.questions_total:3.0f}  ][{progress_bar}]", self.color['default'])
+            scr.addstr(term_height - 3, 3, f"[ {self.questions_complete + 1:3.0f}  / {self.questions_total:3.0f}   ][{progress_bar}]", self.color['default'])
 
             # Progress - Elapsed Exam Time
             elapsed_dec = self.exam_elapsed_time / self.exam_contents['exam']['exam_allowed_time']
@@ -673,7 +683,7 @@ class ExamTerminal:
             if elapsed_dec > 0.92:
                 color = self.color['red'] | self.decor['bold']
             progress_bar = utility.get_progress_bar(exam_progress=elapsed_dec, bar_char_width=term_width - 23)
-            scr.addstr(term_height - 2, 3, f"[ {self.exam_elapsed_time:3.0f}s / {self.exam_allowed_time:3.0f}s ][{progress_bar}]", color)
+            scr.addstr(term_height - 2, 3, f"[ {self.exam_elapsed_time:3.0f}s / {self.exam_contents['exam']['exam_allowed_time']:3.0f}s  ][{progress_bar}]", color)
 
             ########################################################################################
 

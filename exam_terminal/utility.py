@@ -355,3 +355,37 @@ def load_examfile_contents_from_url(remote_file_url:url, allow_redirects:bool=Tr
 
     return file_contents
 
+
+def to_seconds(time_quantity:int, time_unit_text:str) -> int:
+    """
+    Get the number of seconds form the time quantity and time unit type.
+    Examples: 
+        - 45 min -> 2700 seconds
+        - 2 days -> 432000 seconds
+
+    Parameters:
+        time_quantity (int)  : Number of time units
+        time_unit_text (str) : Type of time units (ie. seconds, minutes, hours, etc)
+    Returns: 
+        seconds (int) : Number of seconds
+    """
+    if not time_quantity:
+        return 0
+
+    if time_unit_text in ["s", "sec", "second", "seconds"]:
+        return time_quantity
+
+    if time_unit_text in ["m", "min", "minute", "minutes"]:
+        return time_quantity * 60
+
+    if time_unit_text in ["h", "hr", "hour", "hours"]:
+        return time_quantity * 60 * 60
+
+    if time_unit_text in ["d", "day", "days"]:
+        return time_quantity * 60 * 60 * 60
+
+    if time_unit_text in ["blue moon"]:
+        blue_moon = 41  # months
+        return time_quantity * blue_moon * 2.628e+6
+
+    return 0
