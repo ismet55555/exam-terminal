@@ -37,7 +37,7 @@
 
 The `exam-terminal` is a terminal-based assessment tool. It can potentially be used for making, taking, or delivering exams or quizzes.
 
-<p align="center"><img width="600" alt="demo_gif" src="https://raw.githubusercontent.com/ismet55555/exam-terminal/master/misc/demo.gif"></p>
+<p align="center"><img width="725" alt="demo_gif" src="https://raw.githubusercontent.com/ismet55555/exam-terminal/master/misc/demo.gif"></p>
 
 Exam description can be loaded form a local file or a remote URL link.
 

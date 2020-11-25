@@ -54,7 +54,7 @@ config:
     style:
       border: 0px black solid
       boxShadow: 5px 10px 18px black #h-offset, v-offset, blur, spread, color
-      margin: 7px 20px 20px 7px  # top, right, bottom, left
+      margin: 15px 25px 25px 15px  # top, right, bottom, left
   
   # Add a watermark image to the rendered gif
   # You need to specify an absolute path for
