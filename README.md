@@ -35,7 +35,7 @@
 </p>
 
 
-The `exam-terminal` is a terminal-based assessment tool. It can potentially be used for making, taking, or delivering exams or quizzes.
+The `exam-terminal` is a terminal-based assessment tool. It can be used for making, taking, or delivering exams or quizzes.
 
 <p align="center"><img width="725" alt="demo_gif" src="https://raw.githubusercontent.com/ismet55555/exam-terminal/master/misc/demo.gif"></p>
 
