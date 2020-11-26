@@ -169,7 +169,7 @@ exam-terminal -examfile https://raw.githubusercontent.com/ismet55555/exam-termin
 
 # :pencil: Exam Creation
 
-Exams are described within examfiles.
+Exams are described within examfiles. A full example of an exam file can be seen here: [exam file](exam_terminal/exams/sample_exam.yml)
 
 ## Examfile Format
 
