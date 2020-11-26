@@ -1,10 +1,19 @@
+#####################################################################
+#
+# For recording in windows, can use:
+#      terminalizer record exam-terminal --skip-sharing --command "pwsh.exe -nologo"
+#
+# To render the gif using the recorded file:
+#      terminalizer render .\exam-terminal.yml
+#
+#####################################################################
+
 # The configurations that used for the recording, feel free to edit them
 config:
 
   # Specify a command to be executed
   # like `/bin/bash -l`, `ls`, or any other commands
-  # the default is bash for Linux
-  # or powershell.exe for Windows
+  # the default is bash for Linux or powershell.exe for Windows
   command: pwsh.exe -nologo
   
   # Specify the current working directory path
