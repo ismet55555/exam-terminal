@@ -1075,7 +1075,7 @@ class ExamTerminal:
         pdf.set_right_margin(margin=10)
         pdf.set_top_margin(margin=10)
         pdf.set_font('Helvetica', 'B', 18)  # Italics I, underline U
-        pdf.alias_nb_pages()
+        # pdf.alias_nb_pages()
 
         # Draw border
         pdf.line(10, 10, 200, 10)
