@@ -23,9 +23,12 @@ def exam_terminal(exam_file_contents:dict) -> int:
 
     # TODO: Smarter menu navigation
 
+    # Number of attempts
+    exam_attempt = 0
+
     while True:
         # Create the exam object and loading the exam file
-        exam = ExamTerminal.ExamTerminal(exam_file_contents)
+        exam = ExamTerminal.ExamTerminal(exam_file_contents, exam_attempt)
 
         # Show the intro
         main_menu_selection = exam.show_menu()
@@ -47,5 +50,8 @@ def exam_terminal(exam_file_contents:dict) -> int:
                 break
         else:
             break
+
+        # Increment exam exam_attempt
+        exam_attempt += 1
 
     return 0

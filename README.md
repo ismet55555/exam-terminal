@@ -35,11 +35,13 @@
 </p>
 
 
-The `exam-terminal` is a terminal-based assessment tool. It can potentially be used for making, taking, or delivering exams or quizes.
+The `exam-terminal` is a terminal-based assessment tool. It can be used for making, taking, or delivering exams or quizzes.
+
+<p align="center"><img width="725" alt="demo_gif" src="https://raw.githubusercontent.com/ismet55555/exam-terminal/master/misc/demo.gif"></p>
 
 Exam description can be loaded form a local file or a remote URL link.
 
-The exam results include your general exam score, some basic statistics, and the ability to export your results to a PDF documment.
+The exam results include your general exam score, some basic statistics, and the ability to export your results to a PDF document.
 
 ### Very Basically ...
   - Use `exam-terminal` to take or give exams in a terminal
@@ -50,20 +52,23 @@ The exam results include your general exam score, some basic statistics, and the
 
 # :eyeglasses: Overview
 
-- [Overview](#eyeglasses-overview)
-- [Quick Start](#fast_forward-quick-start)
-- [Compatibility](#thumbsup-compatibility)
-- [Installation](#rocket-installation)
+- [:eyeglasses: Overview](#eyeglasses-overview)
+- [:fast_forward: Quick Start](#fast_forward-quick-start)
+- [:thumbsup: Compatibility](#thumbsup-compatibility)
+- [:rocket: Installation](#rocket-installation)
   - [Install It From PYPI (pre-build)](#install-it-from-pypi-pre-build)
   - [Manually Build and Install it Yourself](#manually-build-and-install-it-yourself)
-- [Usage](#boom-usage)
-- [Exam Creation](#pencil-exam-creation)
+- [:boom: Usage](#boom-usage)
+- [:pencil: Exam Creation](#pencil-exam-creation)
   - [Examfile Format](#examfile-format)
   - [Exam File Structure](#exam-file-structure)
   - [Exam File Section: `exam`](#exam-file-section-exam)
+    - [Example](#example)
   - [Exam File Section: `questions`](#exam-file-section-questions)
-- [Contributors](#bust_in_silhouette-contributors)
-- [Development Notes](#computer-development-notes)
+    - [Answer Selection](#answer-selection)
+    - [Example](#example-1)
+- [:bust_in_silhouette: Contributors](#bust_in_silhouette-contributors)
+- [:computer: Development Notes](#computer-development-notes)
 - [Licence](#licence)
 
 
@@ -164,7 +169,7 @@ exam-terminal -examfile https://raw.githubusercontent.com/ismet55555/exam-termin
 
 # :pencil: Exam Creation
 
-Exams are described within examfiles.
+Exams are described within examfiles. A full example of an exam file can be seen here: [exam file](exam_terminal/exams/sample_exam.yml)
 
 ## Examfile Format
 
