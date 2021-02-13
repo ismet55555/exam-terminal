@@ -4,7 +4,7 @@ import os
 import setuptools
 
 # Package version number (Updated via bumpversion)
-__version__ = "0.2.5"
+__version__ = "0.2.6"
 
 
 def read(fname):
