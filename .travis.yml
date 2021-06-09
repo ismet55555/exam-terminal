@@ -28,8 +28,9 @@ branches:
 #   - bash scripts/preflight.sh $TRAVIS_COMMIT $TRAVIS_BRANCH || travis_terminate 1;
 
 install:
-  - pip install pipenv --upgrade-strategy=only-if-needed
-  - pipenv install --dev --ignore-pipfile
+  - python -m pip install --upgrade pip
+  - python -m pip install --upgrade-strategy=only-if-needed pipenv setuptools wheel twine build
+  - pipenv install --deploy --dev
 
 script: 
     - pwd 
