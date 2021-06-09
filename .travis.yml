@@ -32,10 +32,11 @@ install:
   - python -m pip install --upgrade-strategy=only-if-needed pipenv setuptools wheel twine build
   - pipenv install --deploy --dev
 
-script: 
+script:
+    - pipenv graph
     - pwd 
-    - pip list
-    - exam-terminal --help
+    - pipenv run pip list
+    - pipenv run exam-terminal --help
 
 deploy:
   - provider: pypi
