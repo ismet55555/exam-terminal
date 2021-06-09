@@ -13,8 +13,9 @@ twine = "*"
 exam-terminal = {editable = true, path = "."}
 
 [packages]
+click = "*"
 exam-terminal = {editable = false, path = "."}
 # See setup.py and requirements.txt for exam-terminal dependencies
 
 [pipenv]
-allow_prereleases = false
+allow_prereleases = true
