@@ -5,16 +5,19 @@ verify_ssl = true
 
 [dev-packages]
 wheel = "*"
-# flake8 = '*'
-# autopep8 = "*"
-# pylint = '*'
-bump2version = "*"
+setuptools = "*"
 twine = "*"
+bump2version = "*"
 exam-terminal = {editable = true, path = "."}
 
 [packages]
+click = "*"
+PyYAML = "*"
+fpdf2 = "*"
+requests = "*"
+windows-curses = {version = "*", platform_system = "== 'Windows'"}
 exam-terminal = {editable = false, path = "."}
 # See setup.py and requirements.txt for exam-terminal dependencies
 
 [pipenv]
-allow_prereleases = false
+allow_prereleases = true
