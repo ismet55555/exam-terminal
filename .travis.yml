@@ -34,7 +34,7 @@ install:
 
 script:
     - pipenv graph
-    - pwd 
+    - pwd
     - pipenv run pip list
     - pipenv run exam-terminal --help
 
@@ -57,4 +57,3 @@ deploy:
     skip_existing: true  # Prevent competing deploy builds
     on:
       branch: dev
-

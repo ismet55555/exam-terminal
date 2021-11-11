@@ -2,7 +2,6 @@ import textwrap
 
 sample_text = "fasdfsa' f sf af asfsadfsadfas as sdf asfsdf sdafsadfs s sa fsadf sadfsadasfdsadfsd f  sdfasd fsd"
 
-
 # Wrap this text.
 wrapper = textwrap.TextWrapper(width=20)
 

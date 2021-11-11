@@ -54,14 +54,12 @@ pdf.cell(w=page_x_area, h=20, txt='Exam Results', border=1, align='C')
 
 # Stats
 
-
 # Export the pdf to file
 #  F: Save local, I or D: standard out
 pdf.output(name='tuto1.pdf', dest='F')
 
 # Close
 pdf.close()
-
 
 # pdf.add_font(family: str, style = '', fname = '', uni = False)
 # pdf.cell(w, h = 0, txt = '', border = 0, ln = 0, align = '', fill = False, link = '')

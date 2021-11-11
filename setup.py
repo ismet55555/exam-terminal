@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+
 import setuptools
 
 # Package version number (Updated via bumpversion)

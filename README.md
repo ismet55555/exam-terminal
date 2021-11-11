@@ -186,7 +186,7 @@ Examfiles have two major sections:
 
   1. `exam` - General information about the entire exam. This includes info like exam title or allowed exam time
   2. `questions` - Information/Description for each question. This section includes each question and available selections for that question.
-  
+
 
 An outline of the examfile looks like this:
 
