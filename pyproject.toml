@@ -1,3 +1,11 @@
 [build-system]
 requires = ["setuptools >= 43.0", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[tool.isort]
+skip_gitignore = true
+multi_line_output = 3
+line_length = 100
+include_trailing_comma = true
+supported_extensions = [".py"]
+extend_skip = ["env", "venv", ".vscode", ".pytest_cache", "misc", "dev_stuff"]
