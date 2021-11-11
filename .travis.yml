@@ -29,7 +29,7 @@ branches:
 
 install:
   - pip install pipenv --upgrade-strategy=only-if-needed
-  - pipenv install --dev --ignore-pipfile
+  - pipenv install --ignore-pipfile
 
 script: 
     - pwd 
