@@ -50,34 +50,33 @@ def draw_menu(stdscr):
 
         # Check if no user input for some reason
         if k == 0:
-            keystr = "No key press detected..."[:term_width-1]
+            keystr = "No key press detected..."[:term_width - 1]
 
         # Check for cursor not off the screen in horizontal direction
         cursor_x = max(0, cursor_x)
-        cursor_x = min(term_width-1, cursor_x)
+        cursor_x = min(term_width - 1, cursor_x)
 
         # Check for cursor not off the screen in vertical direction
         cursor_y = max(0, cursor_y)
         # Excluding status bar at bottom
-        cursor_y = min(term_height-2, cursor_y)
+        cursor_y = min(term_height - 2, cursor_y)
 
         ###########################################################################################
 
         # Declaration of strings (ensuring that strings are not larger than screen term_width)
-        title = "Question: AWS Certified Architect Practice Exam"[
-            :term_width-1]
+        title = "Question: AWS Certified Architect Practice Exam"[:term_width - 1]
         x = 10
         y = 10
         stdscr.addstr(y, x, title)
 
         x = 10
         y = 11
-        selection = "Written by Ismet Handzic"[:term_width-1]
+        selection = "Written by Ismet Handzic"[:term_width - 1]
         stdscr.addstr(y, x, selection)
 
         x = 10
         y = 13
-        keystr = "Last key pressed: {}".format(k)[:term_width-1]
+        keystr = "Last key pressed: {}".format(k)[:term_width - 1]
         stdscr.addstr(y, x, keystr)
 
         ###########################################################################################

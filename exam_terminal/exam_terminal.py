@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python3
 
 import logging
@@ -8,7 +7,8 @@ from . import ExamTerminal
 
 logger = logging.getLogger()
 
-def exam_terminal(exam_file_contents:dict) -> int:
+
+def exam_terminal(exam_file_contents: dict) -> int:
     """
     Beginning of program. Called from __main__.py
 

@@ -2,8 +2,8 @@
 
 import logging
 import os
-import sysconfig
 import sys
+import sysconfig
 from urllib.parse import urlparse
 
 import click
@@ -31,7 +31,7 @@ def main(sample, examfile) -> None:
         / _ \ \/ / _` | '_ ` _ \______| __/ _ \ '__| '_ ` _ \| | '_ \ / _` | |
        |  __/>  < (_| | | | | | |     | ||  __/ |  | | | | | | | | | | (_| | |
         \___/_/\_\__,_|_| |_| |_|      \__\___|_|  |_| |_| |_|_|_| |_|\__,_|_|
-                                                                        
+
         Use this little terminal program to perform a exam/quiz/test using a
         predefined YML (or YAML) file containing exam information.
 

@@ -30,11 +30,11 @@ branches:
 install:
   - python -m pip install --upgrade pip
   - python -m pip install --upgrade-strategy=only-if-needed pipenv setuptools wheel twine build
-  - pipenv install --deploy --dev
+  - pipenv install --deploy
 
 script:
     - pipenv graph
-    - pwd 
+    - pwd
     - pipenv run pip list
     - pipenv run exam-terminal --help
 
@@ -57,4 +57,3 @@ deploy:
     skip_existing: true  # Prevent competing deploy builds
     on:
       branch: dev
-

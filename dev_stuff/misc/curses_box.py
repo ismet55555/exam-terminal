@@ -2,7 +2,6 @@
 
 import curses
 
-
 stdscr = curses.initscr()
 
 # Turn off echo
@@ -27,8 +26,7 @@ while (k != ord('q')):
 
     # Dummy text
     for i in range(10):
-        stdscr.addstr(
-            10 + i, 1, "Blah blah blah blah blah blah blah 123 123 123 123")
+        stdscr.addstr(10 + i, 1, "Blah blah blah blah blah blah blah 123 123 123 123")
 
     # Create a box (Height, Width, y, x) (Positions are top left)
     box1 = curses.newwin(7, 45, 15, 10)
@@ -43,8 +41,7 @@ while (k != ord('q')):
 
     # Dummy text
     for i in range(10):
-        stdscr.addstr(
-            21 + i, 1, "Text text text text text text text text text text text text text")
+        stdscr.addstr(21 + i, 1, "Text text text text text text text text text text text text text")
 
     # Refresh the screen and the box
     stdscr.refresh()
@@ -52,7 +49,6 @@ while (k != ord('q')):
 
     # Get User input
     k = stdscr.getch()
-
 
 # Ending curses
 curses.endwin()

@@ -21,7 +21,7 @@ logger = logging.getLogger()
 class ExamTerminal:
     """This class defines the exam terminal and its function."""
 
-    def __init__(self, exam_file_contents:dict, exam_attempt:int = 0) -> None:
+    def __init__(self, exam_file_contents: dict, exam_attempt: int = 0) -> None:
         """
         Object constructor method
 
@@ -31,10 +31,7 @@ class ExamTerminal:
             None
         """
         # Defining all possible exam type descriptions
-        self.exam_types = {
-            0: "Multiple Choice, Single Answer",
-            1: "Multiple Choice, Multiple Answers"
-        }
+        self.exam_types = {0: "Multiple Choice, Single Answer", 1: "Multiple Choice, Multiple Answers"}
 
         # Parse exam contents
         self.exam_contents = {}
@@ -75,13 +72,13 @@ class ExamTerminal:
 
     ###############################################################################################
 
-    def __parse_examfile_contents(self, exam_file_contents:dict, exam_attempt:int) -> Dict:
+    def __parse_examfile_contents(self, exam_file_contents: dict, exam_attempt: int) -> Dict:
         """
         Parsing and supplementing a exam file contents
 
         Parameters:
             exam_file_contents (dict): Pre-loaded exam contents
-        Returns: 
+        Returns:
             return (Dict): Loaded and parsed info of exam file contents
         """
         logger.debug(f"Parsing the loaded exam file ...")
@@ -91,9 +88,7 @@ class ExamTerminal:
             # FIXME: Should not have to use "exam_attempt" to make this work.
             logger.debug(f"Calculating exam_allwed_time ...")
             exam_file_contents['exam']['exam_allowed_time'] = utility.to_seconds(
-                                                exam_file_contents['exam']['exam_allowed_time'],
-                                                exam_file_contents['exam']['exam_allowed_time_units']
-                                                )
+                exam_file_contents['exam']['exam_allowed_time'], exam_file_contents['exam']['exam_allowed_time_units'])
         # Save the current exam attempt
         exam_file_contents['exam']['exam_attempt'] = exam_attempt
 
@@ -158,7 +153,7 @@ class ExamTerminal:
         Parameters:
             scr (obj)      : Handle for curses terminal screen handle
             halfdely (bool): If True, refresh specified 1/10th of second, else refresh 25.5 seconds
-        Returns: 
+        Returns:
             None
         """
         # Hiding the cursor
@@ -182,12 +177,12 @@ class ExamTerminal:
 
         Parameters:
             scr (obj): Handle for curses terminal screen handle
-        Returns: 
+        Returns:
             None
         """
         # Getting the screen height and width
         term_height, term_width = scr.getmaxyx()
-        
+
         # Check Height and width
         self.terminal_size_good = term_height >= self.height_limit and term_width >= self.width_limit
 
@@ -208,15 +203,11 @@ class ExamTerminal:
 
             # if not self.exam_paused and not self.exam_quit:
             message_lines = [
-                'Uh-Oh! Window size too small!',
-                '',
-                f'Current size is W:{term_width} by H:{term_height}',
-                f'Size must be at least W:{self.width_limit} by H:{self.height_limit}',
-                '',
-                'Please resize window to continue',
-                ''
+                'Uh-Oh! Window size too small!', '', f'Current size is W:{term_width} by H:{term_height}',
+                f'Size must be at least W:{self.width_limit} by H:{self.height_limit}', '',
+                'Please resize window to continue', ''
                 'To quit program press "Q" or "ESC"'
-                ]
+            ]
             # utility.draw_message_box(scr, message_lines)
             for y, line in enumerate(message_lines):
                 scr.addstr(1 + y, 1, line, self.decor['bold'])
@@ -226,7 +217,7 @@ class ExamTerminal:
 
     ###############################################################################################
 
-    def __draw_selection_menu(self, scr, selections:list, start_y:int) -> None:
+    def __draw_selection_menu(self, scr, selections: list, start_y: int) -> None:
         """
         Draw a Selection menu at the bottom of the screen with a specified options
 
@@ -234,18 +225,18 @@ class ExamTerminal:
             scr (obj)         : Handle for curses terminal screen handle
             selections (list) : Menu selection for each list item
             start_y (int)     : Line/row number at which selection menu starts
-        Returns: 
+        Returns:
             None
         """
         # Getting the terminal size
-        _, term_width = scr.getmaxyx()  
+        _, term_width = scr.getmaxyx()
 
         # Check if within boundaries of selection indexes
         self.selection_index = max(self.selection_index, 0)
         self.selection_index = min(self.selection_index, len(selections) - 1)
 
         # Get the x position of selection indicator
-        longest_selection_text = len(max(selections, key = len))
+        longest_selection_text = len(max(selections, key=len))
         x_begin = term_width // 2 - longest_selection_text // 2 - 3
         x_end = term_width // 2 + longest_selection_text // 2 + 2
 
@@ -268,7 +259,7 @@ class ExamTerminal:
         Parameters:
             scr (obj)            : Handle for curses terminal screen handle
             message_lines (list) : Lines of text in each list item
-        Returns: 
+        Returns:
             None
         """
         term_height, term_width = scr.getmaxyx()
@@ -296,7 +287,7 @@ class ExamTerminal:
 
         Parameters:
             scr (obj)         : Handle for curses terminal screen handle
-        Returns: 
+        Returns:
             menu option (str)  : Selection menu option user selected (ie. quit)
             successfull (bool) : True if no error, else False
         """
@@ -339,7 +330,7 @@ class ExamTerminal:
 
             ########################################################################################
 
-            term_height, term_width = scr.getmaxyx()          
+            term_height, term_width = scr.getmaxyx()
 
             ########################################################################################
 
@@ -371,7 +362,6 @@ class ExamTerminal:
             scr.addstr(start_y, utility.center_x(term_width, line), line, self.color['grey-light'])
             start_y += 3
 
-
             lines = ["Description:", f"{self.exam_contents['exam']['exam_description']}"]
             menu_item_wrap = ' '
             for x, line_text in zip(start_x, lines):
@@ -380,10 +370,9 @@ class ExamTerminal:
                     scr.addstr(start_y + l - 1, x, line, self.color['default'])
             start_y += len(menu_item_wrap)
 
-            
             lines = ["Exam Type:", self.exam_contents['exam']['exam_type']]
             for x, line in zip(start_x, lines):
-                scr.addstr(start_y , x, line, self.color['default'])
+                scr.addstr(start_y, x, line, self.color['default'])
             start_y += 2
 
             lines = ["Questions:", f"{self.exam_contents['exam']['exam_questions_count']}"]
@@ -391,7 +380,10 @@ class ExamTerminal:
                 scr.addstr(start_y, x, line, self.color['default'])
             start_y += 2
 
-            lines = ["Allowed Time:", f"{self.exam_contents['exam']['exam_allowed_time']} {self.exam_contents['exam']['exam_allowed_time_units']}"]
+            lines = [
+                "Allowed Time:",
+                f"{self.exam_contents['exam']['exam_allowed_time']} {self.exam_contents['exam']['exam_allowed_time_units']}"
+            ]
             for x, line in zip(start_x, lines):
                 scr.addstr(start_y, x, line, self.color['default'])
             start_y += 2
@@ -441,7 +433,7 @@ class ExamTerminal:
 
         Parameters:
             None
-        Returns: 
+        Returns:
             menu option (str)  : Selection menu option user selected (ie. quit)
             successfull (bool) : True if no error, else False
         """
@@ -456,15 +448,15 @@ class ExamTerminal:
 
         Parameters:
             None
-        Returns: 
+        Returns:
             None
         """
         logger.debug('Starting exam timer thread ...')
         while self.is_timer_timing:
-            self.global_elapsed_time = time() - self.exam_begin_time 
+            self.global_elapsed_time = time() - self.exam_begin_time
             if not self.exam_paused:
                 # Elapsed exam time
-                self.exam_elapsed_time = self.global_elapsed_time - self.exam_paused_elapsed_time 
+                self.exam_elapsed_time = self.global_elapsed_time - self.exam_paused_elapsed_time
 
                 # Check if exam time is up
                 if self.exam_elapsed_time > self.exam_contents['exam']['exam_allowed_time']:
@@ -475,13 +467,13 @@ class ExamTerminal:
                 self.exam_paused_elapsed_time = self.global_elapsed_time - self.exam_elapsed_time
         logger.debug('Exam timer thread ended')
 
-    def draw_question(self, scr, question:dict) -> Tuple[str, bool]:
+    def draw_question(self, scr, question: dict) -> Tuple[str, bool]:
         """
         Draw a the current quesition on the screen
 
         Parameters:
             question (dict) : The current question information being presented
-        Returns: 
+        Returns:
             menu option (str)  : Selection menu option user selected (ie. quit)
             successfull (bool) : True if no error, else False
         """
@@ -532,7 +524,7 @@ class ExamTerminal:
                 if not self.exam_paused and not self.is_exam_time_out:
                     self.selection_index -= 1
 
-            elif k in KEYS['ENTER']:                
+            elif k in KEYS['ENTER']:
                 if self.is_exam_time_out:
                     return 'quit', False
 
@@ -548,7 +540,8 @@ class ExamTerminal:
                     logger.debug(f"Selected selection indexes: {question['answered_indexes']}")
 
                     # Determine correct or not correct
-                    question['answered_correct_bool'][self.selection_index] = question['question_answer_bool'][self.selection_index] != question['answered_correct_bool'][self.selection_index]
+                    question['answered_correct_bool'][self.selection_index] = question['question_answer_bool'][
+                        self.selection_index] != question['answered_correct_bool'][self.selection_index]
                     correct_all = question['question_answer_bool'] == question['answered_correct_bool']
 
                     answer = question['selection'][self.selection_index]
@@ -569,7 +562,7 @@ class ExamTerminal:
             elif k in KEYS['QUIT']:
                 if not self.is_exam_time_out:
                     self.exam_quit += 1
-              
+
             ########################################################################################
 
             # Check terminal size
@@ -577,7 +570,7 @@ class ExamTerminal:
 
             # Drawing the screen border
             utility.draw_screen_border(scr, self.color['grey-dark'])
-            
+
             ########################################################################################
 
             # Check if within boundaries of selection indexes
@@ -605,7 +598,7 @@ class ExamTerminal:
             # Message of allowed time for current question
             if question_timer:
                 message.append(f"Allowed Time: {question['question_allowed_time']:3.1f} seconds")
-                
+
             # Construct the question message
             if question['question_multiselect'] or question_timer:
                 color = self.color['grey-light']
@@ -628,7 +621,8 @@ class ExamTerminal:
                     if s == self.selection_index:
                         color = self.color['default'] | self.decor['bold']
                         # Draw the selection indicator
-                        scr.addstr(start_y + selection_offset + l - 1, selection_x - 2, self.selection_indicator, self.color['default'] | self.decor['bold'])
+                        scr.addstr(start_y + selection_offset + l - 1, selection_x - 2, self.selection_indicator,
+                                   self.color['default'] | self.decor['bold'])
                     else:
                         color = self.color['grey-light']
 
@@ -654,7 +648,8 @@ class ExamTerminal:
                     logging.debug('Question timout')
 
                     # Determine correct or not correct at timeout
-                    question['answered_correct_bool'][self.selection_index] = question['question_answer_bool'][self.selection_index] != question['answered_correct_bool'][self.selection_index]
+                    question['answered_correct_bool'][self.selection_index] = question['question_answer_bool'][
+                        self.selection_index] != question['answered_correct_bool'][self.selection_index]
                     correct_all = question['question_answer_bool'] == question['answered_correct_bool']
 
                     question['answered_timeout'] = True
@@ -667,13 +662,20 @@ class ExamTerminal:
                     color = self.color['orange']
                 if elapsed_dec > 0.92:
                     color = self.color['red'] | self.decor['bold']
-                progress_bar = utility.get_progress_bar(exam_progress=elapsed_dec, bar_char_width=term_width - 24, bar_char_full="*")
-                scr.addstr(term_height - 4, 3, f"[ {question_elapsed_time:3.1f}s / {question['question_allowed_time']:3.1f}s ][{progress_bar}]", color)
-
+                progress_bar = utility.get_progress_bar(exam_progress=elapsed_dec,
+                                                        bar_char_width=term_width - 24,
+                                                        bar_char_full="*")
+                scr.addstr(
+                    term_height - 4, 3,
+                    f"[ {question_elapsed_time:3.1f}s / {question['question_allowed_time']:3.1f}s ][{progress_bar}]",
+                    color)
 
             # Progress - Questions answered
-            progress_bar = utility.get_progress_bar(exam_progress=self.questions_progress, bar_char_width=term_width - 23)
-            scr.addstr(term_height - 3, 3, f"[ {self.questions_complete + 1:3.0f}  / {self.questions_total:3.0f}   ][{progress_bar}]", self.color['default'])
+            progress_bar = utility.get_progress_bar(exam_progress=self.questions_progress,
+                                                    bar_char_width=term_width - 23)
+            scr.addstr(term_height - 3, 3,
+                       f"[ {self.questions_complete + 1:3.0f}  / {self.questions_total:3.0f}   ][{progress_bar}]",
+                       self.color['default'])
 
             # Progress - Elapsed Exam Time
             elapsed_dec = self.exam_elapsed_time / self.exam_contents['exam']['exam_allowed_time']
@@ -683,7 +685,10 @@ class ExamTerminal:
             if elapsed_dec > 0.92:
                 color = self.color['red'] | self.decor['bold']
             progress_bar = utility.get_progress_bar(exam_progress=elapsed_dec, bar_char_width=term_width - 23)
-            scr.addstr(term_height - 2, 3, f"[ {self.exam_elapsed_time:3.0f}s / {self.exam_contents['exam']['exam_allowed_time']:3.0f}s  ][{progress_bar}]", color)
+            scr.addstr(
+                term_height - 2, 3,
+                f"[ {self.exam_elapsed_time:3.0f}s / {self.exam_contents['exam']['exam_allowed_time']:3.0f}s  ][{progress_bar}]",
+                color)
 
             ########################################################################################
 
@@ -701,7 +706,10 @@ class ExamTerminal:
             if self.exam_quit:
                 curses.halfdelay(255)
                 self.exam_paused = True
-                message_lines = ['Are you sure you want to quit and evalute exam?', 'To quit and evaluate press "Q"', 'To resume exam press "R"']
+                message_lines = [
+                    'Are you sure you want to quit and evalute exam?', 'To quit and evaluate press "Q"',
+                    'To resume exam press "R"'
+                ]
                 self.__draw_message_box(scr, message_lines)
                 if self.exam_quit > 1:
                     # Quit Message confirmed (pressed twice)
@@ -723,13 +731,13 @@ class ExamTerminal:
             # Get User input
             k = scr.getch()
 
-    def show_question(self, question:dict) -> Tuple[str, bool]:
+    def show_question(self, question: dict) -> Tuple[str, bool]:
         """
         Curses wrapper function for drawing single question on screen
 
         Parameters:
             question (dict) : The current question information being presented
-        Returns: 
+        Returns:
             menu option (str)  : Selection menu option user selected (ie. quit)
             successfull (bool) : True if no error, else False
         """
@@ -743,7 +751,7 @@ class ExamTerminal:
 
         Parameters:
             None
-        Returns: 
+        Returns:
             None
         """
         logger.debug('Evaluating exam results ...')
@@ -766,7 +774,7 @@ class ExamTerminal:
 
         Parameters:
             None
-        Returns: 
+        Returns:
             results (dict) : Combined and formatted exam results for presentation
         """
         results = {}
@@ -793,22 +801,34 @@ class ExamTerminal:
         index += 1
 
         results[index] = {
-            "label": "Correct:",
-            "text": f"{self.exam_contents['exam']['evaluation_percent']:3.1f}% ({self.questions_correct} of {self.exam_contents['exam']['exam_questions_count']}) (Needed: {self.exam_contents['exam']['exam_passing_score']}%)",
-            "color": "default",
-            "decor": "normal",
-            "font_width": '',
-            "skip_lines": 1
+            "label":
+                "Correct:",
+            "text":
+                f"{self.exam_contents['exam']['evaluation_percent']:3.1f}% ({self.questions_correct} of {self.exam_contents['exam']['exam_questions_count']}) (Needed: {self.exam_contents['exam']['exam_passing_score']}%)",
+            "color":
+                "default",
+            "decor":
+                "normal",
+            "font_width":
+                '',
+            "skip_lines":
+                1
         }
         index += 1
 
         results[index] = {
-            "label": "Questions Answered:",
-            "text": f"{self.exam_contents['exam']['exam_questions_answered']} of {self.exam_contents['exam']['exam_questions_count']}",
-            "color": "default",
-            "decor": "normal",
-            "font_width": '',
-            "skip_lines": 1
+            "label":
+                "Questions Answered:",
+            "text":
+                f"{self.exam_contents['exam']['exam_questions_answered']} of {self.exam_contents['exam']['exam_questions_count']}",
+            "color":
+                "default",
+            "decor":
+                "normal",
+            "font_width":
+                '',
+            "skip_lines":
+                1
         }
         index += 1
 
@@ -823,12 +843,18 @@ class ExamTerminal:
         index += 1
 
         results[index] = {
-            "label": "Exam Time Range:",
-            "text": f"{self.exam_contents['exam']['exam_begin_datestring']} -> {self.exam_contents['exam']['exam_end_datestring']}",
-            "color": "default",
-            "decor": "normal",
-            "font_width": '',
-            "skip_lines": 2
+            "label":
+                "Exam Time Range:",
+            "text":
+                f"{self.exam_contents['exam']['exam_begin_datestring']} -> {self.exam_contents['exam']['exam_end_datestring']}",
+            "color":
+                "default",
+            "decor":
+                "normal",
+            "font_width":
+                '',
+            "skip_lines":
+                2
         }
         index += 1
 
@@ -927,7 +953,7 @@ class ExamTerminal:
 
         Parameters:
             None
-        Returns: 
+        Returns:
             menu option (str)  : Selection menu option user selected (ie. quit)
             successfull (bool) : True if no error, else False
         """
@@ -975,7 +1001,7 @@ class ExamTerminal:
 
             ########################################################################################
 
-            term_height, term_width = scr.getmaxyx()          
+            term_height, term_width = scr.getmaxyx()
 
             ########################################################################################
 
@@ -1004,8 +1030,9 @@ class ExamTerminal:
             start_x = [4, 30]
             results = self.__assemble_exam_results()
             for _, item in results.items():
-                scr.addstr(start_y , start_x[0], item['label'], self.color['default'])
-                scr.addstr(start_y , start_x[1], utility.truncate_text(item['text'], term_width - 32), self.color[item['color']] | self.decor[item['decor']])
+                scr.addstr(start_y, start_x[0], item['label'], self.color['default'])
+                scr.addstr(start_y, start_x[1], utility.truncate_text(item['text'], term_width - 32),
+                           self.color[item['color']] | self.decor[item['decor']])
                 start_y += item['skip_lines']
 
             ########################################################################################
@@ -1014,7 +1041,6 @@ class ExamTerminal:
             utility.draw_horizontal_seperator(scr, term_height - len(selections) - 4, self.color['grey-dark'])
             start_y = term_height - len(selections) - 7
             self.__draw_selection_menu(scr, selections, start_y)
-
 
             ########################################################################################
 
@@ -1049,7 +1075,7 @@ class ExamTerminal:
 
         Parameters:
             None
-        Returns: 
+        Returns:
             menu option (str)  : Selection menu option user selected (ie. quit)
             successfull (bool) : True if no error, else False
         """
@@ -1061,8 +1087,8 @@ class ExamTerminal:
 
         Parameters:
             None
-        Returns: 
-            success (bool) : True if successfull, else False 
+        Returns:
+            success (bool) : True if successfull, else False
         """
         page_width = 210
         page_height = 297
@@ -1080,7 +1106,7 @@ class ExamTerminal:
         pdf.set_author("Author Test Terminal")
         pdf.set_creator("Creator Test Terminal")
         pdf.set_subject("Exam Results")
-        pdf.add_page(orientation = 'P', format = 'A4', same = False)
+        pdf.add_page(orientation='P', format='A4', same=False)
         pdf.set_left_margin(margin=10)
         pdf.set_right_margin(margin=10)
         pdf.set_top_margin(margin=10)
@@ -1124,8 +1150,12 @@ class ExamTerminal:
             else:
                 pdf.set_font('Helvetica', '', 11)
             pdf.set_xy(x=start_x[1], y=start_y)
-            pdf.cell(w=60, h=line_height, txt=utility.truncate_text(item['text'], self.width_limit - 25), border=0, align='L')
-            
+            pdf.cell(w=60,
+                     h=line_height,
+                     txt=utility.truncate_text(item['text'], self.width_limit - 25),
+                     border=0,
+                     align='L')
+
             start_y += item['skip_lines'] * 8
 
         # Add divider lines
@@ -1139,7 +1169,8 @@ class ExamTerminal:
         pdf.cell(w=0, h=5, txt=f"Created with {utility.load_software_name_version()}", border=0, align='L')
 
         # Export the pdf to file
-        datetime_text = datetime.fromtimestamp(self.exam_contents['exam']['exam_end_timestamp']).strftime("[%m-%d][%H-%M]")
+        datetime_text = datetime.fromtimestamp(
+            self.exam_contents['exam']['exam_end_timestamp']).strftime("[%m-%d][%H-%M]")
         pdf_filepath = os.path.abspath(os.path.join('.', f'{datetime_text}_Exam_Result_Summary.pdf'))
         try:
             pdf.output(name=pdf_filepath, dest='F')
@@ -1161,7 +1192,7 @@ class ExamTerminal:
 
         Parameters:
             None
-        Returns: 
+        Returns:
             None
         """
         logger.debug('Beginning Exam ...')
@@ -1210,8 +1241,10 @@ class ExamTerminal:
         # Log exam attributes
         self.exam_contents['exam']['exam_begin_timestamp'] = self.exam_begin_time
         self.exam_contents['exam']['exam_end_timestamp'] = time()
-        self.exam_contents['exam']['exam_begin_datestring'] = datetime.fromtimestamp(self.exam_contents['exam']['exam_begin_timestamp']).strftime("%m/%d/%Y, %H:%M:%S")
-        self.exam_contents['exam']['exam_end_datestring'] = datetime.fromtimestamp(self.exam_contents['exam']['exam_end_timestamp']).strftime("%m/%d/%Y, %H:%M:%S")
+        self.exam_contents['exam']['exam_begin_datestring'] = datetime.fromtimestamp(
+            self.exam_contents['exam']['exam_begin_timestamp']).strftime("%m/%d/%Y, %H:%M:%S")
+        self.exam_contents['exam']['exam_end_datestring'] = datetime.fromtimestamp(
+            self.exam_contents['exam']['exam_end_timestamp']).strftime("%m/%d/%Y, %H:%M:%S")
 
         self.exam_contents['exam']['exam_questions_complete'] = self.questions_complete
         self.exam_contents['exam']['exam_questions_correct'] = self.questions_correct
