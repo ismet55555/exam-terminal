@@ -34,7 +34,6 @@
 </a>
 </p>
 
-
 The `exam-terminal` is a terminal-based assessment tool. It can be used for making, taking, or delivering exams or quizzes.
 
 <p align="center"><img width="725" alt="demo_gif" src="https://raw.githubusercontent.com/ismet55555/exam-terminal/master/misc/demo.gif"></p>
@@ -44,14 +43,12 @@ Exam description can be loaded form a local file or a remote URL link.
 The exam results include your general exam score, some basic statistics, and the ability to export your results to a PDF document.
 
 ### Very Basically ...
-  - Use `exam-terminal` to take or give exams in a terminal
 
+- Use `exam-terminal` to take or give exams in a terminal
 
 <p align="center"><a href="https://www.buymeacoffee.com/ismet55555" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a></p>
 
-
 <!-- ################################################ -->
-
 
 # :eyeglasses: Overview
 
@@ -74,9 +71,7 @@ The exam results include your general exam score, some basic statistics, and the
 - [:computer: Development Notes](#computer-development-notes)
 - [Licence](#licence)
 
-
 <!-- ################################################ -->
-
 
 # :fast_forward: Quick Start
 
@@ -96,22 +91,21 @@ exam-terminal --examfile https://raw.githubusercontent.com/ismet55555/exam-termi
 # Make and load your own exams using YAML format (See below)
 ```
 
-
 <!-- ################################################ -->
 
-
 # :thumbsup: Compatibility
+
 As of now the following Python 3 versions are tested and supported:
-  - Python 3.6, 3.7, 3.8, 3.9
+
+- Python 3.7, 3.8, 3.9, 3.10
 
 For the following platforms:
-  - OSX, Windows, Linux (Debian based)
+
+- OSX, Windows, Linux (Debian based)
 
 To check which python version you have, open a terminal and type `python --version`
 
-
 <!-- ################################################ -->
-
 
 # :rocket: Installation
 
@@ -120,11 +114,11 @@ To check which python version you have, open a terminal and type `python --versi
 1.  Ensure internet connection
 2.  Open up a terminal (or PowerShell) on your computer
 3.  Ensure python is installed and has compatible version
-    -  `python --version`
+    - `python --version`
     - If it is not, install it. [Human Readable Guide](https://realpython.com/installing-python/)
 4.  Ensure that `pip`, `setuptools`, and `wheel` are installed an up to date
     - `python -m pip install --upgrade pip setuptools wheel`
-5. Install that `exam-terminal` from PYPI
+5.  Install that `exam-terminal` from PYPI
     - `pip install exam-terminal`
 
 ## Manually Build and Install it Yourself
@@ -135,18 +129,16 @@ These following steps are useful if you do not have access to the internet on a 
 2. Copy it to some temporary location on the computer you wish to install `exam-terminal` on (ie. Downloads)
 3. Open up a terminal (or PowerShell) on your computer
 4. Use the `cd` command to change directory into the `exam-terminal` directory
-   -  Example: `cd /home/username/Downloads/exam-terminal`
-5.  Ensure python is installed and has compatible version
-    -  `python --version`
-    - If it is not, install it. [Human Readable Guide](https://realpython.com/installing-python/)
-6.  Ensure that `pip`, `setuptools`, and `wheel` are installed an up to date
-    - `python -m pip install --upgrade pip setuptools wheel`
+   - Example: `cd /home/username/Downloads/exam-terminal`
+5. Ensure python is installed and has compatible version
+   - `python --version`
+   - If it is not, install it. [Human Readable Guide](https://realpython.com/installing-python/)
+6. Ensure that `pip`, `setuptools`, and `wheel` are installed an up to date
+   - `python -m pip install --upgrade pip setuptools wheel`
 7. Install that `exam-terminal`
-    - `python setup.py install`
-
+   - `python setup.py install`
 
 <!-- ################################################ -->
-
 
 # :boom: Usage
 
@@ -155,6 +147,7 @@ To load a local exam file located on your computer, or load a remote exam file l
 If the file location contains a space, please use single or double quotes
 
 Examples:
+
 ```bash
 # Locally stored exam file
 exam-terminal --examfile home/USERNAME/Downloads/examfile.yml
@@ -166,9 +159,7 @@ exam-terminal -examfile https://raw.githubusercontent.com/ismet55555/exam-termin
 
 **NOTE**: For help enter `exam-terminal --help`
 
-
 <!-- ################################################ -->
-
 
 # :pencil: Exam Creation
 
@@ -184,15 +175,13 @@ The exam file should be named with the `.yml` or `.yaml` file extension.
 
 Examfiles have two major sections:
 
-  1. `exam` - General information about the entire exam. This includes info like exam title or allowed exam time
-  2. `questions` - Information/Description for each question. This section includes each question and available selections for that question.
-
+1. `exam` - General information about the entire exam. This includes info like exam title or allowed exam time
+2. `questions` - Information/Description for each question. This section includes each question and available selections for that question.
 
 An outline of the examfile looks like this:
 
 ```yaml
-exam:
-  ...
+exam: ...
 questions:
   - question: ...
     selection:
@@ -211,15 +200,15 @@ This section describes the general information about the exam. The following are
 
 **NOTE**: _As of now all of the exam descriptions are required_
 
-| Item                      	| Description                                         	| Example                                    	|
-|---------------------------	|-----------------------------------------------------	|--------------------------------------------	|
-| `exam_title`              	| The general title of the exam                       	| `AWS Kiwi Practice Exam`                   	|
-| `exam_description`        	| A longer more detailed description of the exam      	| `This exam assess your knowledge on kiwis` 	|
-| `exam_author`             	| The name of the person or entity that made the exam 	| `Pappa McJameson`                          	|
-| `exam_edit_date`          	| The date when the exam was last edited              	| `01/01/1970`                               	|
-| `exam_allwed_time`        	| Total exam time allowed                             	| `120`                                      	|
-| `exam_allowed_time_units` 	| The time units that describe `exam_allowed_time`    	| `seconds`                                  	|
-| `exam_passing_score`      	| Minimum passing score percentage for the exam       	| `70`                                       	|
+| Item                      | Description                                         | Example                                    |
+| ------------------------- | --------------------------------------------------- | ------------------------------------------ |
+| `exam_title`              | The general title of the exam                       | `AWS Kiwi Practice Exam`                   |
+| `exam_description`        | A longer more detailed description of the exam      | `This exam assess your knowledge on kiwis` |
+| `exam_author`             | The name of the person or entity that made the exam | `Pappa McJameson`                          |
+| `exam_edit_date`          | The date when the exam was last edited              | `01/01/1970`                               |
+| `exam_allwed_time`        | Total exam time allowed                             | `120`                                      |
+| `exam_allowed_time_units` | The time units that describe `exam_allowed_time`    | `seconds`                                  |
+| `exam_passing_score`      | Minimum passing score percentage for the exam       | `70`                                       |
 
 ### Example
 
@@ -232,18 +221,17 @@ exam:
   exam_allowed_time: 240
   exam_allowed_time_units: "seconds"
   exam_passing_score: 95
-...
 ```
 
 ## Exam File Section: `questions`
 
 This section describes each question in the exam. The following are the available options for each question:
 
-| Item                    	| Description                                                                    	| Example                       	|
-|-------------------------	|--------------------------------------------------------------------------------	|-------------------------------	|
-| `question`              	| Question text shown to the exam taker                                          	| `What's your favorite color?` 	|
-| `question_allowed_time` 	| (Optional) Total time allowed for the specific question in seconds             	| `60`                          	|
-| `selection`             	| List of answer selections for the user.<br>Correct answers denoted by `: true` 	| `- green`<br>`- black: true`  	|
+| Item                    | Description                                                                    | Example                       |
+| ----------------------- | ------------------------------------------------------------------------------ | ----------------------------- |
+| `question`              | Question text shown to the exam taker                                          | `What's your favorite color?` |
+| `question_allowed_time` | (Optional) Total time allowed for the specific question in seconds             | `60`                          |
+| `selection`             | List of answer selections for the user.<br>Correct answers denoted by `: true` | `- green`<br>`- black: true`  |
 
 ### Answer Selection
 
@@ -252,7 +240,7 @@ To denoted the correct answer in the `selection` section, simply add at `: true`
 ### Example
 
 ```yaml
-...
+---
 questions:
   - question: What is your hobby?
     selection:
@@ -261,31 +249,28 @@ questions:
       - TV
       - Chillin: true
       - Reading: true
-...
 ```
+
 **NOTE**: If there is more than one correct (`true`) answer, the question automatically becomes a multi-answer question, allowing the exam taker to select multiple selections.
 
-
 <!-- ################################################ -->
-
 
 # :bust_in_silhouette: Contributors
-**Ismet Handžić** - GitHub: [@ismet55555](https://github.com/ismet55555)
 
+**Ismet Handžić** - GitHub: [@ismet55555](https://github.com/ismet55555)
 
 <!-- ################################################ -->
 
-
 # :computer: Development Notes
+
 If you are eying this repo and thinking "Hey this is kind of neat, I'd love to add a few things", well this is your chance :-)
 
 There is definetly work to be done. If you don't have a genius great idea for the next big change, there is a [`TODO.md`](TODO.md) file which outlines some changes, features, and fixes that would be nice to have.
 
 For some guides on how to help out, checkout the `dev_stuff` directory.
 
-
 <!-- ################################################ -->
 
-
 # Licence
+
 This project is licensed under the Apache 2.0 License - Please see the [LICENSE](LICENSE) file for details.
