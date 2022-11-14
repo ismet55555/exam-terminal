@@ -8,10 +8,10 @@ language: python
 cache: pip
 
 python:
-  - "3.6"
   - "3.7"
   - "3.8"
   - "3.9"
+  - "3.10"
 
 matrix:
   allow_failures:
@@ -33,27 +33,27 @@ install:
   - pipenv install --deploy
 
 script:
-    - pipenv graph
-    - pwd
-    - pipenv run pip list
-    - pipenv run exam-terminal --help
+  - pipenv graph
+  - pwd
+  - pipenv run pip list
+  - pipenv run exam-terminal --help
 
 deploy:
   - provider: pypi
     username: $PYPI_USERNAME
     password: $PYPI_PASSWORD
-    edge: true  # Opt in to travis CI dpl v2
+    edge: true # Opt in to travis CI dpl v2
     distributions: "sdist bdist_wheel"
-    skip_existing: true  # Prevent competing deploy builds
+    skip_existing: true # Prevent competing deploy builds
     on:
       branch: master
 
   - provider: pypi
-    server: https://test.pypi.org/legacy/  # Comment out to deploy to PYPI
+    server: https://test.pypi.org/legacy/ # Comment out to deploy to PYPI
     username: $TEST_PYPI_USERNAME
     password: $TEST_PYPI_PASSWORD
-    edge: true  # Opt in to travis CI dpl v2
+    edge: true # Opt in to travis CI dpl v2
     distributions: "sdist bdist_wheel"
-    skip_existing: true  # Prevent competing deploy builds
+    skip_existing: true # Prevent competing deploy builds
     on:
       branch: dev
