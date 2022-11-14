@@ -36,7 +36,7 @@ setuptools.setup(
     include_package_data=True,
     long_description=read('README.md'),
     long_description_content_type='text/markdown',
-    python_requires='>=3.6',
+    python_requires='>=3.7',
     setup_requires=['wheel'],
     py_modules=["exam_terminal"],
     entry_points={"console_scripts": [
@@ -54,7 +54,6 @@ setuptools.setup(
         "Environment :: Console :: Curses",
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
