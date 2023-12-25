@@ -1,6 +1,5 @@
-#!/usr/bin/env python3
+"""Main file."""
 
-import curses
 import logging
 import os
 import sys
@@ -9,7 +8,15 @@ import threading
 from datetime import datetime
 from statistics import mean, median, stdev
 from time import gmtime, strftime, time
-from typing import Dict, Tuple
+from typing import Dict, Tuple, Union
+
+try:
+    import curses
+except ImportError:
+    import click
+    click.secho("ERROR: Python curses library failed to load/import.", fg='bright_red', bold=True)
+    click.secho("       This may be an issue with Python or your terminal.", fg='bright_red', bold=True)
+    sys.exit(1)
 
 from fpdf import FPDF
 
@@ -22,13 +29,11 @@ class ExamTerminal:
     """This class defines the exam terminal and its function."""
 
     def __init__(self, exam_file_contents: dict, exam_attempt: int = 0) -> None:
-        """
-        Object constructor method
+        """Object constructor method.
 
         Parameters:
             exam_file_contents (dict): Pre-loaded exam contents
-        Returns:
-            None
+            exam_attempt (int)       : Current exam attempt
         """
         # Defining all possible exam type descriptions
         self.exam_types = {0: "Multiple Choice, Single Answer", 1: "Multiple Choice, Multiple Answers"}
@@ -37,18 +42,18 @@ class ExamTerminal:
         self.exam_contents = {}
         self.exam_contents = self.__parse_examfile_contents(exam_file_contents, exam_attempt)
 
-        self.color = {}
-        self.decor = {}
+        self.color: dict = {}
+        self.decor: dict = {}
 
         self.halfdelay_screen_refresh = 5  # 10th of a second
 
         self.height_limit = 27
-        self.width_limit = 85
+        self.width_limit = 79
         self.terminal_size_good = True
 
         self.questions_total = len(self.exam_contents['questions'])
         self.questions_complete = 0
-        self.questions_progress = 0
+        self.questions_progress = 0.0
 
         self.questions_correct = 0
         self.questions_wrong = 0
@@ -56,9 +61,9 @@ class ExamTerminal:
         self.selection_indicator = "|"
         self.selection_index = 0
 
-        self.global_elapsed_time = 0
-        self.exam_begin_time = 0
-        self.exam_elapsed_time = 0
+        self.global_elapsed_time = 0.0
+        self.exam_begin_time = 0.0
+        self.exam_elapsed_time = 0.0
         self.is_exam_time_out = False
 
         self.exam_paused = False
@@ -73,11 +78,12 @@ class ExamTerminal:
     ###############################################################################################
 
     def __parse_examfile_contents(self, exam_file_contents: dict, exam_attempt: int) -> Dict:
-        """
-        Parsing and supplementing a exam file contents
+        """Parse and supplementing a exam file contents.
 
         Parameters:
             exam_file_contents (dict): Pre-loaded exam contents
+            exam_attempt (int)       : Current exam attempt
+
         Returns:
             return (Dict): Loaded and parsed info of exam file contents
         """
@@ -89,6 +95,7 @@ class ExamTerminal:
             logger.debug(f"Calculating exam_allwed_time ...")
             exam_file_contents['exam']['exam_allowed_time'] = utility.to_seconds(
                 exam_file_contents['exam']['exam_allowed_time'], exam_file_contents['exam']['exam_allowed_time_units'])
+
         # Save the current exam attempt
         exam_file_contents['exam']['exam_attempt'] = exam_attempt
 
@@ -147,14 +154,11 @@ class ExamTerminal:
         return exam_file_contents
 
     def __basic_screen_setup(self, scr, halfdelay: bool) -> None:
-        """
-        Basic configurations of the current curses terminal screen
+        """Set up basic configurations of the current curses terminal screen.
 
         Parameters:
             scr (obj)      : Handle for curses terminal screen handle
             halfdely (bool): If True, refresh specified 1/10th of second, else refresh 25.5 seconds
-        Returns:
-            None
         """
         # Hiding the cursor
         curses.curs_set(0)
@@ -172,13 +176,10 @@ class ExamTerminal:
             curses.halfdelay(255)
 
     def __check_terminal_size(self, scr) -> None:
-        """
-        Checking if current terminal size is sufficient, if it is not, display warning.
+        """Check if current terminal size is sufficient, if it is not, display warning.
 
         Parameters:
             scr (obj): Handle for curses terminal screen handle
-        Returns:
-            None
         """
         # Getting the screen height and width
         term_height, term_width = scr.getmaxyx()
@@ -218,8 +219,7 @@ class ExamTerminal:
     ###############################################################################################
 
     def __draw_selection_menu(self, scr, selections: list, start_y: int) -> None:
-        """
-        Draw a Selection menu at the bottom of the screen with a specified options
+        """Draw a Selection menu at the bottom of the screen with a specified options.
 
         Parameters:
             scr (obj)         : Handle for curses terminal screen handle
@@ -253,14 +253,11 @@ class ExamTerminal:
             scr.addstr(y + s + 1 + start_y, term_width // 2 - len(selection) // 2, selection, color)
 
     def __draw_message_box(self, scr, message_lines: list) -> None:
-        """
-        Draw a message box in the middle of the terminal screen
+        """Draw a message box in the middle of the terminal screen.
 
         Parameters:
             scr (obj)            : Handle for curses terminal screen handle
             message_lines (list) : Lines of text in each list item
-        Returns:
-            None
         """
         term_height, term_width = scr.getmaxyx()
 
@@ -276,20 +273,20 @@ class ExamTerminal:
             y = l + 2
             message_box.addstr(y, x, line)
 
-        # Refresh the messgae box
+        # Refresh the message box
         message_box.refresh()
 
     ###############################################################################################
 
     def draw_menu(self, scr) -> Tuple[str, bool]:
-        """
-        Draw a the main menu on the screen
+        """Draw a the main menu on the screen.
 
         Parameters:
             scr (obj)         : Handle for curses terminal screen handle
+
         Returns:
             menu option (str)  : Selection menu option user selected (ie. quit)
-            successfull (bool) : True if no error, else False
+            successful (bool)  : True if no error, else False
         """
         # Setting up basic stuff for curses and load keys
         self.__basic_screen_setup(scr, halfdelay=False)
@@ -350,45 +347,72 @@ class ExamTerminal:
             start_y = 2
             start_x = [5, 22]
 
-            line = f"{self.exam_contents['exam']['exam_title']}"
+            # line = f"{self.exam_contents.get('exam', {}).get('exam_title')}"
+            line = str(
+                self.exam_contents.get('exam', {}).get('exam_title')
+                or self.exam_contents.get('exam', {}).get('title', "N/A"))
             scr.addstr(start_y, utility.center_x(term_width, line), line, self.decor['bold'])
             start_y += 1
 
-            line = f"{self.exam_contents['exam']['exam_author']}"
+            # line = f"{self.exam_contents['exam']['exam_author']}"
+            line = str(
+                self.exam_contents.get('exam', {}).get('exam_author')
+                or self.exam_contents.get('exam', {}).get('author', "N/A"))
             scr.addstr(start_y, utility.center_x(term_width, line), line, self.color['grey-light'])
             start_y += 1
 
-            line = f"{self.exam_contents['exam']['exam_edit_date']}"
+            # line = f"{self.exam_contents['exam']['exam_edit_date']}"
+            line = str(
+                self.exam_contents.get('exam', {}).get('exam_edit_date')
+                or self.exam_contents.get('exam', {}).get('edit_date', "N/A"))
             scr.addstr(start_y, utility.center_x(term_width, line), line, self.color['grey-light'])
             start_y += 3
 
-            lines = ["Description:", f"{self.exam_contents['exam']['exam_description']}"]
-            menu_item_wrap = ' '
+            # lines = ["Description:", f"{self.exam_contents['exam']['exam_description']}"]
+            description = str(
+                self.exam_contents.get('exam', {}).get('exam_description')
+                or self.exam_contents.get('exam', {}).get('description', "N/A"))
+            lines = ["Description:", description]
+            menu_item_wrap: Union[str, list[str]] = ' '
             for x, line_text in zip(start_x, lines):
                 menu_item_wrap = wrapper_menu_item.wrap(text=line_text)
                 for l, line in enumerate(menu_item_wrap):
                     scr.addstr(start_y + l - 1, x, line, self.color['default'])
             start_y += len(menu_item_wrap)
 
-            lines = ["Exam Type:", self.exam_contents['exam']['exam_type']]
+            # lines = ["Exam Type:", self.exam_contents['exam']['exam_type']]
+            exam_type = str(
+                self.exam_contents.get('exam', {}).get('exam_type')
+                or self.exam_contents.get('exam', {}).get('type', "N/A"))
+            lines = ["Exam Type:", exam_type]
             for x, line in zip(start_x, lines):
                 scr.addstr(start_y, x, line, self.color['default'])
             start_y += 2
 
-            lines = ["Questions:", f"{self.exam_contents['exam']['exam_questions_count']}"]
+            # lines = ["Questions:", f"{self.exam_contents['exam']['exam_questions_count']}"]
+            question_count = str(
+                self.exam_contents.get('exam', {}).get('exam_questions_count')
+                or self.exam_contents.get('exam', {}).get('questions_count', "N/A"))
+            lines = ["Questions:", question_count]
             for x, line in zip(start_x, lines):
                 scr.addstr(start_y, x, line, self.color['default'])
             start_y += 2
 
-            lines = [
-                "Allowed Time:",
-                f"{self.exam_contents['exam']['exam_allowed_time']} {self.exam_contents['exam']['exam_allowed_time_units']}"
-            ]
+            allowed_time = self.exam_contents.get('exam', {}).get('exam_allowed_time') or self.exam_contents.get(
+                'exam', {}).get('allowed_time')
+            allowed_time_units = self.exam_contents.get(
+                'exam', {}).get('exam_allowed_time_units') or self.exam_contents.get('exam', {}).get(
+                    'allowed_time_units', "N/A")
+            lines = ["Allowed Time:", f"{allowed_time} {allowed_time_units}"]
             for x, line in zip(start_x, lines):
                 scr.addstr(start_y, x, line, self.color['default'])
             start_y += 2
 
-            lines = ["Passing Score:", f"{self.exam_contents['exam']['exam_passing_score']} %"]
+            # lines = ["Passing Score:", f"{self.exam_contents['exam']['exam_passing_score']} %"]
+            passing_score = str(
+                self.exam_contents.get('exam', {}).get('exam_passing_score')
+                or self.exam_contents.get('exam', {}).get('passing_score', "N/A"))
+            lines = ["Passing Score:", f"{passing_score} %"]
             for x, line in zip(start_x, lines):
                 scr.addstr(start_y, x, line, self.color['default'])
             start_y += 2
@@ -428,28 +452,20 @@ class ExamTerminal:
             k = scr.getch()
 
     def show_menu(self) -> Tuple[str, bool]:
-        """
-        Curses wrapper function for drawing main menu on screen
+        """Curses wrapper function for drawing main menu on screen.
 
-        Parameters:
-            None
         Returns:
             menu option (str)  : Selection menu option user selected (ie. quit)
-            successfull (bool) : True if no error, else False
+            successful (bool)  : True if no error, else False
         """
         return curses.wrapper(self.draw_menu)
 
     ###############################################################################################
 
     def __exam_timer_thread(self) -> None:
-        """
-        Exam timer that keeps track of elapsed exam time and exam paused time.
-        Interactions to the main thread are via object properties.
+        """Exam timer that keeps track of elapsed exam time and exam paused time.
 
-        Parameters:
-            None
-        Returns:
-            None
+        Interactions to the main thread are via object properties.
         """
         logger.debug('Starting exam timer thread ...')
         while self.is_timer_timing:
@@ -468,14 +484,14 @@ class ExamTerminal:
         logger.debug('Exam timer thread ended')
 
     def draw_question(self, scr, question: dict) -> Tuple[str, bool]:
-        """
-        Draw a the current quesition on the screen
+        """Draw a the current quesition on the screen.
 
         Parameters:
             question (dict) : The current question information being presented
+
         Returns:
             menu option (str)  : Selection menu option user selected (ie. quit)
-            successfull (bool) : True if no error, else False
+            successful (bool)  : True if no error, else False
         """
         # Setting up basic stuff for curses and load keys
         self.__basic_screen_setup(scr, halfdelay=True)
@@ -503,7 +519,7 @@ class ExamTerminal:
 
         # Start the question timer
         question_start_time = time()
-        question_elapsed_time = 0
+        question_elapsed_time = 0.00
 
         # User key input (ASCII)
         k = 0
@@ -707,7 +723,7 @@ class ExamTerminal:
                 curses.halfdelay(255)
                 self.exam_paused = True
                 message_lines = [
-                    'Are you sure you want to quit and evalute exam?', 'To quit and evaluate press "Q"',
+                    'Are you sure you want to quit and evaluate exam?', 'To quit and evaluate press "Q"',
                     'To resume exam press "R"'
                 ]
                 self.__draw_message_box(scr, message_lines)
@@ -723,7 +739,7 @@ class ExamTerminal:
 
             # Exam timed out message box
             if self.is_exam_time_out:
-                message_lines = ['Exam time has expired', 'Press "ENTER" to evalute exam']
+                message_lines = ['Exam time has expired', 'Press "ENTER" to evaluate exam']
                 self.__draw_message_box(scr, message_lines)
 
             ########################################################################################
@@ -732,11 +748,11 @@ class ExamTerminal:
             k = scr.getch()
 
     def show_question(self, question: dict) -> Tuple[str, bool]:
-        """
-        Curses wrapper function for drawing single question on screen
+        """Curses wrapper function for drawing single question on screen.
 
         Parameters:
             question (dict) : The current question information being presented
+
         Returns:
             menu option (str)  : Selection menu option user selected (ie. quit)
             successfull (bool) : True if no error, else False
@@ -746,14 +762,7 @@ class ExamTerminal:
     ###############################################################################################
 
     def __evaluate_exam(self) -> None:
-        """
-        Evaluate the exam results
-
-        Parameters:
-            None
-        Returns:
-            None
-        """
+        """Evaluate the exam results."""
         logger.debug('Evaluating exam results ...')
         questions_count = len(self.exam_contents['questions'])
 
@@ -769,11 +778,8 @@ class ExamTerminal:
             self.exam_contents['exam']['evaluation_bool'] = False
 
     def __assemble_exam_results(self) -> dict:
-        """
-        Evaluate the exam results for presentation
+        """Evaluate the exam results for presentation.
 
-        Parameters:
-            None
         Returns:
             results (dict) : Combined and formatted exam results for presentation
         """
@@ -948,14 +954,14 @@ class ExamTerminal:
         return results
 
     def draw_result(self, scr) -> Tuple[str, bool]:
-        """
-        Draw a results on the screen
+        """Draw a results on the screen
 
         Parameters:
-            None
+            scr (obj)         : Handle for curses terminal screen handle
+
         Returns:
             menu option (str)  : Selection menu option user selected (ie. quit)
-            successfull (bool) : True if no error, else False
+            successful (bool)  : True if no error, else False
         """
         # Setting up basic stuff for curses and load keys
         self.__basic_screen_setup(scr, halfdelay=False)
@@ -1070,25 +1076,19 @@ class ExamTerminal:
             k = scr.getch()
 
     def show_result(self) -> Tuple[str, bool]:
-        """
-        Curses wrapper function for drawing the results on screen
+        """Curses wrapper function for drawing the results on screen.
 
-        Parameters:
-            None
         Returns:
             menu option (str)  : Selection menu option user selected (ie. quit)
-            successfull (bool) : True if no error, else False
+            successful (bool)  : True if no error, else False
         """
         return curses.wrapper(self.draw_result)
 
     def export_results_to_pdf(self) -> bool:
-        """
-        Export all results to a PDF document.
+        """Export all results to a PDF document.
 
-        Parameters:
-            None
         Returns:
-            success (bool) : True if successfull, else False
+            successful (bool)  : True if no error, else False
         """
         page_width = 210
         page_height = 297
@@ -1179,22 +1179,12 @@ class ExamTerminal:
             logger.error(f'Failed to save exam results PDF document to "{pdf_filepath}". Exception: {e}')
             return False
 
-        # Close
-        pdf.close()
-
         return True
 
     ###############################################################################################
 
     def begin_exam(self) -> None:
-        """
-        Beginning of an exam. Looping through all specified questions
-
-        Parameters:
-            None
-        Returns:
-            None
-        """
+        """Beginning of an exam. Looping through all specified questions."""
         logger.debug('Beginning Exam ...')
         self.exam_begin_time = time()
 
