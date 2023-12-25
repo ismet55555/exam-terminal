@@ -1,6 +1,6 @@
-wheel
-click
-PyYAML
-fpdf2
-requests
+wheel==0.42
+click==8.1
+PyYAML==6.0
+fpdf2==2.7
+requests==2.32
 windows-curses; platform_system=="Windows"
