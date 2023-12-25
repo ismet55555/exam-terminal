@@ -2,6 +2,17 @@
 requires = ["setuptools >= 43.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
+[tool.pytest.ini_options]
+addopts = "-p no:warnings"
+console_output_style = "classic"
+log_level = "INFO"
+log_format = '[%(filename)-22s:%(lineno)4s] %(message)s'
+log_cli = "true"
+log_file = "exam_terminal_pytest.log"
+log_file_format = '[%(filename)-22s:%(lineno)4s] %(message)s'
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+
 [tool.isort]
 skip_gitignore = true
 multi_line_output = 3

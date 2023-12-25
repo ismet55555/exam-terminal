@@ -28,11 +28,21 @@ repos:
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: check-docstring-first
+      - id: detect-private-key
+      - id: check-ast
       - id: check-json
-      - id: check-yaml
       - id: check-toml
-      - id: name-tests-test
+      - id: check-yaml
+        files: (.yaml|.yml)
+      - id: check-added-large-files
+        args: [--maxkb=500]
+      - id: no-commit-to-branch
+        args: [--branch, main]
 
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.16.1
+    hooks:
+      - id: gitleaks
 
   - repo: https://github.com/pre-commit/mirrors-yapf
     rev: v0.31.0
