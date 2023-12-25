@@ -55,7 +55,7 @@ repos:
         verbose: true
 
   - repo: https://github.com/PyCQA/isort
-    rev: 5.9.3
+    rev: 5.12.0
     hooks:
       - id: isort
         name: Python Imports Sorting (isort)
@@ -64,19 +64,19 @@ repos:
         types_or: [python]
         verbose: true
 
-  # - repo: https://github.com/PyCQA/bandit
-  #   rev: 1.7.0
-  #   hooks:
-  #     - id: bandit
-  #       verbose: true
-  #       name: Python Code Security Scan (bandit)
-  # FIXME: File and test exclusion not working in pyproject.toml
-
-  - repo: https://github.com/PyCQA/pylint
-    rev: pylint-2.6.0
+  - repo: local
     hooks:
       - id: pylint
         name: Python Code Linting (pylint)
-        args: ["--rcfile=.pylintrc", "--ignore=dev_stuff", "--fail-under=8.0"]
+        entry: pylint
         language: python
-        # verbose: true
+        types: [python]
+        args:
+          [
+            "-rn", # Only display messages
+            "--rcfile=.pylintrc", # Link to your config file
+            "--load-plugins=pylint.extensions.docparams", # Load an extension
+            "--output-format=colorized", # Load an extension
+            "--fail-under=8.0",
+            "--ignore=dev_stuff",
+          ]

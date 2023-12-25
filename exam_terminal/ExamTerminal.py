@@ -1,6 +1,5 @@
 """Main file."""
 
-import curses
 import logging
 import os
 import sys
@@ -10,6 +9,14 @@ from datetime import datetime
 from statistics import mean, median, stdev
 from time import gmtime, strftime, time
 from typing import Dict, Tuple, Union
+
+try:
+    import curses
+except ImportError:
+    import click
+    click.secho("ERROR: Python curses library failed to load/import.", fg='bright_red', bold=True)
+    click.secho("       This may be an issue with Python or your terminal.", fg='bright_red', bold=True)
+    sys.exit(1)
 
 from fpdf import FPDF
 
@@ -41,7 +48,7 @@ class ExamTerminal:
         self.halfdelay_screen_refresh = 5  # 10th of a second
 
         self.height_limit = 27
-        self.width_limit = 79  # FIXME: Should be 80, but 79 works better
+        self.width_limit = 79
         self.terminal_size_good = True
 
         self.questions_total = len(self.exam_contents['questions'])
@@ -341,22 +348,30 @@ class ExamTerminal:
             start_x = [5, 22]
 
             # line = f"{self.exam_contents.get('exam', {}).get('exam_title')}"
-            line = str(self.exam_contents.get('exam', {}).get('exam_title') or self.exam_contents.get('exam', {}).get('title', "N/A"))
+            line = str(
+                self.exam_contents.get('exam', {}).get('exam_title')
+                or self.exam_contents.get('exam', {}).get('title', "N/A"))
             scr.addstr(start_y, utility.center_x(term_width, line), line, self.decor['bold'])
             start_y += 1
 
             # line = f"{self.exam_contents['exam']['exam_author']}"
-            line = str(self.exam_contents.get('exam', {}).get('exam_author') or self.exam_contents.get('exam', {}).get('author', "N/A"))
+            line = str(
+                self.exam_contents.get('exam', {}).get('exam_author')
+                or self.exam_contents.get('exam', {}).get('author', "N/A"))
             scr.addstr(start_y, utility.center_x(term_width, line), line, self.color['grey-light'])
             start_y += 1
 
             # line = f"{self.exam_contents['exam']['exam_edit_date']}"
-            line = str(self.exam_contents.get('exam', {}).get('exam_edit_date') or self.exam_contents.get('exam', {}).get('edit_date', "N/A"))
+            line = str(
+                self.exam_contents.get('exam', {}).get('exam_edit_date')
+                or self.exam_contents.get('exam', {}).get('edit_date', "N/A"))
             scr.addstr(start_y, utility.center_x(term_width, line), line, self.color['grey-light'])
             start_y += 3
 
             # lines = ["Description:", f"{self.exam_contents['exam']['exam_description']}"]
-            description = str(self.exam_contents.get('exam', {}).get('exam_description') or self.exam_contents.get('exam', {}).get('description', "N/A"))
+            description = str(
+                self.exam_contents.get('exam', {}).get('exam_description')
+                or self.exam_contents.get('exam', {}).get('description', "N/A"))
             lines = ["Description:", description]
             menu_item_wrap: Union[str, list[str]] = ' '
             for x, line_text in zip(start_x, lines):
@@ -366,28 +381,37 @@ class ExamTerminal:
             start_y += len(menu_item_wrap)
 
             # lines = ["Exam Type:", self.exam_contents['exam']['exam_type']]
-            exam_type = str(self.exam_contents.get('exam', {}).get('exam_type') or self.exam_contents.get('exam', {}).get('type', "N/A"))
+            exam_type = str(
+                self.exam_contents.get('exam', {}).get('exam_type')
+                or self.exam_contents.get('exam', {}).get('type', "N/A"))
             lines = ["Exam Type:", exam_type]
             for x, line in zip(start_x, lines):
                 scr.addstr(start_y, x, line, self.color['default'])
             start_y += 2
 
             # lines = ["Questions:", f"{self.exam_contents['exam']['exam_questions_count']}"]
-            question_count = str(self.exam_contents.get('exam', {}).get('exam_questions_count') or self.exam_contents.get('exam', {}).get('questions_count', "N/A"))
+            question_count = str(
+                self.exam_contents.get('exam', {}).get('exam_questions_count')
+                or self.exam_contents.get('exam', {}).get('questions_count', "N/A"))
             lines = ["Questions:", question_count]
             for x, line in zip(start_x, lines):
                 scr.addstr(start_y, x, line, self.color['default'])
             start_y += 2
 
-            allowed_time = self.exam_contents.get('exam', {}).get('exam_allowed_time') or self.exam_contents.get('exam', {}).get('allowed_time')
-            allowed_time_units = self.exam_contents.get('exam', {}).get('exam_allowed_time_units') or self.exam_contents.get('exam', {}).get('allowed_time_units', "N/A")
-            lines = [ "Allowed Time:", f"{allowed_time} {allowed_time_units}" ]
+            allowed_time = self.exam_contents.get('exam', {}).get('exam_allowed_time') or self.exam_contents.get(
+                'exam', {}).get('allowed_time')
+            allowed_time_units = self.exam_contents.get(
+                'exam', {}).get('exam_allowed_time_units') or self.exam_contents.get('exam', {}).get(
+                    'allowed_time_units', "N/A")
+            lines = ["Allowed Time:", f"{allowed_time} {allowed_time_units}"]
             for x, line in zip(start_x, lines):
                 scr.addstr(start_y, x, line, self.color['default'])
             start_y += 2
 
             # lines = ["Passing Score:", f"{self.exam_contents['exam']['exam_passing_score']} %"]
-            passing_score = str(self.exam_contents.get('exam', {}).get('exam_passing_score') or self.exam_contents.get('exam', {}).get('passing_score', "N/A"))
+            passing_score = str(
+                self.exam_contents.get('exam', {}).get('exam_passing_score')
+                or self.exam_contents.get('exam', {}).get('passing_score', "N/A"))
             lines = ["Passing Score:", f"{passing_score} %"]
             for x, line in zip(start_x, lines):
                 scr.addstr(start_y, x, line, self.color['default'])
