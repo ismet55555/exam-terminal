@@ -1,7 +1,7 @@
 import curses
 import logging
 from pathlib import Path
-from typing import Any, Dict, Tuple, Union
+from typing import Any, Dict, Tuple
 
 import requests
 import yaml
