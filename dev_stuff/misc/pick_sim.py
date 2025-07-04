@@ -23,7 +23,7 @@ def draw_menu(stdscr):
     curses.noecho()
 
     # Loop where k is the last character pressed
-    while (k != ord('q')):
+    while k != ord('q'):
         ###########################################################################################
 
         # Clearing the screen at each loop iteration
@@ -33,7 +33,7 @@ def draw_menu(stdscr):
         term_height, term_width = stdscr.getmaxyx()
 
         # Rendering some text
-        whstr = f"[Terminal Size: W:{term_width}, H:{term_height}]"
+        whstr = f'[Terminal Size: W:{term_width}, H:{term_height}]'
         stdscr.addstr(0, 0, whstr, curses.color_pair(1))
 
         ###########################################################################################
@@ -50,7 +50,7 @@ def draw_menu(stdscr):
 
         # Check if no user input for some reason
         if k == 0:
-            keystr = "No key press detected..."[:term_width - 1]
+            keystr = 'No key press detected...'[: term_width - 1]
 
         # Check for cursor not off the screen in horizontal direction
         cursor_x = max(0, cursor_x)
@@ -64,19 +64,19 @@ def draw_menu(stdscr):
         ###########################################################################################
 
         # Declaration of strings (ensuring that strings are not larger than screen term_width)
-        title = "Question: AWS Certified Architect Practice Exam"[:term_width - 1]
+        title = 'Question: AWS Certified Architect Practice Exam'[: term_width - 1]
         x = 10
         y = 10
         stdscr.addstr(y, x, title)
 
         x = 10
         y = 11
-        selection = "Written by Ismet Handzic"[:term_width - 1]
+        selection = 'Written by Ismet Handzic'[: term_width - 1]
         stdscr.addstr(y, x, selection)
 
         x = 10
         y = 13
-        keystr = f"Last key pressed: {k}"[:term_width - 1]
+        keystr = f'Last key pressed: {k}'[: term_width - 1]
         stdscr.addstr(y, x, keystr)
 
         ###########################################################################################
@@ -100,6 +100,6 @@ def main():
     # ... can add more wrappers here here ...
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     # Entry point of code
     main()

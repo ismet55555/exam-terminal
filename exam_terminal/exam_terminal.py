@@ -19,7 +19,7 @@ def exam_terminal(exam_file_contents: dict) -> int:
 
     """
     current_working_dir = os.getcwd()
-    logger.debug(f"Current directory: {current_working_dir}")
+    logger.debug(f'Current directory: {current_working_dir}')
 
     # TODO: Smarter menu navigation
 

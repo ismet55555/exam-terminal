@@ -16,8 +16,7 @@ curses.init_pair(1, 235, curses.COLOR_WHITE)
 
 # Loop where k is the last character pressed
 k = 0
-while (k != ord('q')):
-
+while k != ord('q'):
     # Clearing the screen at each loop iteration
     stdscr.clear()
 
@@ -26,7 +25,7 @@ while (k != ord('q')):
 
     # Dummy text
     for i in range(10):
-        stdscr.addstr(10 + i, 1, "Blah blah blah blah blah blah blah 123 123 123 123")
+        stdscr.addstr(10 + i, 1, 'Blah blah blah blah blah blah blah 123 123 123 123')
 
     # Create a box (Height, Width, y, x) (Positions are top left)
     box1 = curses.newwin(7, 45, 15, 10)
@@ -41,7 +40,7 @@ while (k != ord('q')):
 
     # Dummy text
     for i in range(10):
-        stdscr.addstr(21 + i, 1, "Text text text text text text text text text text text text text")
+        stdscr.addstr(21 + i, 1, 'Text text text text text text text text text text text text text')
 
     # Refresh the screen and the box
     stdscr.refresh()
