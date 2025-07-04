@@ -8,13 +8,12 @@ python_version = "3"
 
 [dev-packages]
 bump2version = "*"
+exam-terminal = {editable = true, path = "."}
 pre-commit = "*"
-pylint = "*"
+ruff = "*"
 setuptools = "*"
 twine = "*"
 wheel = "*"
-yapf = "*"
-exam-terminal = {editable = true, path = "."}
 
 [packages]
 click = "*"

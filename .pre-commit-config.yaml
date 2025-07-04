@@ -44,45 +44,22 @@ repos:
     hooks:
       - id: gitleaks
 
-  - repo: https://github.com/pre-commit/mirrors-yapf
-    rev: v0.31.0
-    hooks:
-      - id: yapf
-        name: Python Code Formatting (yapf)
-        language: python
-        types: [python]
-        args: ["--style=.style.yapf", "--parallel", "--in-place"]
-        verbose: true
-
-  - repo: https://github.com/PyCQA/isort
-    rev: 5.12.0
-    hooks:
-      - id: isort
-        name: Python Imports Sorting (isort)
-        language: python
-        language_version: python3
-        types_or: [python]
-        verbose: true
-
   - repo: https://github.com/adrienverge/yamllint.git
     rev: v1.29.0
     hooks:
       - id: yamllint
         args: [--strict, -c=.yamllint]
 
-  - repo: local
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.0
     hooks:
-      - id: pylint
-        name: Python Code Linting (pylint)
-        entry: pylint
-        language: python
+      - id: ruff
+        name: Python Code Linting (ruff)
+        args: [--fix]
         types: [python]
-        args:
-          [
-            "-rn", # Only display messages
-            "--rcfile=.pylintrc", # Link to your config file
-            "--load-plugins=pylint.extensions.docparams", # Load an extension
-            "--output-format=colorized", # Load an extension
-            "--ignore-paths=dev_stuff",
-            "--fail-under=8.0"
-          ]
+        verbose: true
+
+      - id: ruff-format
+        name: Python Code Formatting (ruff)
+        types: [python]
+        verbose: true
