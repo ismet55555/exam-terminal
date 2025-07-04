@@ -1,7 +1,7 @@
 import curses
 import logging
 from pathlib import Path
-from typing import Any, Dict, Tuple
+from typing import Any
 
 import requests
 import yaml
@@ -10,7 +10,7 @@ url = str
 logger = logging.getLogger()
 
 
-def load_curses_colors_decor() -> Tuple[dict, dict]:
+def load_curses_colors_decor() -> tuple[dict, dict]:
     """Load curses colors and decorations and load them in a usable
     dictionary for reference.
 
@@ -38,7 +38,7 @@ def load_curses_colors_decor() -> Tuple[dict, dict]:
         'grey-dark': [240, 0],
         'grey-light': [248, 0],
         'black-white': [curses.COLOR_BLACK, curses.COLOR_WHITE],
-        'white-red': [curses.COLOR_WHITE, curses.COLOR_RED]
+        'white-red': [curses.COLOR_WHITE, curses.COLOR_RED],
     }
 
     # If terminal does not support colors, reset everything to white
@@ -67,8 +67,7 @@ def load_curses_colors_decor() -> Tuple[dict, dict]:
         'protect': curses.A_PROTECT,  # Protected mode
         'invisible': curses.A_INVIS,  # Invisible or blank mode
         'alt-char': curses.A_ALTCHARSET,  # Alternate character set
-        'char':
-            curses.A_CHARTEXT  # Bit-mask to extract a character
+        'char': curses.A_CHARTEXT,  # Bit-mask to extract a character
     }
 
     # Initiating curses color and saving for quick reference
@@ -79,7 +78,7 @@ def load_curses_colors_decor() -> Tuple[dict, dict]:
     return color, decor
 
 
-def load_keys() -> Dict[str, Any]:
+def load_keys() -> dict[str, Any]:
     """Load all keyboard keys available to user in program.
 
     Usage:
@@ -90,15 +89,15 @@ def load_keys() -> Dict[str, Any]:
         keys (dict): Dictionary of references to curses keys
     """
     keys = {
-        "ENTER": (curses.KEY_ENTER, ord('\n'), ord('\r')),
-        "SPACE": (32, ord(' ')),
-        "UP": (curses.KEY_UP, ord('k')),
-        "DOWN": (curses.KEY_DOWN, ord('j')),
-        "RIGHT": (curses.KEY_RIGHT, ord('l')),
-        "LEFT": (curses.KEY_LEFT, ord('h')),
-        "PAUSE": (ord('p'), ord('P')),
-        "RESUME": (ord('r'), ord('R')),
-        "QUIT": (27, ord('q'), ord('Q'))
+        'ENTER': (curses.KEY_ENTER, ord('\n'), ord('\r')),
+        'SPACE': (32, ord(' ')),
+        'UP': (curses.KEY_UP, ord('k')),
+        'DOWN': (curses.KEY_DOWN, ord('j')),
+        'RIGHT': (curses.KEY_RIGHT, ord('l')),
+        'LEFT': (curses.KEY_LEFT, ord('h')),
+        'PAUSE': (ord('p'), ord('P')),
+        'RESUME': (ord('r'), ord('R')),
+        'QUIT': (27, ord('q'), ord('Q')),
     }
     return keys
 
@@ -111,8 +110,8 @@ def load_software_name_version() -> str:
     Returns:
         (str): Software name and version
     """
-    software_name = "exam-terminal"
-    software_version = "0.2.12"  # Updated with bumpversion
+    software_name = 'exam-terminal'
+    software_version = '0.2.13'  # Updated with bumpversion
     return software_name + ' v' + software_version
 
 
@@ -155,12 +154,12 @@ def truncate_text(text: str, length_limit: int) -> str:
     """
     truncated_text = text
     if len(text) >= length_limit - 3:
-        truncated_text = text[0:length_limit - 3] + '...'
+        truncated_text = text[0 : length_limit - 3] + '...'
 
     return truncated_text
 
 
-def get_message_box_size(term_height: int, term_width: int, message_lines: list) -> Tuple[int, int, int, int]:
+def get_message_box_size(term_height: int, term_width: int, message_lines: list) -> tuple[int, int, int, int]:
     """Given a message box list with each item being a message box line/row,
     this method find the right size and position of the message box for
     the given terminal size
@@ -200,13 +199,12 @@ def get_progress_bar(exam_progress: float, bar_char_width=60, bar_char_full='|',
 
     progress_str = []
     for i in range(bar_char_width):
-
         if i <= exam_progress * bar_char_width:
             progress_str.append(bar_char_full)
         else:
             progress_str.append(bar_char_empty)
 
-    progress_str = "".join(progress_str)
+    progress_str = ''.join(progress_str)
     return progress_str
 
 
@@ -256,7 +254,7 @@ def draw_vertical_seperator(scr, x: int, color: list) -> None:
     # NOTE: Currently unused but may come in handy
 
 
-def load_examfile_contents_from_local_file(local_file_path: str) -> Dict:
+def load_examfile_contents_from_local_file(local_file_path: str) -> dict:
     """Loading a local file exam contents.
 
     Parameters:
@@ -268,16 +266,16 @@ def load_examfile_contents_from_local_file(local_file_path: str) -> Dict:
     # NOTE: Check if right file type (.yml or .yaml)
     logger.debug(f"Loading specified local exam file: '{local_file_path}' ...")
     try:
-        with open(local_file_path, 'r') as file:
+        with open(local_file_path) as file:
             file_contents = yaml.safe_load(file)
-        logger.debug("Successfully loaded local exam file")
+        logger.debug('Successfully loaded local exam file')
     except Exception as e:
         logger.error(f"Failed to load specified local exam file: '{local_file_path}'. Exception: {e}")
         return {}
     return file_contents
 
 
-def load_examfile_contents_from_url(remote_file_url: url, allow_redirects: bool = True) -> Dict:
+def load_examfile_contents_from_url(remote_file_url: url, allow_redirects: bool = True) -> dict:
     """Load a remote exam file contents over HTTP.
 
     Parameters:
@@ -296,7 +294,8 @@ def load_examfile_contents_from_url(remote_file_url: url, allow_redirects: bool 
     file_ext_accepted = ['.yml', '.yaml']
     if remote_file_ext not in file_ext_accepted:
         logger.debug(
-            f'Remote file requested "{remote_filename}"" is not one of the accepted file types: {file_ext_accepted}')
+            f'Remote file requested "{remote_filename}"" is not one of the accepted file types: {file_ext_accepted}'
+        )
         return {}
 
     # Get request headers
@@ -312,8 +311,10 @@ def load_examfile_contents_from_url(remote_file_url: url, allow_redirects: bool 
     content_length = int(header['Content-length']) / 1000000
     logger.debug(f'Requested file content length: {content_length:.5f} MB)')
     if content_length > 1.0:
-        logger.debug(f'The requested remote file "{remote_filename}" is {content_length:.2f} MB '
-                     'and larger than 1.0 MB limit, will not download')
+        logger.debug(
+            f'The requested remote file "{remote_filename}" is {content_length:.2f} MB '
+            'and larger than 1.0 MB limit, will not download'
+        )
         return {}
 
     # Check if content is text or yaml based
@@ -323,8 +324,10 @@ def load_examfile_contents_from_url(remote_file_url: url, allow_redirects: bool 
     if not content_type:
         return {}
     if not any(ext in content_type for ext in content_types_accepted):
-        logger.debug(f'The content type "{content_type}" of the requested file "{remote_filename}" is '
-                     'not one of the following: {content_types_accepted}')
+        logger.debug(
+            f'The content type "{content_type}" of the requested file "{remote_filename}" is '
+            'not one of the following: {content_types_accepted}'
+        )
         return {}
 
     # Downloading the file content
@@ -334,7 +337,7 @@ def load_examfile_contents_from_url(remote_file_url: url, allow_redirects: bool 
     # Check if no error from downloading
     if response.ok:
         # Loading the yaml file content
-        logger.debug("Loading contents of remote file ...")
+        logger.debug('Loading contents of remote file ...')
         try:
             # open(os.path.join(local_dir, remote_filename), 'wb').write(remote_request.content)
             file_contents = yaml.safe_load(response.content)
@@ -365,16 +368,16 @@ def to_seconds(time_quantity: int, time_unit_text: str) -> int:
     if not time_quantity:
         return 0
 
-    if time_unit_text in ["s", "sec", "second", "seconds"]:
+    if time_unit_text in ['s', 'sec', 'second', 'seconds']:
         return time_quantity
 
-    if time_unit_text in ["m", "min", "minute", "minutes"]:
+    if time_unit_text in ['m', 'min', 'minute', 'minutes']:
         return time_quantity * 60
 
-    if time_unit_text in ["h", "hr", "hour", "hours"]:
+    if time_unit_text in ['h', 'hr', 'hour', 'hours']:
         return time_quantity * 60 * 60
 
-    if time_unit_text in ["d", "day", "days"]:
+    if time_unit_text in ['d', 'day', 'days']:
         return time_quantity * 60 * 60 * 60
 
     return 0

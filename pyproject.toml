@@ -13,10 +13,68 @@ log_file_format = '[%(filename)-22s:%(lineno)4s] %(message)s'
 testpaths = ["tests"]
 python_files = ["test_*.py"]
 
-[tool.isort]
-skip_gitignore = true
-multi_line_output = 3
-line_length = 100
-include_trailing_comma = true
-supported_extensions = [".py"]
-extend_skip = ["env", "venv", ".vscode", ".pytest_cache", "misc", "dev_stuff"]
+[tool.ruff]
+line-length = 119
+target-version = "py39"
+
+# Only specify exclusions beyond ruff's smart defaults
+exclude = [
+    "dev_things",
+    "docs",
+    "setup.py",
+    "**/__main__.py",
+]
+
+[tool.ruff.lint]
+# Enable comprehensive rule sets - ruff's defaults are already good
+select = [
+    "E", "W",    # pycodestyle
+    "F",         # Pyflakes
+    "I",         # isort
+    "B",         # flake8-bugbear
+    "C4",        # flake8-comprehensions
+    "UP",        # pyupgrade
+    "C90",       # mccabe
+    "PL",        # pylint rules
+    "RUF",       # ruff-specific
+]
+
+# Only ignore what conflicts with your current codebase
+ignore = [
+    "E501",      # Line too long
+    "PLR0913",   # Too many arguments
+    "PLR0915",   # Too many statements
+    "PLR2004",   # Magic values
+    "T201",      # print statements (CLI tool needs these)
+    "RUF012",    # Mutable class attributes ClassVar annotation
+    "B006",      # Mutable default arguments (fix manually when convenient)
+    "E712",      # Comparison to True/False (can be auto-fixed)
+    "F403",      # Undefined iport names
+]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.ruff.lint.pylint]
+max-args = 5
+max-statements = 50
+max-branches = 12
+
+[tool.ruff.lint.isort]
+known-first-party = ["exam_terminal"]
+
+[tool.ruff.format]
+quote-style = "single"
+
+[tool.ruff.lint.per-file-ignores]
+# Only essential per-file ignores
+"tests/**" = ["PLR2004", "S101"]  # Allow magic values and asserts in tests
+"**/__init__.py" = ["F401"]       # Allow unused imports
+"setup.py" = ["ALL"]              # Ignore setup.py entirely
+"dev_stuff/**" = ["ALL"]
+
+# UI drawing functions - complex terminal interface logic
+"exam_terminal/ExamTerminal.py" = ["C901", "PLR0912"]  # Allow complex UI functions
+
+# Utility functions - complex logic with many return paths
+"exam_terminal/utility.py" = ["PLR0911"]  # Allow many return statements

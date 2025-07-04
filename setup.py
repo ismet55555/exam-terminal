@@ -5,7 +5,7 @@ import os
 import setuptools
 
 # Package version number (Updated via bumpversion)
-__version__ = "0.2.12"
+__version__ = "0.2.13"
 
 
 def read(fname):
@@ -53,13 +53,6 @@ setuptools.setup(
         "Environment :: Console",
         "Environment :: Console :: Curses",
         'Operating System :: OS Independent',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
-        'Programming Language :: Python :: 3.9',
-        'Programming Language :: Python :: 3.10',
-        'Programming Language :: Python :: 3.11',
-        'Programming Language :: Python :: 3.12',
         'Programming Language :: Python :: 3 :: Only'
     ]
 )

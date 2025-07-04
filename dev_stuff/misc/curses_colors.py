@@ -15,7 +15,7 @@ def main(stdscr):
     try:
         for i in range(0, 255):
             print(i, str(i))
-            stdscr.addstr(str(i) + ", ", curses.color_pair(i))
+            stdscr.addstr(str(i) + ', ', curses.color_pair(i))
             stdscr.refresh()
 
     except curses.ERR:

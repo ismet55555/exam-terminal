@@ -1,6 +1,9 @@
-wheel==0.42
-click==8.1
+
 PyYAML==6.0
+click==8.2
 fpdf2==2.7
+pypiwin32; platform_system == "Windows"
+pywin32; platform_system == "Windows"
 requests==2.31
-windows-curses; platform_system=="Windows"
+wheel==0.42
+windows-curses; sys_platform == "win32"

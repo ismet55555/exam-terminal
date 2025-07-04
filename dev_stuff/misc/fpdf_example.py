@@ -30,9 +30,9 @@ page_y_area = page_height - page_top_margin - page_bottom_margin
 
 pdf = FPDF(orientation='P', unit='mm', format='A4')
 
-pdf.set_author("Author Test Terminal")
-pdf.set_creator("Creator Test Terminal")
-pdf.set_subject("Exam Results")
+pdf.set_author('Author Test Terminal')
+pdf.set_creator('Creator Test Terminal')
+pdf.set_subject('Exam Results')
 
 pdf.add_page(orientation='P', format='A4', same=False)
 pdf.set_left_margin(margin=10)
