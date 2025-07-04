@@ -1,7 +1,7 @@
 import curses
 import logging
 from pathlib import Path
-from typing import Any, Dict, Tuple
+from typing import Any
 
 import requests
 import yaml
@@ -10,7 +10,7 @@ url = str
 logger = logging.getLogger()
 
 
-def load_curses_colors_decor() -> Tuple[dict, dict]:
+def load_curses_colors_decor() -> tuple[dict, dict]:
     """Load curses colors and decorations and load them in a usable
     dictionary for reference.
 
@@ -79,7 +79,7 @@ def load_curses_colors_decor() -> Tuple[dict, dict]:
     return color, decor
 
 
-def load_keys() -> Dict[str, Any]:
+def load_keys() -> dict[str, Any]:
     """Load all keyboard keys available to user in program.
 
     Usage:
@@ -160,7 +160,7 @@ def truncate_text(text: str, length_limit: int) -> str:
     return truncated_text
 
 
-def get_message_box_size(term_height: int, term_width: int, message_lines: list) -> Tuple[int, int, int, int]:
+def get_message_box_size(term_height: int, term_width: int, message_lines: list) -> tuple[int, int, int, int]:
     """Given a message box list with each item being a message box line/row,
     this method find the right size and position of the message box for
     the given terminal size
@@ -256,7 +256,7 @@ def draw_vertical_seperator(scr, x: int, color: list) -> None:
     # NOTE: Currently unused but may come in handy
 
 
-def load_examfile_contents_from_local_file(local_file_path: str) -> Dict:
+def load_examfile_contents_from_local_file(local_file_path: str) -> dict:
     """Loading a local file exam contents.
 
     Parameters:
@@ -268,7 +268,7 @@ def load_examfile_contents_from_local_file(local_file_path: str) -> Dict:
     # NOTE: Check if right file type (.yml or .yaml)
     logger.debug(f"Loading specified local exam file: '{local_file_path}' ...")
     try:
-        with open(local_file_path, 'r') as file:
+        with open(local_file_path) as file:
             file_contents = yaml.safe_load(file)
         logger.debug("Successfully loaded local exam file")
     except Exception as e:
@@ -277,7 +277,7 @@ def load_examfile_contents_from_local_file(local_file_path: str) -> Dict:
     return file_contents
 
 
-def load_examfile_contents_from_url(remote_file_url: url, allow_redirects: bool = True) -> Dict:
+def load_examfile_contents_from_url(remote_file_url: url, allow_redirects: bool = True) -> dict:
     """Load a remote exam file contents over HTTP.
 
     Parameters:

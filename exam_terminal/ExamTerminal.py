@@ -8,7 +8,7 @@ import threading
 from datetime import datetime
 from statistics import mean, median, stdev
 from time import gmtime, strftime, time
-from typing import Dict, Tuple, Union
+from typing import Union
 
 try:
     import curses
@@ -77,7 +77,7 @@ class ExamTerminal:
 
     ###############################################################################################
 
-    def __parse_examfile_contents(self, exam_file_contents: dict, exam_attempt: int) -> Dict:
+    def __parse_examfile_contents(self, exam_file_contents: dict, exam_attempt: int) -> dict:
         """Parse and supplementing a exam file contents.
 
         Parameters:
@@ -87,12 +87,12 @@ class ExamTerminal:
         Returns:
             return (Dict): Loaded and parsed info of exam file contents
         """
-        logger.debug(f"Parsing the loaded exam file ...")
+        logger.debug("Parsing the loaded exam file ...")
 
         # Get the exam allowed time in seconds
         if exam_attempt < 1:
             # FIXME: Should not have to use "exam_attempt" to make this work.
-            logger.debug(f"Calculating exam_allwed_time ...")
+            logger.debug("Calculating exam_allwed_time ...")
             exam_file_contents['exam']['exam_allowed_time'] = utility.to_seconds(
                 exam_file_contents['exam']['exam_allowed_time'], exam_file_contents['exam']['exam_allowed_time_units'])
 
@@ -278,7 +278,7 @@ class ExamTerminal:
 
     ###############################################################################################
 
-    def draw_menu(self, scr) -> Tuple[str, bool]:
+    def draw_menu(self, scr) -> tuple[str, bool]:
         """Draw a the main menu on the screen.
 
         Parameters:
@@ -451,7 +451,7 @@ class ExamTerminal:
             # Get User input
             k = scr.getch()
 
-    def show_menu(self) -> Tuple[str, bool]:
+    def show_menu(self) -> tuple[str, bool]:
         """Curses wrapper function for drawing main menu on screen.
 
         Returns:
@@ -483,7 +483,7 @@ class ExamTerminal:
                 self.exam_paused_elapsed_time = self.global_elapsed_time - self.exam_elapsed_time
         logger.debug('Exam timer thread ended')
 
-    def draw_question(self, scr, question: dict) -> Tuple[str, bool]:
+    def draw_question(self, scr, question: dict) -> tuple[str, bool]:
         """Draw a the current quesition on the screen.
 
         Parameters:
@@ -747,7 +747,7 @@ class ExamTerminal:
             # Get User input
             k = scr.getch()
 
-    def show_question(self, question: dict) -> Tuple[str, bool]:
+    def show_question(self, question: dict) -> tuple[str, bool]:
         """Curses wrapper function for drawing single question on screen.
 
         Parameters:
@@ -953,7 +953,7 @@ class ExamTerminal:
 
         return results
 
-    def draw_result(self, scr) -> Tuple[str, bool]:
+    def draw_result(self, scr) -> tuple[str, bool]:
         """Draw a results on the screen
 
         Parameters:
@@ -1025,7 +1025,7 @@ class ExamTerminal:
             start_y = 2
 
             # Heading
-            line = f"Exam Result Summary"
+            line = "Exam Result Summary"
             scr.addstr(start_y, utility.center_x(term_width, line), line, self.decor['bold'])
             start_y += 2
 
@@ -1075,7 +1075,7 @@ class ExamTerminal:
             # Get User input
             k = scr.getch()
 
-    def show_result(self) -> Tuple[str, bool]:
+    def show_result(self) -> tuple[str, bool]:
         """Curses wrapper function for drawing the results on screen.
 
         Returns:

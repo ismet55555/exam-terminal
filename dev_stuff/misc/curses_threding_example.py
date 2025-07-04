@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 
 import curses
-import time
 import threading
+import time
 
 
 class Clock(threading.Thread):
@@ -10,7 +10,7 @@ class Clock(threading.Thread):
 
     def __init__(self, stdscr, show_seconds=True):
         """ Create the clock """
-        super(Clock, self).__init__()
+        super().__init__()
         if show_seconds:
             self._target = self.update_seconds
         else:
@@ -41,13 +41,13 @@ def run(stdscr):
 
     stdscr.addstr(1, 0, "This is sample text\n\n")
     stdscr.addstr(18, 0, "This is more sample text\n\n")
-    clock1 = Clock(stdscr)
+    Clock(stdscr)
     # clock2 = Clock(stdscr, seconds=False)
 
     # End with any key
 
     while 1:
-        event = stdscr.getch()
+        stdscr.getch()
         break
 
 

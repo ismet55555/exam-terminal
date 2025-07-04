@@ -17,7 +17,7 @@ def main(stdscr):
     box.edit()
 
     # Get resulting contents
-    message = box.gather()
+    box.gather()
 
 
 curses.wrapper(main)

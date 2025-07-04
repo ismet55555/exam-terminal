@@ -33,7 +33,7 @@ def draw_menu(stdscr):
         term_height, term_width = stdscr.getmaxyx()
 
         # Rendering some text
-        whstr = "[Terminal Size: W:{}, H:{}]".format(term_width, term_height)
+        whstr = f"[Terminal Size: W:{term_width}, H:{term_height}]"
         stdscr.addstr(0, 0, whstr, curses.color_pair(1))
 
         ###########################################################################################
@@ -76,7 +76,7 @@ def draw_menu(stdscr):
 
         x = 10
         y = 13
-        keystr = "Last key pressed: {}".format(k)[:term_width - 1]
+        keystr = f"Last key pressed: {k}"[:term_width - 1]
         stdscr.addstr(y, x, keystr)
 
         ###########################################################################################

@@ -35,7 +35,7 @@ def draw_menu(stdscr):
         term_height, term_width = stdscr.getmaxyx()
 
         # Rendering some text
-        whstr = "[Terminal Size: W:{}, H:{}]".format(term_width, term_height)
+        whstr = f"[Terminal Size: W:{term_width}, H:{term_height}]"
         stdscr.addstr(0, 0, whstr, curses.color_pair(1))
 
         ###########################################################################################
@@ -66,7 +66,7 @@ def draw_menu(stdscr):
         ###########################################################################################
 
         # Render status bar at the bottom
-        statusbarstr = "[STATUS BAR] Press 'q' to exit | Cursor Position: {}, {}".format(cursor_x, cursor_y)
+        statusbarstr = f"[STATUS BAR] Press 'q' to exit | Cursor Position: {cursor_x}, {cursor_y}"
         # stdscr.attron(curses.color_pair(3))
         stdscr.addstr(term_height - 1, 0, statusbarstr)
         stdscr.addstr(term_height - 1, len(statusbarstr), " " * (term_width - len(statusbarstr) - 1),
@@ -78,7 +78,7 @@ def draw_menu(stdscr):
         # Declaration of strings (ensuring that strings are not larger than screen term_width)
         title = "AWS Certified Architect Practice Exam"[:term_width - 1]
         subtitle = "Written by Ismet Handzic"[:term_width - 1]
-        keystr = "Last key pressed: {}".format(k)[:term_width - 1]
+        keystr = f"Last key pressed: {k}"[:term_width - 1]
 
         # Centering label calculations and what position in terminal to start
         start_x_title = int((term_width // 2) - (len(title) // 2) - len(title) % 2)
