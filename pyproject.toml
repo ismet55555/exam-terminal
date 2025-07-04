@@ -41,6 +41,7 @@ select = [
 
 # Only ignore what conflicts with your current codebase
 ignore = [
+    "E501",      # Line too long
     "PLR0913",   # Too many arguments
     "PLR0915",   # Too many statements
     "PLR2004",   # Magic values
@@ -70,3 +71,10 @@ quote-style = "single"
 "tests/**" = ["PLR2004", "S101"]  # Allow magic values and asserts in tests
 "**/__init__.py" = ["F401"]       # Allow unused imports
 "setup.py" = ["ALL"]              # Ignore setup.py entirely
+"dev_stuff/**" = ["ALL"]
+
+# UI drawing functions - complex terminal interface logic
+"exam_terminal/ExamTerminal.py" = ["C901", "PLR0912"]  # Allow complex UI functions
+
+# Utility functions - complex logic with many return paths
+"exam_terminal/utility.py" = ["PLR0911"]  # Allow many return statements

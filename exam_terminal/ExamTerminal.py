@@ -272,10 +272,10 @@ class ExamTerminal:
         message_box.box()
         message_box.border()
 
-        for l, line in enumerate(message_lines):
+        for line_index, line in enumerate(message_lines):
             # Add text each line to box (Text is relative to box -> y, x)
             x = width // 2 - len(line) // 2
-            y = l + 2
+            y = line_index + 2
             message_box.addstr(y, x, line)
 
         # Refresh the message box
@@ -385,8 +385,8 @@ class ExamTerminal:
             menu_item_wrap: Union[str, list[str]] = ' '
             for x, line_text in zip(start_x, lines):
                 menu_item_wrap = wrapper_menu_item.wrap(text=line_text)
-                for l, line in enumerate(menu_item_wrap):
-                    scr.addstr(start_y + l - 1, x, line, self.color['default'])
+                for line_index, line in enumerate(menu_item_wrap):
+                    scr.addstr(start_y + line_index - 1, x, line, self.color['default'])
             start_y += len(menu_item_wrap)
 
             # lines = ["Exam Type:", self.exam_contents['exam']['exam_type']]
@@ -617,9 +617,9 @@ class ExamTerminal:
 
             # Wrap and show the question
             question_wrap = wrapper_question.wrap(text=question['question'])
-            l = 0
-            for l, line in enumerate(question_wrap):
-                scr.addstr(start_y + l - 1, question_x, line, self.color['default'] | self.decor['bold'])
+            line_index = 0
+            for line_index, line in enumerate(question_wrap):
+                scr.addstr(start_y + line_index - 1, question_x, line, self.color['default'] | self.decor['bold'])
 
             # Message of number of selections needed for current question
             message = []
@@ -633,7 +633,7 @@ class ExamTerminal:
             # Construct the question message
             if question['question_multiselect'] or question_timer:
                 color = self.color['grey-light']
-                scr.addstr(start_y + l, question_x, '(' + ', '.join(message) + ')', color)
+                scr.addstr(start_y + line_index, question_x, '(' + ', '.join(message) + ')', color)
                 line_offset = 1
             else:
                 line_offset = 0
@@ -644,15 +644,15 @@ class ExamTerminal:
             selection_offset = len(question_wrap) + 3 + line_offset
 
             # Wrap and show selection
-            for s, selection in enumerate(question['selection']):
+            for selection_index, selection in enumerate(question['selection']):
                 selection_wrap = wrapper_selection.wrap(text=selection)
-                for l, line in enumerate(selection_wrap):
+                for line_index, line in enumerate(selection_wrap):
                     # Style selection and draw selector
-                    if s == self.selection_index:
+                    if selection_index == self.selection_index:
                         color = self.color['default'] | self.decor['bold']
                         # Draw the selection indicator
                         scr.addstr(
-                            start_y + selection_offset + l - 1,
+                            start_y + selection_offset + line_index - 1,
                             selection_x - 2,
                             self.selection_indicator,
                             self.color['default'] | self.decor['bold'],
@@ -662,10 +662,10 @@ class ExamTerminal:
 
                     # Style already selected indexes (for multi-select)
                     if question['question_multiselect']:
-                        if s in question['answered_indexes']:
+                        if selection_index in question['answered_indexes']:
                             color = self.color['black-white']
 
-                    scr.addstr(start_y + selection_offset + l - 1, selection_x + 2, line, color)
+                    scr.addstr(start_y + selection_offset + line_index - 1, selection_x + 2, line, color)
 
                 # Set the offset to the next line
                 selection_offset += len(selection_wrap) + 1
