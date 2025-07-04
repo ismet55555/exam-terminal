@@ -16,12 +16,14 @@ twine = "*"
 wheel = "*"
 
 [packages]
-click = "*"
-fpdf2 = "*"
 PyYAML = "*"
-requests = "*"
-windows-curses = {version = "*", platform_system = "== 'Windows'"}
 exam-terminal = {editable = false, path = "."}
+fpdf2 = "*"
+pypiwin32 = {version = "*", markers = "sys_platform == 'win32' or platform_system == 'Windows' or os_name =='nt'"}
+pywin32 = {version = "*", markers = "sys_platform == 'win32' or platform_system == 'Windows' or os_name =='nt'"}
+requests = "*"
+click = "*"
+windows-curses = {version = "*", markers = "sys_platform == 'win32' or platform_system == 'Windows' or os_name =='nt'"}
 # See setup.py and requirements.txt for exam-terminal dependencies
 
 [pipenv]
